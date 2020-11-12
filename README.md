@@ -1,3 +1,3 @@
 # StatewidePlanningMap
 
-https://txdot.github.io/StatewidePlanningMap/
+https://txdot.github.io/StatewidePlanningMap/StatewidePlanningMap.html
