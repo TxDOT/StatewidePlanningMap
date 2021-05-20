@@ -445,6 +445,36 @@
     	display: none !important;
 	}
 
+  /*CSS for Query Form*/
+  .qryButton {
+    width: 100%;
+    background-color: gray;
+    color: white;
+    padding: 7px 10px;
+    margin: 4px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: Arial;
+    font-size: 14px;
+  }
+  .qryInputs {
+    width: 100%;
+    padding: 7px 10px;
+    margin: 4px 0px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: Arial;
+    font-size: 14px;
+  }
+  .qryLabel {
+    font-family: Arial;
+    font-size: 14px;
+  }
+  /*End CSS for Query Form*/
+
   </style>
   <!-- Google Analystics -->
   <script>
@@ -504,6 +534,12 @@
 	var google;
 	var TxDOTVectorTileLayer;
 	var appVersion = "4.4.6 Ohio";
+
+  //Route Event Variables
+	var dropbox;
+  var currentRoute = "Nope";
+  var previousRoute = "";
+  var currentGeometry;
 
 	//Overlay variables
 	var aadtLyr;
@@ -625,13 +661,14 @@
 		"esri/layers/VectorTileLayer",
         "esri/layers/WMTSLayer",
         "esri/layers/WMTSLayerInfo",
+        "esri/geometry/Circle",
 
 		"dojo/domReady!"], function (Map, OpenStreetMapLayer, esriRequest, Renderer, domConstruct, LayerInfo, Scalebar, on, domClass, query, Moveable, HomeButton,
 			Query, QueryTask, arcgisUtils, domUtils, Legend, Search, webMercatorUtils, dom, KMLLayer, parser, Draw, geometryEngine,
 			geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,
 			SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
 			SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,
-			Polyline, Point, Font, PopupTemplate, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo) {
+			Polyline, Point, Font, PopupTemplate, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo, Circle) {
 
 		parser.parse();
 
@@ -681,6 +718,7 @@
 
 		//Add Roadway Inventory data to map but don't show until needed during Query.
 		addInventoryData();
+    addBridgeData();
 
 		// Add Home Button
           var home = new HomeButton({
@@ -716,6 +754,12 @@
             };
         });
 
+        on(dom.byId("btnAddSecondCondition"), "click", addSecondCondition);
+        on(dom.byId("btnRemoveLastCondition"), "click", removeLastCondition);
+        on(dom.byId("btnRunQuery"), "click", runQuery);
+        on(dom.byId("radBridge"), "click", activateBridge);
+        on(dom.byId("radRoadwayInventory"), "click", activateRoadwayInventory);
+
 		map.on("click", logCoords);
         map.on("click", identRouteForM);
         map.on("mouse-up", function() {
@@ -727,6 +771,487 @@
 		map.on("click", clearMeasuredLineGraphic);
 		map.on("mouse-move", newCoords);
 		//map.on("load",turnOnTop100);
+
+    //- - - Drag and Drop Route Events - - -
+    map.on("load", addDropListeners);
+
+function addDropListeners() {
+  dropbox = document.getElementById("mapDiv");
+  dropbox.addEventListener("dragenter", dragenter, false);
+  dropbox.addEventListener("dragover", dragover, false);
+  dropbox.addEventListener("drop", drop, false);
+  }
+
+function dragenter(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function dragover(e) {
+  e.stopPropagation();
+  e.preventDefault();
+}
+
+function drop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  const dt = e.dataTransfer;
+  const files = dt.files;
+
+  readFile(files);
+}
+
+function readFile(input) {
+  var fileType = getRightCharacters(input[0].name,4);
+
+  if (fileType==".csv") {
+    map.graphics.clear();
+
+    var file = input[0];
+    var reader = new FileReader();
+
+    reader.readAsText(file);
+
+    reader.onload = function() {
+      mapIt(reader.result.split("\n"));
+    };
+
+    reader.onerror = function() {
+      console.log(reader.error);
+    };
+  }
+  else {
+    alert("Only .csv files are supported at this time.");
+    document.getElementById("fileLoad").value="";
+  }
+}
+
+function columnsList(theColumns) {
+        var columnAssignments = {};
+        var columns = theColumns.split("|");
+        var fileRoute = columns.indexOf("RIA_RTE_ID");
+        var fileFrom = columns.indexOf("FRM_DFO");
+        var fileTo = columns.indexOf("TO_DFO");
+        var fileColor = columns.indexOf("COLOR");
+        var fileWidth = columns.indexOf("WIDTH");
+        var fileDescription = columns.indexOf("DESCRIPTION");
+
+        if (fileRoute>=0) {
+          columnAssignments.RTE_NM = fileRoute;
+        }
+        if (fileFrom>=0) {
+          columnAssignments.FROM = fileFrom;
+        }
+        if (fileTo>=0) {
+          columnAssignments.TO = fileTo;
+        }
+        if (fileColor>=0) {
+          columnAssignments.COLOR = fileColor;
+        }
+        if (fileWidth>=0) {
+          columnAssignments.WIDTH = fileWidth;
+        }
+        if (fileDescription>=0) {
+          columnAssignments.DESCRIPTION = fileDescription;
+        }
+
+        return columnAssignments;
+    }
+
+function getRouteType(availableColumns) {
+  var routeCheck = "RTE_NM" in availableColumns;
+  var fromCheck = "FROM" in availableColumns;
+  var toCheck = "TO" in availableColumns;
+  var theRoute;
+  var fromStatus = false;
+  var toStatus = false;
+
+  if (routeCheck) {
+    theRoute = "RTE_NM";
+  }
+  else {
+    theRoute = "None";
+  }
+
+  if (fromCheck) {
+    fromStatus = true;
+  }
+
+  if (toCheck) {
+    toStatus = true;
+  }
+
+  var headerStatus = [theRoute,fromCheck,toCheck];
+
+  return headerStatus;
+}
+
+function setOrder(currentRecord,availableColumns) {
+        var orderedData = [];
+        var routeType = getRouteType(availableColumns);
+
+        orderedData.push(routeType[0]);
+
+        //Checking for route identifier
+        if (routeType[0]=="RTE_NM") {
+          orderedData.push(currentRecord[availableColumns.RTE_NM].toUpperCase());
+        }
+
+        orderedData.push(Number(currentRecord[availableColumns.FROM]));
+        orderedData.push(Number(currentRecord[availableColumns.TO]));
+
+        //Checks for missin elements and application of defaults
+        var colorCheck = "COLOR" in availableColumns;
+        var widthCheck = "WIDTH" in availableColumns;
+        var descriptionCheck = "DESCRIPTION" in availableColumns;
+
+        //Check Color, this one is causing it to crash for some reason
+        if (colorCheck) {
+          orderedData.push(currentRecord[availableColumns.COLOR]);
+        }
+        else {
+          // orderedData.push("#0000FF");
+          orderedData.push(getRandomColor());
+        }
+
+        //Check Width
+        if (widthCheck) {
+          orderedData.push(currentRecord[availableColumns.WIDTH]);
+        }
+        else {
+          orderedData.push("4");
+        }
+
+        //Check Description
+        if (descriptionCheck) {
+          orderedData.push(currentRecord[availableColumns.DESCRIPTION]);
+        }
+        else {
+          orderedData.push("No description available.<br><br>Adding location info. <br>From: " + currentRecord[availableColumns.FROM] + "<br>To: " + currentRecord[availableColumns.TO]);
+        }
+
+        return orderedData;
+    }
+
+function mapIt(theData) {
+  var currentRecord = [];
+  var organizedRecord = [];
+  var fileHeaderCheck = theData[0].trim();
+  var availableColumns = columnsList(fileHeaderCheck);
+
+  console.log("Record Count = " + theData.length);
+
+  if (theData.length>=100) {
+    var r = confirm("Mapping " + theData.length + " records could take a few minutes. The recommended record count is 100 or less. Continue?");
+    if (r != true) {
+      return;
+    }
+  }
+
+  //checking for a RTE_NM or CTRL_SECT_NBR, FROM, TO
+  var routeType = getRouteType(availableColumns);
+
+  if (routeType[0]=="None"||routeType[1]==false||routeType[2]==false) {
+    alert("No valid route or measures fields found. Please check your data and try again.");
+    return;
+  }
+
+  if (Object.keys(availableColumns).length>=3) {
+    for (var i = 1; i < theData.length; i ++) {
+      currentRecord = theData[i].split("|");
+      organizedRecord = setOrder(currentRecord,availableColumns);
+      // console.log(organizedRecord);
+      if (currentRecord.length>0) {
+        getSegmentWithM(organizedRecord);
+      }
+    }
+  }
+  else {
+    alert("File header record unrecognized.\n\nMinimum columns expected:\nRIA_RTE_ID|FRM_DFO|TO_DFO\nor\nCTRL_SECT_NBR|BMP|EMP\n\nFull header record example:\n\nRIA_RTE_ID|FRM_DFO|TO_DFO|COLOR|WIDTH|DESCRIPTION\n\nPlease check your file and try again.");
+  }
+}
+
+    function getSegmentWithM(theData) {
+      // console.log(theData);
+        //Checking for undefined parameters, stop process if found.
+        for (var i = 0; i < theData.length; i++) {
+          if (theData[i]==undefined) {
+            console.log("Too few parameters.  Please check the URL");
+            console.log(theData);
+            return;
+          }
+        }
+
+        currentRoute = theData[1];
+
+        if (currentRoute==previousRoute) {
+          findVertices("static",currentGeometry,theData[1],theData[2],theData[3],theData[4],theData[5],theData[6]);
+        }
+        else {
+          var xmlhttp = new XMLHttpRequest();
+          //Comment the following line out for synchronous
+          //xmlhttp.responseType = 'json';
+          xmlhttp.onreadystatechange=function() {
+            if (xmlhttp.readyState==4 && xmlhttp.status==200)	{
+              //Post edit activities
+              currentGeometry = xmlhttp.response;
+              findVertices("static",xmlhttp.response,theData[1],theData[2],theData[3],theData[4],theData[5],theData[6]);
+            }
+          };
+
+          var serviceString;
+          var paraString;
+
+          if (theData[0]=="RTE_NM"||theData[0]=="TE_NM") {
+            serviceString = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways/FeatureServer/0";
+            paraString = "/query?f=json&where=RTE_NM='" + theData[1] + "'&returnGeometry=true&returnM=true";
+          }
+          if (theData[0]=="CTRL_SECT_NBR"||theData[0]=="TRL_SECT_NBR") {
+            serviceString = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Control_Sections/FeatureServer/0";
+            paraString = "/query?f=json&where=CTRL_SECT_NBR='" + theData[1] + "'&returnGeometry=true&returnM=true";
+          }
+
+          previousRoute = currentRoute;
+
+          var queryString = serviceString+paraString;
+          //Synchronous
+           xmlhttp.open("POST",queryString,false);
+          //Asynchronous
+          //xmlhttp.open("POST",queryString,true);
+          xmlhttp.send();
+        }
+    }
+
+function findVertices(requestType,geomWithM,theRoute,theFrom,theTo,theColor,theSize,theDescription) {
+        var theGeomPart;
+        var theGeometry;
+
+        if (requestType=="static") {
+          theGeometry = JSON.parse(geomWithM);
+        }
+        else {
+          theGeometry = geomWithM;
+        }
+
+        // console.log(geomWithM);
+
+        var PrevCoordM;
+        var CurCoordM;
+        var partNumberBegin;
+        var partNumberEnd;
+        var vertexNumberBegin;
+        var vertexNumberEnd;
+        var beginM = 0;
+        var endM = 0;
+
+        var beginPoint=[];
+        var endPoint=[];
+
+        //Round measure parameters to prevent errors outside measure range
+        theFrom = roundToDecimalPlace(theFrom,3);
+        theTo = roundToDecimalPlace(theTo,3);
+
+        var maxFeatureM = 0;
+        var minFeatureM = 0;
+        var maxCoordsLength = 0;
+        //var tempTo = 0;
+
+        for (var a=0; a < theGeometry.features.length; a++) {
+          theGeomPart = theGeometry.features[a].geometry.paths;
+
+          //Check Event M's and Feature M's
+          maxCoordsLength = theGeometry.features[a].geometry.paths[0].length-1;
+          minFeatureM = roundToDecimalPlace(theGeometry.features[a].geometry.paths[0][0][2],3);
+          maxFeatureM = roundToDecimalPlace(theGeometry.features[a].geometry.paths[0][maxCoordsLength][2],3);
+
+          //if from >= minM and to <= maxM run normally
+          //if from < minM and to > maxM take the whole segment
+
+          if (theFrom<=minFeatureM&&theTo>=maxFeatureM) {
+            //Take the whole segment
+            partNumberBegin = a;
+            partNumberEnd = a;
+            vertexNumberBegin = 0;
+            vertexNumberEnd = theGeometry.features[a].geometry.paths[0].length-1;
+            beginM = minFeatureM;
+            endM = maxFeatureM;
+            theFrom = minFeatureM;
+            theTo = maxFeatureM;
+          }
+          else {
+            //Run normally
+            for (var j = 1; j < theGeomPart[0].length; j++) {
+              PrevCoordM = roundToDecimalPlace(theGeomPart[0][j-1][2],3);
+              CurCoordM = roundToDecimalPlace(theGeomPart[0][j][2],3);
+
+              //Finding the Begin Vertex
+              if (theFrom>=PrevCoordM&&theFrom<=CurCoordM) {
+                partNumberBegin = a;
+                vertexNumberBegin = j-1;
+                beginM = theGeomPart[0][j-1][2];
+                beginPoint.push(theGeomPart[0][j-1][0],theGeomPart[0][j-1][1]);
+              }
+
+              //Finding the End Vertex
+              if (theTo>=PrevCoordM&&theTo<=CurCoordM) {
+                partNumberEnd = a;
+                vertexNumberEnd = j;
+                endM = theGeomPart[0][j][2];
+                endPoint.push(theGeomPart[0][j][0],theGeomPart[0][j][1]);
+              }
+
+            }
+          }
+        }
+
+        if (partNumberBegin!=partNumberEnd) {
+          return;
+        }
+
+        //Build Line 102100
+        var newPolyline = new esri.geometry.Polyline(new esri.SpatialReference({wkid:102100}));
+        newPolyline.type = "polyline";
+        var tmpAttLine = [];
+
+        for (var x = vertexNumberBegin; x <= vertexNumberEnd; x++) {
+          tmpAttLine.push([theGeometry.features[partNumberBegin].geometry.paths[0][x][0],theGeometry.features[partNumberBegin].geometry.paths[0][x][1]]);
+        }
+
+        newPolyline.addPath(tmpAttLine);
+
+        //4326
+        var spatialReferenceLatLong = new SpatialReference({wkid:4326});
+
+        //-- Set Radius for Begin Circle --
+        var beginCircleRadius = Math.abs(beginM-theFrom) * 1609.344; //was theFrom
+
+        if (beginCircleRadius<=0) {
+          beginCircleRadius=1;
+        }
+
+        var beginCircleLatLong = webMercatorUtils.xyToLngLat(tmpAttLine[0][0], tmpAttLine[0][1]);
+
+        //Build Circle from begin point
+        var beginCircle = new Circle([beginCircleLatLong[0], beginCircleLatLong[1]],{
+          "radius": beginCircleRadius,
+          "radiusUnit": Units.METERS,
+          "geodesic": true,
+          "spatialReference": spatialReferenceLatLong
+        });
+
+        //Convert Begin Circle to Polygon 4326
+        var beginPolygon = new esri.geometry.Polygon(new esri.SpatialReference({wkid:4326}));
+        beginPolygon.type = "polygon";
+        beginPolygon.addRing(beginCircle.rings[0]);
+
+        //Convert Lat Long to Web Mercator, so everything is the same
+        var beginPolygonWebMer = webMercatorUtils.geographicToWebMercator(beginPolygon);
+
+        //-- Set Radius for End Circle --
+        var endCircleRadius = Math.abs(endM-theTo) * 1609.344; //was theTo
+
+        if (endCircleRadius<=0) {
+          endCircleRadius=1;
+        }
+
+        var endCircleLatLong = webMercatorUtils.xyToLngLat(tmpAttLine[tmpAttLine.length-1][0], tmpAttLine[tmpAttLine.length-1][1]);
+
+        //Build Circle from end point
+        var endCircle = new Circle([endCircleLatLong[0], endCircleLatLong[1]],{
+          "radius": endCircleRadius,
+          "radiusUnit": Units.METERS,
+          "geodesic": true,
+          "spatialReference": spatialReferenceLatLong
+        });
+
+        //Convert End Circle to Polygon 4326
+        var endPolygon = new esri.geometry.Polygon(new esri.SpatialReference({wkid:4326}));
+        endPolygon.type = "polygon";
+        endPolygon.addRing(endCircle.rings[0]);
+
+        //Convert Lat Long to Web Mercator, so everything is the same
+        var endPolygonWebMer = webMercatorUtils.geographicToWebMercator(endPolygon);
+
+        //Trimming event linework if needed from beginning and ending of segment
+        var finalLinework = newPolyline;
+        var beginClip;
+        var endClip;
+
+        if (Math.abs(beginM-theFrom)>=.001) { // was .002
+          beginClip = intersectLinework(newPolyline,beginPolygonWebMer);
+          finalLinework = cutLinework(newPolyline,beginClip);
+        }
+
+        if (Math.abs(endM-theTo)>=.001) { // was .002
+          endClip = intersectLinework(newPolyline,endPolygonWebMer);
+          finalLinework = cutLinework(finalLinework,endClip);
+        }
+
+        if (tmpAttLine.length>1) {
+          //mappedRecords.push(finalLinework);
+          //console.log(finalLinework);
+          addEventToMap(finalLinework,theRoute,theFrom,theTo,theColor,theSize,theDescription,beginPolygon,endPolygon);
+          // drawPoint(beginPoint,"Begin","#FF0000");
+          // drawPoint(endPoint,"End","#0000FF");
+        }
+        else {
+          alert("No points found within range " + theFrom + "-" + theTo);
+        }
+
+      }
+
+function intersectLinework(linework,polygon) {
+  var newGeometry = geometryEngine.intersect(linework, polygon);
+  return newGeometry;
+}
+
+function cutLinework(linework,clipper) {
+  var newGeometry = geometryEngine.difference(linework,clipper);
+  return newGeometry;
+}
+
+function addEventToMap(theGeom,theRoute,theFrom,theTo,theColor,theSize,theDescription,beginPolygon,endPolygon) {
+  var symbol = new esri.symbol.SimpleLineSymbol("solid", theColor, theSize);
+
+  //Replace All, new method not common enough in new browsers yet
+  //theDescription = theDescription.replaceAll("%20", " ");
+
+  //Replace All, works in all browsers
+  theDescription = theDescription.replace(/%20/g, ' ');
+
+  var attr = {"Route Name":theRoute,"Description":theDescription,"From":theFrom,"To":theTo};
+  var infoTemplate = new InfoTemplate("${Route Name}","<br/>${Description} <br/><br/>");
+
+  // console.log(theGeom);
+
+  map.graphics.add(new esri.Graphic(theGeom, symbol, attr, infoTemplate));
+}
+
+function roundToDecimalPlace(value,decimals) {
+  return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+
+function getRightCharacters(theData,theNumber) {
+  //console.log(theData.substring(theData.length-theNumber, theData.length));
+  return theData.substring(theData.length-theNumber, theData.length);
+}
+
+function getRandomColor() {
+  var availableColors = ["#ff0000","#ffbf00","#ffff00","#00ff00","#0000ff","#808080"];
+  var ranColor = availableColors[getRandomIntInclusive(0,availableColors.length-1)];
+  return ranColor;
+}
+
+//Random Number
+function getRandomIntInclusive(min,max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  // console.log(Math.floor(Math.random() * (max - min + 1)) + min);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+//- - - End Drag and Drop Route Events - - -
 
         var scalebar = new Scalebar({
           map: map,
@@ -1993,15 +2518,16 @@
 			map.graphics.clear();
 			map.infoWindow.hide();
 			clearMeasure();
-            document.getElementById("mapDiv_container").style.cursor = "default"; // reset cursor to default -mw
-			document.getElementById("rteName").value = "";
-			document.getElementById("attrValue").value = "";
-			document.getElementById("attrSelect").value = "ADT_CUR";
-			document.getElementById("opSelect").value = "opEqual";
-			document.getElementById("queryResults").innerHTML = "";
+      document.getElementById("mapDiv_container").style.cursor = "default"; // reset cursor to default -mw
+			// document.getElementById("rteName").value = "";
+			// document.getElementById("attrValue").value = "";
+			// document.getElementById("attrSelect").value = "ADT_CUR";
+			// document.getElementById("opSelect").value = "opEqual";
+			// document.getElementById("queryResults").innerHTML = "";
 
-		    if (activeTab!="queryTab") {
+		  if (activeTab!="queryTab") {
 				projectsRI.hide();
+        bridgeLyr.hide();
 			}
 			if (activeTab=="queryTab"||activeTab=="sketchTab") {
 				hideAllOverlays();
@@ -2276,6 +2802,7 @@
             if (STRAHNETLyr) {STRAHNETLyr.hide();}
             if (bikeLayer) {bikeLayer.hide();}
 			clearStyle("tocData");
+      map.graphics.clear();
 		}
 
 		dojo.query(".Overlay").forEach(function (result){
@@ -3723,8 +4250,9 @@
 					else {
 						tableText = "";
 						tableText = "See the <a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank'>Bridge Coding Guide</a> for descriptions of each coded domain value.";
-						tableText += "<br><br><table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-						tableText += "<tr><td>Bridge ID</td><td>${BRDG_ID}</td></tr>";
+            tableText += "<br><br><table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+            var bridgeLink = "http://iapps/apps/txdot_gis_portal/BridgeReport.aspx?&BrgID=" + "${BRDG_ID}" + "&rc:Parameters=false";
+            tableText += "<tr><td>Bridge ID</td><td><a href='" + bridgeLink + "' target='_blank'>${BRDG_ID}</a></td></tr>";
 						tableText += "<tr><td>Operational Status</td><td>${OPRTL_STAT}</td></tr>";
 						tableText += "<tr><td>Facility Carried</td><td>${FACLTY_CARRD_BY_STRUC}</td></tr>";
 						tableText += "<tr><td>Feature Crossed</td><td>${FEAT_INTSECT}</td></tr>";
@@ -3833,7 +4361,6 @@
 			scaleDependentQueries();
 		}
 		function addInventoryData() {
-
 			tableText = "";
 			tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 			tableText += "<tr><td>Route Name</td><td>${HWY}</td></tr>";
@@ -3862,95 +4389,96 @@
 			map.addLayer(projectsRI);
 		}
 
-		on(dom.byId("resetQuery"), "click", resetQuery);
-    	//this function resets the query parameters, removes RI graphics/infowindows, and recenters the map
+    function addBridgeData() {
+  			tableText = "";
+  			tableText = "See the <a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank'>Bridge Coding Guide</a> for descriptions of each coded domain value.";
+  			tableText += "<br><br><table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+        var bridgeLink = "http://iapps/apps/txdot_gis_portal/BridgeReport.aspx?&BrgID=" + "${BRDG_ID}" + "&rc:Parameters=false";
+        tableText += "<tr><td>Bridge ID</td><td><a href='" + bridgeLink + "' target='_blank'>${BRDG_ID}</a></td></tr>";
+  			tableText += "<tr><td>Operational Status</td><td>${OPRTL_STAT}</td></tr>";
+  			tableText += "<tr><td>Facility Carried</td><td>${FACLTY_CARRD_BY_STRUC}</td></tr>";
+  			tableText += "<tr><td>Feature Crossed</td><td>${FEAT_INTSECT}</td></tr>";
+  			tableText += "<tr><td>Location</td><td>${LOCN}</td></tr>";
+  			tableText += "<tr><td>Latitude</td><td>${LAT_DD}</td></tr>";
+  			tableText += "<tr><td>Longitude</td><td>${LONG_DD}</td></tr>";
+  			tableText += "<tr><td>Deck</td><td>${DECK_COND_RTNG}</td></tr>";
+  			tableText += "<tr><td>Superstructure</td><td>${SUPERSTRUC_COND_RTNG}</td></tr>";
+  			tableText += "<tr><td>Substructure</td><td>${SUBSTRUC_COND_RTNG}</td></tr>";
+  			tableText += "<tr><td>Culvert</td><td>${CULV_COND_RTNG}</td></tr>";
+  			tableText += "<tr><td>Structural Evaluation</td><td>${APPRSL_RTNG_STRUC_EVAL}</td></tr>";
+  			tableText += "<tr><td>Deck Geometry</td><td>${APPRSL_RTNG_DECK_GMTRY}</td></tr>";
+  			tableText += "<tr><td>Underclearances, Vertical and Horizontal</td><td>${APPRSL_RTNG_VERT_HRZNTL_UNDR}</td></tr>";
+  			tableText += "<tr><td>Waterway Adequacy</td><td>${APPRSL_RTNG_WATRWY}</td></tr>";
+  			tableText += "<tr><td>Approach Roadway Alignment</td><td>${APPRSL_RTNG_APRCH_ALGN}</td></tr>";
+  			tableText += "<tr><td>Year Built</td><td>${YR_BLT}</td></tr>";
+  			tableText += "<tr><td>Year Reconstructed or Widened</td><td>${YR_RECNSTR}</td></tr>";
+  			tableText += "<tr><td>Structure Length</td><td>${STRUC_LNGTH}</td></tr>";
+  			tableText += "<tr><td>NBIS Bridge Length</td><td>${NBIS_BRDG_LNGTH}</td></tr>";
+  			tableText += "</table>";
+
+  			var infoTemplate = new InfoTemplate("Bridge:",tableText);
+  			var projectsBridgeUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Bridges/FeatureServer/0";
+
+  			bridgeLyr = new FeatureLayer(projectsBridgeUrl, {id:"Bridges",visible: false,outFields:["*"], infoTemplate: infoTemplate});
+  			map.addLayer(bridgeLyr);
+    }
+
+    //this function resets the query parameters, removes RI or bridge graphics/infowindows, and recenters the map
 		function resetQuery() {
-			document.getElementById("rteName").value = "";
-			document.getElementById("attrValue").value = "";
-			document.getElementById("attrSelect").value = "ADT_CUR";
-			document.getElementById("opSelect").value = "opEqual";
-			document.getElementById("queryResults").innerHTML = "Query parameters have been reset, please enter new values";
-		  	map.centerAndZoom(webMercatorUtils.geographicToWebMercator(theCenter),theZoom);
-			map.infoWindow.hide();
-			projectsRI.hide();
+      document.getElementById("print").innerHTML = "";
+      document.getElementById("conditions").value = "";
+      document.getElementById("queryResults").innerHTML = "Query parameters have been reset, please enter new values";
+      queries = [];
+      map.centerAndZoom(webMercatorUtils.geographicToWebMercator(theCenter),theZoom);
+      map.infoWindow.hide();
+      projectsRI.setDefinitionExpression("OBJECTID>=0");
+      projectsRI.hide();
+      bridgeLyr.setDefinitionExpression("OBJECTID>=0");
+      bridgeLyr.hide();
 		}
 
+    function selectAttributes(theQuery) {
+			if (document.getElementById("radBridge").checked) {
+				bridgeLyr.setDefinitionExpression(theQuery);
+				noResults("queryResults","Running Query.....");
 
-		on(dom.byId("cmdRunQuery"), "click", gatherQueryInfo);
-		function gatherQueryInfo() {
-			/*if (validateQueryForm()!=true) {
-				updateExternalLinks();
-				return;
-			}*/
-
-			var theRteName = document.getElementById("rteName").value;
-			var theAttrSelected = document.getElementById("attrSelect").value;
-			var theOpSelected = document.getElementById("opSelect").value;
-			var theValue = document.getElementById("attrValue").value;
-			var theOperator = "";
-
-			theRteName = theRteName.toUpperCase();
-
-			if (theOpSelected=="opGreaterThan") {
-			  theOperator = ">";
-			}
-			if (theOpSelected=="opLessThan") {
-			  theOperator = "<";
-			}
-			if (theOpSelected=="opEqual") {
-			  theOperator = "=";
-			}
-
-			var theQuery = "";
-
-			if (theRteName=="*") {
-				theQuery = "REC=1 and HWY_STAT>3 and " + theAttrSelected + theOperator + theValue;
-			}
-			else if (theRteName=="IH") {
-				theQuery = "REC=1 and HWY_STAT>3 and HSYS='IH' and " + theAttrSelected + theOperator + theValue;
-			}
-			else if (theRteName=="US") {
-				theQuery = "REC=1 and HWY_STAT>3 and HSYS='US' and " + theAttrSelected + theOperator + theValue;
-			}
-			else if (theRteName=="SH") {
-				theQuery = "REC=1 and HWY_STAT>3 and HSYS='SH' and " + theAttrSelected + theOperator + theValue;
-			}
-			else if (theRteName=="SL") {
-				theQuery = "REC=1 and HWY_STAT>3 and HSYS='SL' and " + theAttrSelected + theOperator + theValue;
-			}
-			else if (theRteName=="FM") {
-				theQuery = "REC=1 and HWY_STAT>3 and HSYS='FM' and " + theAttrSelected + theOperator + theValue;
-			}
-			else if (theRteName=="RM") {
-				theQuery = "REC=1 and HWY_STAT>3 and HSYS='RM' and " + theAttrSelected + theOperator + theValue;
-			}
-			else {
-				theQuery = "REC=1 and HWY_STAT>3 and RIA_RTE_ID='" + theRteName + "-KG' and " + theAttrSelected + theOperator + theValue;
-			}
-
-			selectAttributes(theQuery);
-		}
-
-		function selectAttributes(theQuery) {
-			projectsRI.setDefinitionExpression(theQuery);
-			noResults("queryResults","Running Query.....");
-
-			projectsRI.selectFeatures(theQuery,FeatureLayer.SELECTION_NEW,function(featureSet){
-				if (featureSet.length>0) {
-				    if (featureSet.length<150) {
-						map.setExtent(graphicsUtils.graphicsExtent(featureSet));
-						noResults("queryResults",featureSet.length + " records returned.  Click mapped segments to view details.");
+				bridgeLyr.selectFeatures(theQuery,FeatureLayer.SELECTION_NEW,function(featureSet){
+					if (featureSet.length>0) {
+					    if (featureSet.length<150) {
+							map.setExtent(graphicsUtils.graphicsExtent(featureSet));
+							noResults("queryResults",featureSet.length + " records returned.  Click mapped segments to view details.");
+						}
+						else {
+							noResults("queryResults","More than 150 records returned.  Zoom out to view results, then click mapped segments to view details.");
+						}
+						bridgeLyr.show();
 					}
 					else {
-						noResults("queryResults","More than 150 records returned.  Zoom out to view results, then click mapped segments to view details.");
+						noResults("queryResults","Query returned 0 records.<br>Please try again.");
+						bridgeLyr.hide();
 					}
-					projectsRI.show();
-				}
-				else {
-					noResults("queryResults","Query returned 0 records.<br>Please try again.");
-					projectsRI.hide();
-				}
-			});
+				});
+			} else {
+				projectsRI.setDefinitionExpression(theQuery);
+				noResults("queryResults","Running Query.....");
+
+				projectsRI.selectFeatures(theQuery,FeatureLayer.SELECTION_NEW,function(featureSet){
+					if (featureSet.length>0) {
+					    if (featureSet.length<150) {
+							map.setExtent(graphicsUtils.graphicsExtent(featureSet));
+							noResults("queryResults",featureSet.length + " records returned.  Click mapped segments to view details.");
+						}
+						else {
+							noResults("queryResults","More than 150 records returned.  Zoom out to view results, then click mapped segments to view details.");
+						}
+						projectsRI.show();
+					}
+					else {
+						noResults("queryResults","Query returned 0 records.<br>Please try again.");
+						projectsRI.hide();
+					}
+				});
+			}
 		}
 
 		function noResults(theDiv,theText) {
@@ -4096,6 +4624,115 @@
         function beep() {
            var snd = new Audio("resources/engage.mp3");
            snd.play();
+        }
+        //---------------------------------------
+
+        function addSecondCondition() {
+    			if (document.getElementById("radBridge").checked) {
+    				var txtAttributes = document.getElementById("bridgeAttributes").value;
+    			} else {
+    				var txtAttributes = document.getElementById("riAttributes").value;
+    			}
+
+    			var txtOperator = document.getElementById("operators").value;
+    			var txtConditions = document.getElementById("conditions").value;
+
+          if (txtConditions.length<1) {
+              alert("Please add a condition.");
+              return;
+          }
+
+    			if (isNaN(txtConditions)) {
+    				txtConditions = "'" + txtConditions + "'";
+    			}
+
+    			if (getLeftCharacters(txtConditions,1)=="0") {
+    				txtConditions = "'" + txtConditions + "'";
+    			}
+
+          var currentValueCheck = queries.indexOf(txtAttributes + txtOperator + txtConditions);
+          if (currentValueCheck>=0) {
+              //Nothing, already there
+          }
+          else {
+              queries.push(txtAttributes + txtOperator + txtConditions);
+              listQueries();
+          }
+        }
+
+        function removeLastCondition() {
+            queries.pop();
+            listQueries();
+        }
+
+        function listQueries() {
+            var theOutput = "";
+            for (var i = 0; i < queries.length; i++) {
+                    theOutput += "<br>" + queries[i];
+            }
+
+            document.getElementById("print").innerHTML = theOutput;
+        }
+
+        var queries = [];
+        function runQuery() {
+    			if (document.getElementById("radBridge").checked) {
+    				var txtAttributes = document.getElementById("bridgeAttributes").value;
+    			} else {
+    				var txtAttributes = document.getElementById("riAttributes").value;
+    			}
+
+    			var txtOperator = document.getElementById("operators").value;
+    			var txtConditions = document.getElementById("conditions").value;
+
+          if (txtConditions.length<1) {
+              alert("Please add a condition.");
+              return;
+          }
+
+    			if (isNaN(txtConditions)) {
+    				txtConditions = "'" + txtConditions + "'";
+    			}
+
+    			if (getLeftCharacters(txtConditions,1)=="0") {
+    				txtConditions = "'" + txtConditions + "'";
+    			}
+
+          var currentValueCheck = queries.indexOf(txtAttributes + txtOperator + txtConditions);
+          if (currentValueCheck>=0) {
+              //Nothing, already there
+          }
+          else {
+              queries.push(txtAttributes + txtOperator + txtConditions);
+          }
+
+          listQueries();
+
+          var queryConditions = "";
+
+          for (var i = 0; i < queries.length; i++) {
+                  queryConditions += " AND "; //was &
+                  queryConditions += queries[i];
+          }
+
+          selectAttributes(getRightCharacters(queryConditions, queryConditions.length-5));
+        }
+
+    		function getLeftCharacters(theData,theNumber) {
+    		    //console.log(theData.substring(0, theNumber));
+    		    return theData.substring(0, theNumber);
+    		}
+
+        function activateBridge() {
+        	resetQuery();
+        	document.getElementById("bridgeAttributes").style.display="block";
+        	document.getElementById("riAttributes").style.display="none";
+        }
+
+        function activateRoadwayInventory () {
+        	resetQuery();
+        	document.getElementById("bridgeAttributes").style.display="none";
+        	document.getElementById("riAttributes").style.display="block";
         }
         //---------------------------------------
 	});
@@ -4314,36 +4951,110 @@
 		 <tr><td><button title="Clear Graphics" id="clearMeasure">Clear</button></td></tr>
       	</table>
 	  </div>
-	  <div id="queryTab">
-		<table class="tocTables">
-			<tr><th colspan=2>Query Inventory Data</th><tr>
-			<tr><td>Route:</td><td><input Class="queryFields" id="rteName" type="text"></td></tr>
-			<tr><td>Attribute:</td><td>
-				<select Class="queryFields" id="attrSelect">
-				  <option value="ADT_CUR">AADT</option>
-				  <option value="ADT_DESGN">AADT Future</option>
-				  <option value="TRK_AADT_PCT">Percent Truck</option>
-				  <option value="SPD_MAX">Speed Limit</option>
-				  <option value="NUM_LANES">Lanes</option>
-				  <option value="ROW_W_USL">ROW Width</option>
-				  <option value="SUR_W">Surface Width</option>
-				  <option value="RB_WID">Roadbed Width</option>
-				  <option value="MED_WID">Median Width</option>
-				</select>
-			</td></tr>
-			<tr><td>Operation:</td><td>
-			  <select Class="queryFields" id="opSelect">
-				  <option value="opEqual">Equals</option>
-				  <option value="opLessThan">Less Than</option>
-				  <option value="opGreaterThan">Greater Than</option>
-			  </select>
-			</td></tr>
-			<tr><td>Value:</td><td><input Class="queryFields" id="attrValue" type="number" ></td></tr>
-			<tr><td>&nbsp;</td><td align="left"><button id="cmdRunQuery" type="button" value="Run Query">Run Query</button></td>
-      		<tr><td>&nbsp;</td><td align="left"><button id="resetQuery" type="button" value="Reset Query">Reset Query</button></td>
-			<tr><td colspan=2>Route tips:<br>Format=IH0035,SL0001 etc.<br>Enter * for all routes<br>Enter IH for all Interstates<br>Enter US for all US Highways<br>Enter SH for all State Highways<br><br><div id="queryResults"></div></td></tr>
-		</table>
-	  </div>
+
+    <div id="queryTab">
+			<table class="tocTables">
+			<tr><th>Choose Query Layer</th></tr>
+			</table>
+			<br>
+			<input type="radio" id="radBridge" name="dataType" value="bridge" title="Select Bridge Data">
+			<label for="bridge">Bridge</label><br>
+			<input type="radio" checked id="radRoadwayInventory" name="dataType" value="roadwayInventory" title="Select Roadway Inventory Data">
+			<label for="roadwayInventory">Roadway Inventory</label><br>
+			<br>
+			<br>
+            <form name="riInput">
+                <label class="qryLabel" for="riAttributes">Pick an Attribute</label>
+                <select class="qryInputs" id="riAttributes" name="riAttributes">
+                    <option title="Roadway Inventory ID with Roadbed Extension - Examples: IH0035-KG, IH0035-RG, IH0035-LG" value="RIA_RTE_ID">Roadway ID (Ex. IH0035-KG)</option>
+                    <option value="FRM_DFO">From DFO</option>
+                    <option value="TO_DFO">To DFO</option>
+                    <option value="C_SEC">Control Section</option>
+                    <option value="BMP">Begin Milepoint</option>
+                    <option value="EMP">End Milepoint</option>
+                    <option value="CO">County (Ex. 227)</option>
+                    <option value="DI">District (Ex. 15)</option>
+                    <option value="ACES_CTRL">Access Control</option>
+                    <option value="ADT_YEAR">Annual Average Daily Traffic Year</option>
+                    <option value="ADT_CUR">Annual Average Daily Traffic</option>
+                    <option value="DESGN_YR">Annual Average Daily Traffic - Future Year</option>
+                    <option value="AADT_DESGN">Annual Average Daily Traffic - Future</option>
+                    <option value="AADT_TRUCKS">Annual Average Daily Traffic - Truck</option>
+                    <option value="AADT_SINGLE_UNIT">Annual Average Daily Single Unit Truck</option>
+                    <option value="AADT_COMBINATION">Annual Average Daily Combined Axle Truck</option>
+                    <option value="CITY">City</option>
+                    <option value="DVMT">Daily Vehicle Miles Traveled</option>
+                    <option value="DTRKVMT">Daily Vehicle Miles Traveled - Truck</option>
+                    <option value="F_SYSTEM">Functional System</option>
+                    <option value="LN_MILES">Lane Miles</option>
+                    <option value="LANE_WIDTH">Lane Width</option>
+                    <option value="MED_TYPE">Median Type</option>
+                    <option value="MED_WID">Median Width</option>
+                    <option value="MPA">Metropolitan Planning Area</option>
+                    <option value="SEC_NHS">National Highway System</option>
+                    <option value="NUM_LANES">Number of Lanes</option>
+                    <option value="TRK_AADT_PCT">Percent Trucks</option>
+                    <option value="PCT_SADT">Percent Truck Single Unit</option>
+                    <option value="PCT_CADT">Percent Truck Combined Axle</option>
+                    <option value="SPD_MAX">Posted Speed Limit</option>
+                    <option value="ROW_MIN">Right of Way - Minimum</option>
+                    <option value="RB_WID">Roadbed Width</option>
+                    <option value="RU">Rural/Urban</option>
+                    <option value="SUR_W">Surface Width</option>
+                    <option value="SRF_TYPE">Surface Type</option>
+                    <option value="SEC_TRUNK">Texas Trunk System</option>
+                    <option value="TRF_STA_ID">Traffic Station ID</option>
+                </select>
+                <select style="display:none;" class="qryInputs" id="bridgeAttributes" name="bridgeAttributes">
+                    <option title="Roadway Name - Examples: IH 35" value="FACLTY_CARRD_BY_STRUC">Facility Carried (Ex. IH 35)</option>
+                    <option value="PRNCPL_INV_RTE">Principal Inventory Route</option>
+                    <option value="RTE_NBR">Route Number (Ex. 0035)</option>
+                    <option value="ADT">Annual Average Daily Traffic</option>
+                    <option value="ADT_TRK">Annual Average Daily Traffic - Truck</option>
+                    <option value="ADT_YR">Annual Average Daily Traffic Year</option>
+                    <option value="FUT_ADT_YR">Annual Average Daily Traffic - Future Year</option>
+                    <option value="FUT_ADT">Annual Average Daily Traffic - Future</option>
+					          <option value="APRCH_RDWAY_WIDTH">Approach Width</option>
+                    <option value="BRDG_ID">Bridge ID</option>
+                    <option value="CNTY_CD">County (Ex. 227)</option>
+                    <option value="CULV_COND_RTNG">Culvert Condition Rating</option>
+					          <option value="STATE_HWY_DEPT_DIST">District (Ex. 15)</option>
+                    <option value="DECK_COND_RTNG">Deck Condition Rating</option>
+                    <option value="APPRSL_RTNG_DECK_GMTRY">Deck Geometry</option>
+                    <option value="INV_RTE_HRZNTL_CLEAR">Inventory Route, Total Horizontal Clearance</option>
+                    <option value="MIN_VERT_CLEAR">Minimum Vertical Clearance</option>
+                    <option value="OPRTL_STAT">Operational Status</option>
+                    <option value="SPAN_TYPE">Span Type</option>
+                    <option value="STRUC_LNGTH">Structure Length</option>
+					          <option value="APPRSL_RTNG_STRUC_EVAL">Structural Evaluation</option>
+                    <option value="SUFF_RTNG">Sufficiency Rating</option>
+                    <option value="SUPERSTRUC_COND_RTNG">Superstructure Condition Rating</option>
+                    <option value="SUBSTRUC_COND_RTNG">Substructure Condition Rating</option>
+                    <option value="YR_BLT">Year Built</option>
+                </select>
+                <br><br>
+                <label class="qryLabel" for="operators">Pick an Operator</label>
+                <select class="qryInputs" id="operators" name="Operator">
+                    <option value="<">Less Than</option>
+                    <option value=">">Greater Than</option>
+                    <option value="=">Equal To</option>
+                </select>
+                <br><br>
+                <label class="qryLabel" for="conditions">Add Condition</label>
+                <input class="qryInputs" type="text" id="conditions" name="conditions"/>
+            </form>
+
+            <p id="print"></p>
+
+            <button id="btnAddSecondCondition" class="qryButton" title="Click to save current condition and add another.">Add Condition</button>
+            <button id="btnRemoveLastCondition" class="qryButton" title="Click to remove last condition on list.">Remove Last</button>
+            <button id="btnRunQuery" class="qryButton" title="Click to view results.">Run</button>
+            <br><br>
+            <div id="queryResults"></div>
+            <!--<br><br>-->
+            <!--<a href="https://gis-txdot.opendata.arcgis.com/datasets/txdot-roadway-inventory-specifications-2018" target="_blank">Inventory Attribute Specifications</a>	  	-->
+	  	</div>
+
       <div id="lrsTab">
 		<table class="tocTables">
          <tr><th colspan="2">LRS Readout Tool</th></tr>
