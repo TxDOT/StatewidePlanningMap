@@ -533,7 +533,7 @@
 	var layer1;
 	var google;
 	var TxDOTVectorTileLayer;
-	var appVersion = "4.4.6 Ohio";
+	var appVersion = "4.4.7 Springfield";
 
   //Route Event Variables
 	var dropbox;
@@ -759,6 +759,10 @@
         on(dom.byId("btnRunQuery"), "click", runQuery);
         on(dom.byId("radBridge"), "click", activateBridge);
         on(dom.byId("radRoadwayInventory"), "click", activateRoadwayInventory);
+
+        //This caused a problem when running a query.  If user selected a new column but didn't specify a condition (but other conditions were already picked) it defaults to a dialog that can't be cleared.
+        on(dom.byId("riAttributes"), "change", function() {document.getElementById("conditions").value="";});
+        on(dom.byId("bridgeAttributes"), "change", function() {document.getElementById("conditions").value="";});
 
 		map.on("click", logCoords);
         map.on("click", identRouteForM);
@@ -4391,8 +4395,8 @@ function getRandomIntInclusive(min,max) {
 
     function addBridgeData() {
   			tableText = "";
-  			tableText = "See the <a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank'>Bridge Coding Guide</a> for descriptions of each coded domain value.";
-  			tableText += "<br><br><table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+  			//tableText = "See the <a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank'>Bridge Coding Guide</a> for descriptions of each coded domain value.";
+  			tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
         var bridgeLink = "http://iapps/apps/txdot_gis_portal/BridgeReport.aspx?&BrgID=" + "${BRDG_ID}" + "&rc:Parameters=false";
         tableText += "<tr><td>Bridge ID</td><td><a href='" + bridgeLink + "' target='_blank'>${BRDG_ID}</a></td></tr>";
   			tableText += "<tr><td>Operational Status</td><td>${OPRTL_STAT}</td></tr>";
@@ -4685,25 +4689,27 @@ function getRandomIntInclusive(min,max) {
     			var txtOperator = document.getElementById("operators").value;
     			var txtConditions = document.getElementById("conditions").value;
 
-          if (txtConditions.length<1) {
+          if (txtConditions.length<1&&queries.length<1) {
               alert("Please add a condition.");
               return;
           }
 
-    			if (isNaN(txtConditions)) {
-    				txtConditions = "'" + txtConditions + "'";
-    			}
+          if (txtConditions.length>0) {
+            if (isNaN(txtConditions)) {
+      				txtConditions = "'" + txtConditions + "'";
+      			}
 
-    			if (getLeftCharacters(txtConditions,1)=="0") {
-    				txtConditions = "'" + txtConditions + "'";
-    			}
+      			if (getLeftCharacters(txtConditions,1)=="0") {
+      				txtConditions = "'" + txtConditions + "'";
+      			}
 
-          var currentValueCheck = queries.indexOf(txtAttributes + txtOperator + txtConditions);
-          if (currentValueCheck>=0) {
-              //Nothing, already there
-          }
-          else {
-              queries.push(txtAttributes + txtOperator + txtConditions);
+            var currentValueCheck = queries.indexOf(txtAttributes + txtOperator + txtConditions);
+            if (currentValueCheck>=0) {
+                //Nothing, already there
+            }
+            else {
+                queries.push(txtAttributes + txtOperator + txtConditions);
+            }
           }
 
           listQueries();
@@ -4726,13 +4732,17 @@ function getRandomIntInclusive(min,max) {
         function activateBridge() {
         	resetQuery();
         	document.getElementById("bridgeAttributes").style.display="block";
+          document.getElementById("refBridge").style.display="block";
         	document.getElementById("riAttributes").style.display="none";
+          document.getElementById("refRoadway").style.display="none";
         }
 
         function activateRoadwayInventory () {
         	resetQuery();
         	document.getElementById("bridgeAttributes").style.display="none";
+          document.getElementById("refBridge").style.display="none";
         	document.getElementById("riAttributes").style.display="block";
+          document.getElementById("refRoadway").style.display="block";
         }
         //---------------------------------------
 	});
@@ -4827,7 +4837,8 @@ function getRandomIntInclusive(min,max) {
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
-      <li>Bug fix related to Query tool</li>
+      <li>Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li>
+      <li>(v4.4.6) Bug fix related to Query tool</li>
       <li>(v4.4.5) Updated AADT popups and labels for 2019 data</li>
       <li>(v4.4.4) Added "TxDOT Bicycle Tourism Trails Example Network" layer</li>
       <li>(v4.4.4) Updated Reference Marker labels to include suffix</li>
@@ -4837,7 +4848,7 @@ function getRandomIntInclusive(min,max) {
       <li>(v4.4.3) Updated API to 3.32</li>
       <li>(v4.4.3) Bug fix related to layer visibilty and zoom level</li>
       <li>(v4.4.3) Bug fix related to TxDOT Light Gray basemap labels</li>
-      <li>(v4.4.2) Bug fix related to UZA layer</li>
+      <!-- <li>(v4.4.2) Bug fix related to UZA layer</li> -->
       <!-- <li>(v4.4.1) Improved LRS performance</li>
       <li>(v4.4.1) Bug Fix related to Roadways popup</li> -->
       <!-- <li>(v4.4.0) Added Reference Marker Offset to LRS Tool and Updated LRS Readout</li>
@@ -4957,6 +4968,10 @@ function getRandomIntInclusive(min,max) {
 			<tr><th>Choose Query Layer</th></tr>
 			</table>
 			<br>
+      <a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank' id="refBridge" style="display:none;">Bridge Attribute Specifications</a>
+      <a href="https://gis-txdot.opendata.arcgis.com/datasets/txdot-roadway-inventory-specifications-2018" target="_blank" id="refRoadway">Roadway Attribute Specifications</a>
+      <br>
+      <br>
 			<input type="radio" id="radBridge" name="dataType" value="bridge" title="Select Bridge Data">
 			<label for="bridge">Bridge</label><br>
 			<input type="radio" checked id="radRoadwayInventory" name="dataType" value="roadwayInventory" title="Select Roadway Inventory Data">
@@ -5007,30 +5022,38 @@ function getRandomIntInclusive(min,max) {
                 </select>
                 <select style="display:none;" class="qryInputs" id="bridgeAttributes" name="bridgeAttributes">
                     <option title="Roadway Name - Examples: IH 35" value="FACLTY_CARRD_BY_STRUC">Facility Carried (Ex. IH 35)</option>
-                    <option value="PRNCPL_INV_RTE">Principal Inventory Route</option>
+                    <option value="PRNCPL_INV_RTE">Principle Inventory Route</option>
                     <option value="RTE_NBR">Route Number (Ex. 0035)</option>
-                    <option value="ADT">Annual Average Daily Traffic</option>
-                    <option value="ADT_TRK">Annual Average Daily Traffic - Truck</option>
-                    <option value="ADT_YR">Annual Average Daily Traffic Year</option>
-                    <option value="FUT_ADT_YR">Annual Average Daily Traffic - Future Year</option>
-                    <option value="FUT_ADT">Annual Average Daily Traffic - Future</option>
-					          <option value="APRCH_RDWAY_WIDTH">Approach Width</option>
-                    <option value="BRDG_ID">Bridge ID</option>
-                    <option value="CNTY_CD">County (Ex. 227)</option>
-                    <option value="CULV_COND_RTNG">Culvert Condition Rating</option>
-					          <option value="STATE_HWY_DEPT_DIST">District (Ex. 15)</option>
-                    <option value="DECK_COND_RTNG">Deck Condition Rating</option>
-                    <option value="APPRSL_RTNG_DECK_GMTRY">Deck Geometry</option>
+                    <option value="APRCH_RDWAY_WIDTH">Approach Roadway Width</option>
+                    <option value="ADT">Average Daily Traffic (ADT)</option>
+                    <option value="ADT_TRK">Average Daily Traffic Truck</option>
+                    <option value="BRDG_RDWAY_WIDTH_CURB_CURB">Bridge Roadway Width (Curb-to-Curb)</option>
+                    <option value="CHNL_COND_RTNG">Condition Rating – Channel & Channel Protection</option>
+                    <option value="CULV_COND_RTNG">Condition Rating – Culverts</option>
+                    <option value="DECK_COND_RTNG">Condition Rating – Deck</option>
+                    <option value="SUBSTRUC_COND_RTNG">Condition Rating - Substructure</option>
+                    <option value="SUPERSTRUC_COND_RTNG">Condition Rating - Superstructure</option>
+                    <option value="DEFIC_OBSO_CD">Deficient/Obsolete Code</option>
                     <option value="INV_RTE_HRZNTL_CLEAR">Inventory Route, Total Horizontal Clearance</option>
-                    <option value="MIN_VERT_CLEAR">Minimum Vertical Clearance</option>
-                    <option value="OPRTL_STAT">Operational Status</option>
+                    <option value="LANES_ON_STRUC">Lanes On The Structure</option>
+                    <option value="LANES_UNDER_STRUC">Lanes Under The Structure</option>
+                    <option value="MAINT_SECT_NBR">Maintenance Section Number</option>
+                    <option value="MEMB_TYPE">Member Type</option>
+                    <option value="MIN_VERT_UNDR_CLRNC_IN">Minimum Vertical Under clearance (Inches)</option>
+                    <option value="MIN_VERT_UNDR_CLRNC_FT">Minimum Vertical Under clearance (Feet)</option>
+                    <option value="OPRTL_STAT_CD">Operational Status</option>
+                    <option value="RDWAY_TYPE">Roadway Type</option>
+                    <option value="SCOUR_CRIT">Scour Critical Bridges</option>
+                    <option value="SKEW">Skew</option>
                     <option value="SPAN_TYPE">Span Type</option>
                     <option value="STRUC_LNGTH">Structure Length</option>
-					          <option value="APPRSL_RTNG_STRUC_EVAL">Structural Evaluation</option>
+                    <option value="SUBSTRUC_MAIN_SPAN_ABOVE">Substructure Type, Main Spans (Above)</option>
+                    <option value="SUBSTRUC_MAIN_SPAN_BELOW">Substructure Type, Main Spans (Below)</option>
+                    <option value="SUBSTRUC_MAIN_SPAN_BENT_CAP">Substructure Type, Main Spans (Bent Cap)</option>
                     <option value="SUFF_RTNG">Sufficiency Rating</option>
-                    <option value="SUPERSTRUC_COND_RTNG">Superstructure Condition Rating</option>
-                    <option value="SUBSTRUC_COND_RTNG">Substructure Condition Rating</option>
+                    <option value="TOTL_NBR_SPANS">Total Number of Spans</option>
                     <option value="YR_BLT">Year Built</option>
+                    <option value="YR_RECNSTR">Year Reconstructed</option>
                 </select>
                 <br><br>
                 <label class="qryLabel" for="operators">Pick an Operator</label>
