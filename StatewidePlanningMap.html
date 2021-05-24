@@ -2494,7 +2494,9 @@ function getRandomIntInclusive(min,max) {
 		dojo.query(".Tabs").forEach(function (result){
 				on(result, "click", changeTab);
 		});
-		function changeTab(event) {
+
+    function changeTab(event) {
+      activeOverlaysArray=[];
 			var ID = event.target.id;
 			if (ID == 'tcMap') {
 				activeTab = 'mapTab';
@@ -2523,11 +2525,6 @@ function getRandomIntInclusive(min,max) {
 			map.infoWindow.hide();
 			clearMeasure();
       document.getElementById("mapDiv_container").style.cursor = "default"; // reset cursor to default -mw
-			// document.getElementById("rteName").value = "";
-			// document.getElementById("attrValue").value = "";
-			// document.getElementById("attrSelect").value = "ADT_CUR";
-			// document.getElementById("opSelect").value = "opEqual";
-			// document.getElementById("queryResults").innerHTML = "";
 
 		  if (activeTab!="queryTab") {
 				projectsRI.hide();
@@ -2546,7 +2543,7 @@ function getRandomIntInclusive(min,max) {
 			document.getElementById("sketchTab").style.display="none";
 			document.getElementById("legendTab").style.display="none";
 			document.getElementById("aboutTab").style.display="none";
-            document.getElementById("lrsTab").style.display="none";
+      document.getElementById("lrsTab").style.display="none";
 			document.getElementById(activeTab).style.display="block";
 			document.getElementById(ID).style.color='white';
 			document.getElementById(ID).style.backgroundColor='#143c5c';
@@ -2797,14 +2794,15 @@ function getRandomIntInclusive(min,max) {
 			if (tollLyr) {tollLyr.hide();}
 			if (futTollLyr) {futTollLyr.hide();}
 			if (hurrEvacLyr) {hurrEvacLyr.hide();}
-            if (memorialHighwayLyr) {memorialHighwayLyr.hide();}
-            if (curCongLyr) {curCongLyr.hide();}
-            if (futCongLyr) {futCongLyr.hide();}
-            if (facLyr) {facLyr.hide();}
-            if (bridgeLyr) {bridgeLyr.hide();}
-            if (connCorrLyr) {connCorrLyr.hide();}
-            if (STRAHNETLyr) {STRAHNETLyr.hide();}
-            if (bikeLayer) {bikeLayer.hide();}
+      if (memorialHighwayLyr) {memorialHighwayLyr.hide();}
+      if (curCongLyr) {curCongLyr.hide();}
+      if (futCongLyr) {futCongLyr.hide();}
+      if (facLyr) {facLyr.hide();}
+      if (bridgeLyr) {bridgeLyr.hide();}
+      if (connCorrLyr) {connCorrLyr.hide();}
+      if (STRAHNETLyr) {STRAHNETLyr.hide();}
+      if (bikeLayer) {bikeLayer.hide();}
+      if (projectsRI) {projectsRI.hide();}
 			clearStyle("tocData");
       map.graphics.clear();
 		}
@@ -2814,7 +2812,7 @@ function getRandomIntInclusive(min,max) {
 		});
 		function changeOverlay(event) {
 			var tableText="";
-	        clearStyle("tocData");
+	    clearStyle("tocData");
 			hideAllOverlays();
 			map.infoWindow.hide();
 			map.infoWindow.resize(300,270);
@@ -5026,7 +5024,7 @@ function getRandomIntInclusive(min,max) {
                     <option value="RTE_NBR">Route Number (Ex. 0035)</option>
                     <option value="APRCH_RDWAY_WIDTH">Approach Roadway Width</option>
                     <option value="ADT">Average Daily Traffic (ADT)</option>
-                    <option value="ADT_TRK">Average Daily Traffic Truck</option>
+                    <option value="ADT_TRK">Average Daily Truck Percent</option>
                     <option value="BRDG_RDWAY_WIDTH_CURB_CURB">Bridge Roadway Width (Curb-to-Curb)</option>
                     <option value="CHNL_COND_RTNG">Condition Rating – Channel & Channel Protection</option>
                     <option value="CULV_COND_RTNG">Condition Rating – Culverts</option>
