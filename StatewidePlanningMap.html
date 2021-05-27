@@ -2287,6 +2287,7 @@
 
 			if (activeTab=="measureTab"||activeTab=="sketchTab") {
 			  measureUnits="Miles";
+        document.getElementById("radMile").checked = true;
 			  theDistMeasured=0;
 			  xPointArray.length=0;
 			  currentMeasure=0;
@@ -3341,30 +3342,27 @@
 							var costTruck = "$"+(graphic.attributes.COST_TRK/1000000).toFixed(2)+" Million";
 							var delayMile = addCommas(Math.round(parseFloat(graphic.attributes.DLAY_MILE)));
 							var truckDelay = addCommas(Math.round(parseFloat(graphic.attributes.TRK_DLAY)));
-							tableText = "";
-							tableText += "<table border=1  cellspacing=0 cellpadding=3 style='font-size:small'>";
-							tableText += "<tr><td>Route Name</td><td>"+graphic.attributes.RD_NM+"</td></tr>";
-							tableText += "<tr><td>TxDOT District</td><td>"+graphic.attributes.DIST_NM+"</td></tr>";
-							tableText += "<tr><td>Annual Cost of Delay</td><td>"+costDelay+"</td></tr>";
-							tableText += "<tr><td>Annual Hours of Delay per Mile</td><td>"+delayMile+"</td></tr>";
+
+              var trkDelayRank;
 							if (graphic.attributes.TRK_RANK == 0){
-								tableText += "<tr><td>Truck Delay Rank</td><td>-</td></tr>";
+                trkDelayRank = "-";
 							}
 							else{
-								tableText += "<tr><td>Truck Delay Rank</td><td>"+graphic.attributes.TRK_RANK+"</td></tr>";
+                trkDelayRank = graphic.attributes.TRK_RANK;
 							}
-							tableText += "<tr><td>Annual Hours of Truck Delay per Mile</td><td>"+truckDelay+"</td></tr>";
-							tableText += "<tr><td>Annual Cost of Truck Delay</td><td>"+costTruck+"</td></tr>";
-							tableText += "<tr><td>TCI</td><td>"+graphic.attributes.TCI+"</td></tr>";
-							tableText += "<tr><td colspan='2' align='left' style= font-size:10px>TCI - Texas Congestion Index - ratio of the peak period average travel time to the free flow travel time. A value of 1.20 means that a 30 minute trip during light traffic would take 36 minutes during peak periods.</td></tr>";
-							tableText += "<tr><td colspan='2'><a href='https://www.txdot.gov/inside-txdot/projects/100-congested-roadways.html' target='_blank'>List View</a></td></tr>";
-							tableText += "</table>";
-							return tableText;
-						}
-						var infoTemplate = new InfoTemplate("Rank: ${RANK} / Year: ${YR}",getTextContent);
 
+              var tableText = makeTableFromArrayNoHeader([["Route Name",graphic.attributes.RD_NM],["TxDOT District",graphic.attributes.DIST_NM],["Annual Cost of Delay",costDelay],["Annual Hours of Delay per Mile",delayMile],
+              ["Truck Delay Rank",trkDelayRank],["Annual Hours of Truck Delay per Mile",truckDelay],["Annual Cost of Truck Delay",costTruck],["TCI",graphic.attributes.TCI]]);
+
+              tableText += "TCI - Texas Congestion Index - ratio of the peak period average travel time to the free flow travel time. A value of 1.20 means that a 30 minute trip during light traffic would take 36 minutes during peak periods.<br><br>";
+              tableText += "<a href='https://www.txdot.gov/inside-txdot/projects/100-congested-roadways.html' target='_blank'>List View</a>";
+
+              return tableText;
+						}
+
+            var infoTemplate = new InfoTemplate("Rank: ${RANK} / Year: ${YR}",getTextContent);
 						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Top_100_Congested_Roadways/FeatureServer/0";
-						//var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/100_test_service/FeatureServer/0"
+
 						top100Lyr = new FeatureLayer(projectsUrl, {id:"Top 100:",visible: true,outFields:["RANK","TRK_RANK","SEG_ID","RD_NM","DLAY_MILE","TRK_DLAY","TCI","COST_DLAY","COST_TRK","DIST_NM","YR"], infoTemplate: infoTemplate});
 						map.addLayer(top100Lyr);
 						//Labeling
@@ -3396,7 +3394,7 @@
 						}
 
 						function getTextContent(graphic){
-                            map.infoWindow.resize(310,510);
+              map.infoWindow.resize(310,510);
 							var ADT_CUR = addCommas(Math.round(parseFloat(graphic.attributes.ADT_CUR)));
 							var AADT_DESGN = addCommas(Math.round(parseFloat(graphic.attributes.AADT_DESGN)));
 							var toDFO = graphic.attributes.TO_DFO;
@@ -3407,13 +3405,13 @@
 							var rndVMT = addCommas(Math.round(parseFloat(VMT)));
 							var ADT_YEAR = graphic.attributes.ADT_YEAR;
 							var DESGN_YR = graphic.attributes.DESGN_YR;
-                            var DIR_TRAV = graphic.attributes.DIR_TRAV;
+              var DIR_TRAV = graphic.attributes.DIR_TRAV;
 
-                            tableText = "";
-                            tableText += "*For RG, LG, MG or SG roadbeds, AADT and Daily VMT values represent the combined total across all mainlanes (RG + LG + MG + SG). ";
-                            tableText += "For KG, AG or XG roadbeds, AADT and Daily VMT values are specific to the selected roadbed.";
-                            tableText += "<br><br>";
-                            tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
+              tableText = "";
+              tableText += "*For RG, LG, MG or SG roadbeds, AADT and Daily VMT values represent the combined total across all mainlanes (RG + LG + MG + SG). ";
+              tableText += "For KG, AG or XG roadbeds, AADT and Daily VMT values are specific to the selected roadbed.";
+              tableText += "<br><br>";
+              tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 							tableText += "<tr><td>Route Name</td><td>"+graphic.attributes.RIA_RTE_ID+"</td></tr>";
 							tableText += "<tr><td>From DFO</td><td>"+graphic.attributes.FRM_DFO+"</td></tr>";
 							tableText += "<tr><td>To DFO</td><td>"+graphic.attributes.TO_DFO+"</td></tr>";
@@ -3421,22 +3419,6 @@
 							tableText += "<tr><td>"+DESGN_YR+" Estimated AADT*</td><td>"+AADT_DESGN+"</td></tr>";
 							tableText += "<tr><td>Truck Percent</td><td>"+graphic.attributes.TRK_AADT_PCT+"</td></tr>";
 							tableText += "<tr><td>Speed Limit</td><td>"+graphic.attributes.SPD_MAX+"</td></tr>";
-                            // Need to clean up data before implementing this 6/1/20 -mw
-                            // if (DIR_TRAV == 0){
-                            //     tableText += "<tr><td>Direction of Travel</td><td>Not Applicable</td></tr>";
-                            // }
-                            // if (DIR_TRAV == 1){
-                            //     tableText += "<tr><td>Direction of Travel</td><td>North to South</td></tr>";
-                            // }
-                            // if (DIR_TRAV == 2){
-                            //     tableText += "<tr><td>Direction of Travel</td><td>West to East</td></tr>";
-                            // }
-                            // if (DIR_TRAV == 3){
-                            //     tableText += "<tr><td>Direction of Travel</td><td>South to North</td></tr>";
-                            // }
-                            // if (DIR_TRAV == 4){
-                            //     tableText += "<tr><td>Direction of Travel</td><td>Clockwise Loop</td></tr>";
-                            // }
 							tableText += "<tr><td>Number of Lanes</td><td>"+graphic.attributes.NUM_LANES+"</td></tr>";
 							if (graphic.attributes.SRF_TYPE == 1){
 								tableText += "<tr><td>Surface Type</td><td>Unpaved</td></tr>";
@@ -3471,7 +3453,6 @@
 						map.addLayer(rdwyInvLyr);
 					}
 					activeOverlay = rdwyInvLyr;
-					// theLegend.layerInfos=[{layer:rdwyInvLyr, title:"Roadway Inventory"}];
 					layerInfo.push({layer:rdwyInvLyr, title:"Roadway Inventory"});
 				}
 
@@ -4028,6 +4009,7 @@
         	resetQuery();
         	document.getElementById("bridgeAttributes").style.display="block";
           document.getElementById("refBridge").style.display="block";
+          document.getElementById("refBridgeDD").style.display="block";
         	document.getElementById("riAttributes").style.display="none";
           document.getElementById("refRoadway").style.display="none";
         }
@@ -4036,6 +4018,7 @@
         	resetQuery();
         	document.getElementById("bridgeAttributes").style.display="none";
           document.getElementById("refBridge").style.display="none";
+          document.getElementById("refBridgeDD").style.display="none";
         	document.getElementById("riAttributes").style.display="block";
           document.getElementById("refRoadway").style.display="block";
         }
@@ -4285,8 +4268,9 @@
 			<tr><th>Choose Query Layer</th></tr>
 			</table>
 			<br>
-      <a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank' id="refBridge" style="display:none;">Bridge Attribute Specifications</a>
-      <a href="https://gis-txdot.opendata.arcgis.com/datasets/txdot-roadway-inventory-specifications-2018" target="_blank" id="refRoadway">Roadway Attribute Specifications</a>
+      <a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank' id="refBridge" style="display:none;">Bridge Coding Guide</a>
+      <a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/e9d8d0e3a9794be19be6ecaf5a24c176/data' target='_blank' id="refBridgeDD" style="display:none;">Bridge Data Dictionary</a>
+      <a href="https://gis-txdot.opendata.arcgis.com/datasets/txdot-roadway-inventory-specifications-2018" target="_blank" id="refRoadway">Roadway Data Dictionary</a>
       <br>
       <br>
 			<input type="radio" id="radBridge" name="dataType" value="bridge" title="Select Bridge Data">
