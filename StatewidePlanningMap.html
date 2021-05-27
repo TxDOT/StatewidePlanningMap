@@ -3407,42 +3407,31 @@
 							var DESGN_YR = graphic.attributes.DESGN_YR;
               var DIR_TRAV = graphic.attributes.DIR_TRAV;
 
-              tableText = "";
-              tableText += "*For RG, LG, MG or SG roadbeds, AADT and Daily VMT values represent the combined total across all mainlanes (RG + LG + MG + SG). ";
+              var surfTypeText="";
+              if (graphic.attributes.SRF_TYPE == 1){
+								surfTypeText = "Unpaved";
+							} else if (graphic.attributes.SRF_TYPE == 99){
+								surfTypeText = "Unknown";
+							}	else {
+								surfTypeText = "Paved";
+							}
+
+              var outsideShoulderText="";
+              if (graphic.attributes.S_TYPE_O == 2){
+								outsideShoulderText = "Paved";
+							}	else {
+								outsideShoulderText = "Unpaved";
+							}
+
+              var tableText = "*For RG, LG, MG or SG roadbeds, AADT and Daily VMT values represent the combined total across all mainlanes (RG + LG + MG + SG). ";
               tableText += "For KG, AG or XG roadbeds, AADT and Daily VMT values are specific to the selected roadbed.";
               tableText += "<br><br>";
-              tableText += "<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
-							tableText += "<tr><td>Route Name</td><td>"+graphic.attributes.RIA_RTE_ID+"</td></tr>";
-							tableText += "<tr><td>From DFO</td><td>"+graphic.attributes.FRM_DFO+"</td></tr>";
-							tableText += "<tr><td>To DFO</td><td>"+graphic.attributes.TO_DFO+"</td></tr>";
-							tableText += "<tr><td>"+ADT_YEAR+" AADT*</td><td>"+ADT_CUR+"</td></tr>";
-							tableText += "<tr><td>"+DESGN_YR+" Estimated AADT*</td><td>"+AADT_DESGN+"</td></tr>";
-							tableText += "<tr><td>Truck Percent</td><td>"+graphic.attributes.TRK_AADT_PCT+"</td></tr>";
-							tableText += "<tr><td>Speed Limit</td><td>"+graphic.attributes.SPD_MAX+"</td></tr>";
-							tableText += "<tr><td>Number of Lanes</td><td>"+graphic.attributes.NUM_LANES+"</td></tr>";
-							if (graphic.attributes.SRF_TYPE == 1){
-								tableText += "<tr><td>Surface Type</td><td>Unpaved</td></tr>";
-							}
-							if (graphic.attributes.SRF_TYPE == 99){
-								tableText += "<tr><td>Surface Type</td><td>Unknown</td></tr>";
-							}
-							else {
-								tableText += "<tr><td>Surface Type</td><td>Paved</td></tr>";
-							}
-							tableText += "<tr><td>Surface Width</td><td>"+graphic.attributes.SUR_W+"'"+"</td></tr>";
-							tableText += "<tr><td>Roadbed Width</td><td>"+graphic.attributes.RB_WID+"'"+"</td></tr>";
-							tableText += "<tr><td>ROW Width</td><td>"+graphic.attributes.ROW_MIN+"'"+"</td></tr>";
-							tableText += "<tr><td>Median Width</td><td>"+graphic.attributes.MED_WID+"'"+"</td></tr>";
-							tableText += "<tr><td>Outside Shoulder Width</td><td>"+graphic.attributes.S_WID_O+"'"+"</td></tr>";
-							if (graphic.attributes.S_TYPE_O == 2){
-								tableText += "<tr><td>Outside Shoulder Type</td><td>Paved</td></tr>";
-							}
-							else {
-								tableText += "<tr><td>Outside Shoulder Type</td><td>Unpaved</td></tr>";
-							}
-							tableText += "<tr><td>Daily VMT*</td><td>"+rndVMT+"</td></tr>";
-							tableText += "<tr><td>Segment Length</td><td>"+rndLen+"</td></tr>";
-							tableText += "</table>";
+
+              tableText += makeTableFromArrayNoHeader([["Route Name",graphic.attributes.RIA_RTE_ID],["From DFO",graphic.attributes.FRM_DFO],["To DFO",graphic.attributes.TO_DFO],[ADT_YEAR+" AADT*",ADT_CUR],
+              [DESGN_YR+" Estimated AADT*",AADT_DESGN],["Truck Percent",graphic.attributes.TRK_AADT_PCT],["Speed Limit",graphic.attributes.SPD_MAX],["Number of Lanes",graphic.attributes.NUM_LANES],
+              ["Surface Type",surfTypeText],["Surface Width",graphic.attributes.SUR_W],["Roadbed Width",graphic.attributes.RB_WID],["ROW Width",graphic.attributes.ROW_MIN],["Median Width",graphic.attributes.MED_WID],["Outside Shoulder Width",graphic.attributes.S_WID_O],
+              ["Outside Shoulder Type",outsideShoulderText],["Daily VMT*",rndVMT],["Segment Length",rndLen]]);
+
 							return tableText;
 						}
 
@@ -3698,19 +3687,54 @@
 			scaleDependentQueries();
 		}
 		function addInventoryData() {
-      var tableText = makeTableFromArrayNoHeader([["Route Name","${HWY}"],["${ADT_YEAR} AADT","${ADT_CUR:NumberFormat}"],["${DESGN_YR} Estimated AADT","${AADT_DESGN:NumberFormat}"],["Lanes","${NUM_LANES}"],
-      ["Speed","${SPD_MAX}"],["Truck PCT","${TRK_AADT_PCT}"],["ROW Width","${ROW_W_USL}"],["Surface Width","${SUR_W}"],["Roadbed Width","${RB_WID}"],["Median Width","${MED_WID}"]]);
+      function getTextContentQuery(graphic){
+        map.infoWindow.resize(310,510);
+        var ADT_CUR = addCommas(Math.round(parseFloat(graphic.attributes.ADT_CUR)));
+        var AADT_DESGN = addCommas(Math.round(parseFloat(graphic.attributes.AADT_DESGN)));
+        var toDFO = graphic.attributes.TO_DFO;
+        var fromDFO = graphic.attributes.FRM_DFO;
+        var len = toDFO - fromDFO;
+        var rndLen = len.toFixed(3);
+        var VMT = len * graphic.attributes.ADT_CUR;
+        var rndVMT = addCommas(Math.round(parseFloat(VMT)));
+        var ADT_YEAR = graphic.attributes.ADT_YEAR;
+        var DESGN_YR = graphic.attributes.DESGN_YR;
+        var DIR_TRAV = graphic.attributes.DIR_TRAV;
 
-      var infoTemplate = new InfoTemplate("${ADT_YEAR} Roadway Inventory:",tableText);
-			var projectsRIUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadway_Inventory_OnSystem/FeatureServer/0";
+        var surfTypeText="";
+        if (graphic.attributes.SRF_TYPE == 1){
+          surfTypeText = "Unpaved";
+        } else if (graphic.attributes.SRF_TYPE == 99){
+          surfTypeText = "Unknown";
+        }	else {
+          surfTypeText = "Paved";
+        }
+
+        var outsideShoulderText="";
+        if (graphic.attributes.S_TYPE_O == 2){
+          outsideShoulderText = "Paved";
+        }	else {
+          outsideShoulderText = "Unpaved";
+        }
+
+        var tableText += makeTableFromArrayNoHeader([["Route Name",graphic.attributes.RIA_RTE_ID],["From DFO",graphic.attributes.FRM_DFO],["To DFO",graphic.attributes.TO_DFO],[ADT_YEAR+" AADT*",ADT_CUR],
+        [DESGN_YR+" Estimated AADT*",AADT_DESGN],["Truck Percent",graphic.attributes.TRK_AADT_PCT],["Speed Limit",graphic.attributes.SPD_MAX],["Number of Lanes",graphic.attributes.NUM_LANES],
+        ["Surface Type",surfTypeText],["Surface Width",graphic.attributes.SUR_W],["Roadbed Width",graphic.attributes.RB_WID],["ROW Width",graphic.attributes.ROW_MIN],["Median Width",graphic.attributes.MED_WID],["Outside Shoulder Width",graphic.attributes.S_WID_O],
+        ["Outside Shoulder Type",outsideShoulderText],["Daily VMT*",rndVMT],["Segment Length",rndLen]]);
+
+        return tableText;
+      }
+
+      var infoTemplate = new InfoTemplate("${ADT_YEAR} Roadway Inventory:",getTextContentQuery);
+      var projectsRIUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/TxDOT_Roadway_Inventory_OnSystem/FeatureServer/0";
 
 			var theSymbol = new esri.symbol.SimpleLineSymbol("solid", new esri.Color("#FF0000"), 5);
 			//var theSymbol = new CartographicLineSymbol(CartographicLineSymbol.STYLE_SOLID, new Color("#FF0000"), 5, CartographicLineSymbol.CAP_ROUND, CartographicLineSymbol.JOIN_MITER, 5);
 			var theRenderer = new SimpleRenderer(theSymbol);
 
 			//Add the layer - outFields: ["*"] if you want to use all fields
-			projectsRI = new FeatureLayer(projectsRIUrl, {id:"RoadwayInventory",visible: false,outFields:["HWY","ADT_CUR","AADT_DESGN","NUM_LANES","SPD_MAX","TRK_AADT_PCT","ROW_W_USL","SUR_W","RB_WID","MED_WID","HSYS","ADT_YEAR", "DESGN_YR"], infoTemplate: infoTemplate});
-			projectsRI.setRenderer(theRenderer);
+			projectsRI = new FeatureLayer(projectsRIUrl, {id:"RoadwayInventory",visible: false,outFields:["*"], infoTemplate: infoTemplate});
+      projectsRI.setRenderer(theRenderer);
 			projectsRI.setAutoGeneralize(false);
 			map.addLayer(projectsRI);
 		}
