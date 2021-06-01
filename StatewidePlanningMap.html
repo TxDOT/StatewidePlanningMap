@@ -2233,7 +2233,6 @@
 		});
 
     function changeTab(event) {
-      activeOverlaysArray=[];
 			var ID = event.target.id;
 			if (ID == 'tcMap') {
 				activeTab = 'mapTab';
@@ -2255,7 +2254,7 @@
 			}
 			else if (ID == 'tcAbout') {
 				activeTab = 'aboutTab';
-        		document.getElementById('btnReleaseNotes').innerHTML = appVersion;
+        document.getElementById('btnReleaseNotes').innerHTML = appVersion;
 			}
 
 			map.graphics.clear();
@@ -2269,6 +2268,7 @@
 			}
 			if (activeTab=="queryTab"||activeTab=="sketchTab") {
 				hideAllOverlays();
+        activeOverlaysArray=[];
 				document.getElementById("CLEAR").style.color = "red";
 				document.getElementById("radMile").checked = true;
 			}
