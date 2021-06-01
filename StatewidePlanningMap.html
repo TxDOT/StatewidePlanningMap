@@ -3717,7 +3717,7 @@
           outsideShoulderText = "Unpaved";
         }
 
-        var tableText += makeTableFromArrayNoHeader([["Route Name",graphic.attributes.RIA_RTE_ID],["From DFO",graphic.attributes.FRM_DFO],["To DFO",graphic.attributes.TO_DFO],[ADT_YEAR+" AADT*",ADT_CUR],
+        var tableText = makeTableFromArrayNoHeader([["Route Name",graphic.attributes.RIA_RTE_ID],["From DFO",graphic.attributes.FRM_DFO],["To DFO",graphic.attributes.TO_DFO],[ADT_YEAR+" AADT*",ADT_CUR],
         [DESGN_YR+" Estimated AADT*",AADT_DESGN],["Truck Percent",graphic.attributes.TRK_AADT_PCT],["Speed Limit",graphic.attributes.SPD_MAX],["Number of Lanes",graphic.attributes.NUM_LANES],
         ["Surface Type",surfTypeText],["Surface Width",graphic.attributes.SUR_W],["Roadbed Width",graphic.attributes.RB_WID],["ROW Width",graphic.attributes.ROW_MIN],["Median Width",graphic.attributes.MED_WID],["Outside Shoulder Width",graphic.attributes.S_WID_O],
         ["Outside Shoulder Type",outsideShoulderText],["Daily VMT*",rndVMT],["Segment Length",rndLen]]);
