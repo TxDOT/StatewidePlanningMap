@@ -482,7 +482,7 @@
 
   //Map and measure variables
 	var map,osmLayer,projectsRI,esri,measureClicked=false,gidWithMeasuresGeom,gidWithMeasuresGeomMPT,mapPoint,queryTaskDFO,queryTaskMPT,queryM,featurePartIndex,toolbar,xPointArray=new Array(),globalX,globalY
-	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,appVersion="4.4.7 Springfield";
+	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,appVersion="4.4.8 Panhandle";
 
   //Route Event Variables
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
@@ -3019,13 +3019,13 @@
 						map.reorderLayer(aadtLyr,pos);
 					}
 					else {
-            var tableText = makeTableFromArrayNoHeader([["Station Flag","${T_FLAG}"],["AADT 2019","${AADT_2019:NumberFormat}"],["AADT 2018","${AADT_2018:NumberFormat}"],["AADT 2017","${AADT_2017:NumberFormat}"],["AADT 2016","${AADT_2016:NumberFormat}"],["AADT 2015","${AADT_2015:NumberFormat}"],["AADT 2014","${AADT_2014:NumberFormat}"],["AADT 2013","${AADT_2013:NumberFormat}"],["AADT 2012","${AADT_2012:NumberFormat}"],["AADT 2011","${AADT_2011:NumberFormat}"]
-            ,["AADT 2010","${AADT_2010:NumberFormat}"],["AADT 2009","${AADT_2009:NumberFormat}"],["AADT 2008","${AADT_2008:NumberFormat}"],["AADT 2007","${AADT_2007:NumberFormat}"],["AADT 2006","${AADT_2006:NumberFormat}"],["AADT 2005","${AADT_2005:NumberFormat}"],["AADT 2004","${AADT_2004:NumberFormat}"],["AADT 2003","${AADT_2003:NumberFormat}"],["AADT 2002","${AADT_2002:NumberFormat}"],["AADT 2001","${AADT_2001:NumberFormat}"],["AADT 2000","${AADT_2000:NumberFormat}"]]);
+            var tableText = makeTableFromArrayNoHeader([["Station Flag","${T_FLAG}"],["AADT 2020","${AADT_2020:NumberFormat}"],["AADT 2019","${AADT_2019:NumberFormat}"],["AADT 2018","${AADT_2018:NumberFormat}"],["AADT 2017","${AADT_2017:NumberFormat}"],["AADT 2016","${AADT_2016:NumberFormat}"],["AADT 2015","${AADT_2015:NumberFormat}"],["AADT 2014","${AADT_2014:NumberFormat}"],["AADT 2013","${AADT_2013:NumberFormat}"],["AADT 2012","${AADT_2012:NumberFormat}"],["AADT 2011","${AADT_2011:NumberFormat}"]
+            ,["AADT 2010","${AADT_2010:NumberFormat}"],["AADT 2009","${AADT_2009:NumberFormat}"],["AADT 2008","${AADT_2008:NumberFormat}"],["AADT 2007","${AADT_2007:NumberFormat}"],["AADT 2006","${AADT_2006:NumberFormat}"],["AADT 2005","${AADT_2005:NumberFormat}"],["AADT 2004","${AADT_2004:NumberFormat}"],["AADT 2003","${AADT_2003:NumberFormat}"],["AADT 2002","${AADT_2002:NumberFormat}"],["AADT 2001","${AADT_2001:NumberFormat}"]]);
 
             var infoTemplate = new InfoTemplate("Traffic Count Station:","This count includes frontage roads when present.<br><br>" + tableText);
 						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_AADT_Annuals/FeatureServer/0";
 
-						aadtLyr = new FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["T_FLAG","AADT_2018","AADT_2017","AADT_2016","AADT_2015","AADT_2014","AADT_2013","AADT_2012","AADT_2011","AADT_2010","AADT_2009","AADT_2008","AADT_2007","AADT_2006","AADT_2005","AADT_2004","AADT_2003","AADT_2002","AADT_2001","AADT_2000","AADT_1999"], infoTemplate: infoTemplate});
+						aadtLyr = new FeatureLayer(projectsUrl, {id:"AADT",visible: true,outFields:["*"], infoTemplate: infoTemplate});
 						map.addLayer(aadtLyr);
 
 						//Labeling
@@ -3037,7 +3037,7 @@
 
 						var label_renderer = new SimpleRenderer(label_symbol);
 						labelLayerAADT = new LabelLayer({id:"AADT_Labels"});
-						labelLayerAADT.addFeatureLayer(aadtLyr, label_renderer, "{AADT_2019}");
+						labelLayerAADT.addFeatureLayer(aadtLyr, label_renderer, "{AADT_2020}");
 						map.addLayer(labelLayerAADT);
 					}
 					activeOverlay = aadtLyr;
@@ -4161,17 +4161,18 @@
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
-      <li>Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li>
+      <li>AADT layer updates to add 2020 data</li>
+      <li>(v4.4.7) Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li>
       <li>(v4.4.6) Bug fix related to Query tool</li>
       <li>(v4.4.5) Updated AADT popups and labels for 2019 data</li>
       <li>(v4.4.4) Added "TxDOT Bicycle Tourism Trails Example Network" layer</li>
       <li>(v4.4.4) Updated Reference Marker labels to include suffix</li>
       <li>(v4.4.4) Minor update related to Imagery Service attribution</li>
-      <li>(v4.4.3) Added new "TxDOT Dark Grey" basemap</li>
+      <!-- <li>(v4.4.3) Added new "TxDOT Dark Grey" basemap</li>
       <li>(v4.4.3) Standardized popup text for "Route Name" field</li>
       <li>(v4.4.3) Updated API to 3.32</li>
       <li>(v4.4.3) Bug fix related to layer visibilty and zoom level</li>
-      <li>(v4.4.3) Bug fix related to TxDOT Light Gray basemap labels</li>
+      <li>(v4.4.3) Bug fix related to TxDOT Light Gray basemap labels</li> -->
       <!-- <li>(v4.4.2) Bug fix related to UZA layer</li> -->
       <!-- <li>(v4.4.1) Improved LRS performance</li>
       <li>(v4.4.1) Bug Fix related to Roadways popup</li> -->
