@@ -2233,6 +2233,12 @@
 		});
 
     function changeTab(event) {
+      if (activeTab == 'queryTab') {
+        // projectsRI.hide();
+        // bridgeLyr.hide();
+        resetQuery();
+      }
+
 			var ID = event.target.id;
 			if (ID == 'tcMap') {
 				activeTab = 'mapTab';
@@ -2262,10 +2268,6 @@
 			clearMeasure();
       document.getElementById("mapDiv_container").style.cursor = "default"; // reset cursor to default -mw
 
-		  if (activeTab!="queryTab") {
-				projectsRI.hide();
-        bridgeLyr.hide();
-			}
 			if (activeTab=="queryTab"||activeTab=="sketchTab") {
 				hideAllOverlays();
         activeOverlaysArray=[];
