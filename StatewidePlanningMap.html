@@ -482,7 +482,7 @@
 
   //Map and measure variables
 	var map,osmLayer,projectsRI,esri,measureClicked=false,gidWithMeasuresGeom,gidWithMeasuresGeomMPT,mapPoint,queryTaskDFO,queryTaskMPT,queryM,featurePartIndex,toolbar,xPointArray=new Array(),globalX,globalY
-	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,appVersion="4.4.8 Panhandle";
+	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,appVersion="4.4.9 Aguascalientes";
 
   //Route Event Variables
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
@@ -2547,7 +2547,7 @@
 			if (rdwyInvLyr) {rdwyInvLyr.hide();}
 			if (cemeteryLyr) {cemeteryLyr.hide();}
 			if (energySectorLyr) {energySectorLyr.hide();}
-			if (shalePlaysLyr) {shalePlaysLyr.hide(); shaleBasinsLyr.hide();}
+			if (shalePlaysLyr) {shalePlaysLyr.hide();} //if (shalePlaysLyr) {shalePlaysLyr.hide(); shaleBasinsLyr.hide();}
 			if (RMAlyr) {RMAlyr.hide();}
 			if (tollLyr) {tollLyr.hide();}
 			if (futTollLyr) {futTollLyr.hide();}
@@ -3301,28 +3301,28 @@
 					var pos = activeOverlaysArray.indexOf("Shale_Plays");
 					if (shalePlaysLyr) {
 						shalePlaysLyr.show();
-						shaleBasinsLyr.show();
+						// shaleBasinsLyr.show();
 						map.reorderLayer(shalePlaysLyr,pos);
 					}
 					else {
-            var tableText = makeTableFromArrayNoHeader([["Shale Play Name","${Shale_Play}"]]);
-            var tableText2 = makeTableFromArrayNoHeader([["Basin Name","${NAME}"]]);
+            var tableText = makeTableFromArrayNoHeader([["Shale Play Name","${Shale_play}"],["Shale Basin Name","${Basin}"]]);
+            // var tableText2 = makeTableFromArrayNoHeader([["Basin Name","${NAME}"]]);
 						var infoTemplate = new InfoTemplate("Shale Play:",tableText);
-						var infoTemplate2 = new InfoTemplate("Basin:",tableText2);
+						// var infoTemplate2 = new InfoTemplate("Basin:",tableText2);
 
-						shalePlaysLyr = new FeatureLayer("https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Plays/FeatureServer/0", {id:"Shale_Plays",visible: true,outFields:["*"], infoTemplate: infoTemplate});
-						shaleBasinsLyr = new FeatureLayer("https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Basins/FeatureServer/0", {id:"Shale_Basins",visible: true,outFields:["*"], infoTemplate: infoTemplate2});
-						map.addLayers([shaleBasinsLyr, shalePlaysLyr]);
+						shalePlaysLyr = new FeatureLayer("https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/Tight_Oil_and_Shale_Gas_Plays_of_the_Contiguous_US_1/FeatureServer/0", {id:"Shale_Plays",visible: true,outFields:["*"], infoTemplate: infoTemplate});
+						// shaleBasinsLyr = new FeatureLayer("https://landscape1.arcgis.com/arcgis/rest/services/USA_Oil_Shale_Basins/MapServer/0", {id:"Shale_Basins",visible: true,outFields:["*"], infoTemplate: infoTemplate2});
+						map.addLayers([shalePlaysLyr]); //map.addLayers([shaleBasinsLyr, shalePlaysLyr]);
 
-						shalePlaysLyr.on("load", function(){
-						shalePlaysLyr.renderer.setOpacityInfo({opacityValues: [0.5]});
-						});
-						shaleBasinsLyr.on("load", function(){
-						shaleBasinsLyr.renderer.setOpacityInfo({opacityValues: [0.5]});
-						});
+						// shalePlaysLyr.on("load", function(){
+						// shalePlaysLyr.renderer.setOpacityInfo({opacityValues: [0.5]});
+						// });
+						// shaleBasinsLyr.on("load", function(){
+						// shaleBasinsLyr.renderer.setOpacityInfo({opacityValues: [0.5]});
+						// });
 					}
 					activeOverlay = shalePlaysLyr;
-					layerInfo.push({layer:shalePlaysLyr, title:"Shale Plays"}, {layer:shaleBasinsLyr, title:"Shale Basins"});
+					layerInfo.push({layer:shalePlaysLyr, title:"Shale Plays"}); //layerInfo.push({layer:shalePlaysLyr, title:"Shale Plays"}, {layer:shaleBasinsLyr, title:"Shale Basins"});
 				}
 
 				if (activeOverlaysArray.indexOf("Top_100")> -1) {
@@ -4161,7 +4161,8 @@
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
-      <li>AADT layer updates to add 2020 data</li>
+      <li>Updates to Shale Play layer</li>
+      <li>(v4.4.8)AADT layer updates to add 2020 data</li>
       <li>(v4.4.7) Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li>
       <li>(v4.4.6) Bug fix related to Query tool</li>
       <li>(v4.4.5) Updated AADT popups and labels for 2019 data</li>
@@ -4256,7 +4257,7 @@
 	      <tr><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
 	      <tr><td class="Overlay" id='RMA'>Regional Mobility Authorities (RMA)</td></tr>
 	      <tr><td class="Overlay" id='Roadway_Inventory'>Roadway Inventory - On-System Roadbeds</td></tr>
-		  <tr><td class="Overlay" id='Shale_Plays'>Shale Plays and Basins</td></tr>
+		  <tr><td class="Overlay" id='Shale_Plays'>Shale Plays</td></tr>
 		  <tr><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
 		  <tr><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
 		  <tr><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>
