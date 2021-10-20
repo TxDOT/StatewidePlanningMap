@@ -281,8 +281,18 @@
         z-index: 30;
         display: block;
       }
+
     .Overlay, .Basemaps, .SearchResult, .clickable{
     	cursor: pointer;
+    }
+    #PrintButton {
+      position: absolute;
+      left: 20px;
+      top: 180px;
+      z-index: 30;
+      display: block;
+      height: 48px;
+      width: 28px;
     }
 	#searchResults{
 	 position: relative;
@@ -500,11 +510,11 @@
 		"esri/toolbars/draw","esri/geometry/geometryEngine","esri/geometry/geodesicUtils","esri/units","esri/graphic","esri/graphicsUtils","esri/SpatialReference","esri/geometry/Extent","esri/layers/FeatureLayer","esri/symbols/SimpleLineSymbol",
 		"esri/symbols/CartographicLineSymbol","esri/renderers/UniqueValueRenderer","esri/symbols/SimpleMarkerSymbol","esri/symbols/SimpleFillSymbol","esri/symbols/TextSymbol","esri/renderers/SimpleRenderer","esri/renderers/ClassBreaksRenderer",
 		"esri/layers/LabelLayer","esri/layers/LabelClass","esri/Color","esri/InfoTemplate","esri/layers/ArcGISTiledMapServiceLayer","esri/geometry/Polyline","esri/geometry/Point","esri/symbols/Font","esri/dijit/PopupTemplate",
-		"dojo/number","dojo/_base/array","esri/layers/VectorTileLayer","esri/layers/WMTSLayer","esri/layers/WMTSLayerInfo","esri/geometry/Circle",
+		"esri/tasks/PrintTask","esri/tasks/PrintParameters","esri/tasks/PrintTemplate","esri/tasks/LegendLayer","dojo/number","dojo/_base/array","esri/layers/VectorTileLayer","esri/layers/WMTSLayer","esri/layers/WMTSLayerInfo","esri/geometry/Circle",
 		"dojo/domReady!"],
     function (Map, OpenStreetMapLayer, esriRequest, Renderer, domConstruct, LayerInfo, Scalebar, on, domClass, query, Moveable, HomeButton,Query, QueryTask, arcgisUtils, domUtils, Legend, Search, webMercatorUtils, dom, KMLLayer, parser, Draw, geometryEngine,
 		geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
-		SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,Polyline, Point, Font, PopupTemplate, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo, Circle)
+		SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,Polyline, Point, Font, PopupTemplate, PrintTask, PrintParameters, PrintTemplate, LegendLayer, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo, Circle)
     {
 
 		parser.parse();
@@ -582,6 +592,9 @@
         };
     });
 
+    // Print button
+    on(dom.byId("PrintButton"), "click", printMap);
+
     //Query Tab buttons and events
     on(dom.byId("btnAddSecondCondition"), "click", addSecondCondition);
     on(dom.byId("btnRemoveLastCondition"), "click", removeLastCondition);
@@ -602,6 +615,53 @@
 		// Clear graphic line on Measure Tab if when a new line is started
 		map.on("click", clearMeasuredLineGraphic);
 		map.on("mouse-move", newCoords);
+
+    // Printing Tools
+
+    function printMap() {
+      //get visible layers and push to array of legendLayers
+
+       //-- remove graphicsLayer1 whatever the hell it is
+      console.log(map);
+      var gL1 = map.graphicsLayerIds.indexOf('graphicsLayer1');
+      map.graphicsLayerIds.splice(gL1,1);
+      console.log(map);
+
+      var printLegend = [];
+      for (let i=0; i<activeOverlaysArray.length; i++){
+        var theLayer = new LegendLayer();
+        theLayer.layerId = activeOverlaysArray[i];
+        printLegend.push(theLayer);
+      }
+
+      //set print template (users will populate this)
+      var printTemplate = new PrintTemplate();
+      printTemplate.format = "PDF";
+      printTemplate.layout = "8x5x11_Landscape";
+      printTemplate.layoutOptions = printLegend;
+      console.log(printTemplate.layoutOptions);
+      console.log(activeOverlaysArray);
+
+      //set print task to service URL
+      var printURL = "https://testportal.txdot.gov/sstestarcgis/rest/services/CustomPrintService/GPServer/Export%20Web%20Map";
+      var printTask = new PrintTask(printURL);
+      // //set print Parameters
+      var printParams = new PrintParameters();
+      printParams.map = map;
+      printParams.template = printTemplate;
+
+      //execute the print task
+      printTask.execute(printParams, printResult, printError);
+      //need a loading spinner here...
+      //callback for result
+      function printResult(result) {
+        console.log(result.url);
+        window.open(result.url, "_blank");
+      }
+      function printError(result){
+        console.log(result);
+      }
+    }
 
     //- - - Drag and Drop Route Events - - -
     map.on("load", addDropListeners);
@@ -2180,7 +2240,7 @@
 		}
 
 		function showZoom(evt) {
-      var zoomLev2 = map.getZoom(evt);
+      var zoomLev2 = map.getZoom(evt)+1; //fix zoom level -mw
       document.getElementById("info").innerHTML = "Level:  " + zoomLev2 + ", ";
     }
 
@@ -4549,6 +4609,9 @@
  <div id="search"></div>
  <div id="mapDiv" oncontextmenu="getCoords()">
 	 <div id="HomeButton" class="button"></div>
+   <div id="PrintButton" class="button">
+     <button> Print</button>
+   </div>
      <span id="info"></span>
      <span id="info2"></span>
 	 <button id="btnClearHighlighter" title="Clear Highlight" style="display:none">
