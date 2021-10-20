@@ -482,7 +482,7 @@
 
   //Map and measure variables
 	var map,osmLayer,projectsRI,esri,measureClicked=false,gidWithMeasuresGeom,gidWithMeasuresGeomMPT,mapPoint,queryTaskDFO,queryTaskMPT,queryM,featurePartIndex,toolbar,xPointArray=new Array(),globalX,globalY
-	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,appVersion="4.4.9 Aguascalientes";
+	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,appVersion="4.4.10 Bradford";
 
   //Route Event Variables
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
@@ -2180,7 +2180,7 @@
 		}
 
 		function showZoom(evt) {
-      var zoomLev2 = map.getZoom(evt);
+      var zoomLev2 = map.getZoom(evt)+1 // fix zoom level -mw;
       document.getElementById("info").innerHTML = "Level:  " + zoomLev2 + ", ";
     }
 
