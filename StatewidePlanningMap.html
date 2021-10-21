@@ -567,6 +567,7 @@
     	map.on("mouse-move", showZoom);
   		map.on("mouse-drag", showZoom);
   		map.on("extent-change", showZoom);
+      map.on("zoom-end", preventZoomOnImagery);
   		map.on("zoom-end", scaleDependentQueries);
 		});
 
@@ -2180,7 +2181,7 @@
 		}
 
 		function showZoom(evt) {
-      var zoomLev2 = map.getZoom(evt)+1 // fix zoom level -mw;
+      var zoomLev2 = map.getZoom(evt)+1 // fix zoom level display -mw;
       document.getElementById("info").innerHTML = "Level:  " + zoomLev2 + ", ";
     }
 
@@ -2188,6 +2189,20 @@
 				on(result, "click", changeBaseMap);
 		});
 
+    // the following 2 functions prevent basemap from zoom past 21 on imagery
+    // using 19 due to vector tiles setting wrong scale
+    function preventZoomOnImagery(evt) {
+      var basemap = map.getLayer(map.layerIds[0]);
+      if (basemap.id == "layer2"){
+        imageryZoomOut();
+      };
+    }
+    function imageryZoomOut() {
+      if (map.getZoom()>19){
+        console.log("Zoom Lv: "+map.getZoom()+"; Back Off!");
+        map.setLevel(19);
+      }
+    }
 		function changeBaseMap(event) {
 			getBasemapLayers();
 			clearStyle("tocMaps");
@@ -2199,6 +2214,7 @@
 				document.getElementById("credits").innerHTML = "TxDOT, TPP-GIS";
 			}
 			if (newMap=="Google") {
+        imageryZoomOut(); // prevent zoom past 21 on imagery -mw
 				map.addLayer(google);
 				document.getElementById("credits").innerHTML = "Texas Imagery Service";
 			}
