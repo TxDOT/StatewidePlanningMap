@@ -624,7 +624,9 @@
        //-- remove graphicsLayer1 whatever the hell it is
       console.log(map);
       var gL1 = map.graphicsLayerIds.indexOf('graphicsLayer1');
-      map.graphicsLayerIds.splice(gL1,1);
+      if (gL1 > -1) {
+        map.graphicsLayerIds.splice(gL1,1);
+      }
       console.log(map);
 
       var printLegend = [];
