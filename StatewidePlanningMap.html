@@ -638,8 +638,12 @@
       var printTemplate = new PrintTemplate();
       printTemplate.format = "PDF";
       printTemplate.layout = "8x5x11_Landscape";
-      printTemplate.layoutOptions = printLegend;
-      console.log(printTemplate.layoutOptions);
+      printTemplate.layoutOptions = {
+        legendLayers: printLegend,
+        titleText: "My Custom Map",
+        customTextElements: [{"HEADER - Custom Text": activeOverlaysArray[0]}]
+      };
+      console.log(printTemplate);
       console.log(activeOverlaysArray);
 
       //set print task to service URL
