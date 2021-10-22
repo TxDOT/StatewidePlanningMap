@@ -482,7 +482,7 @@
 
   //Map and measure variables
 	var map,osmLayer,projectsRI,esri,measureClicked=false,gidWithMeasuresGeom,gidWithMeasuresGeomMPT,mapPoint,queryTaskDFO,queryTaskMPT,queryM,featurePartIndex,toolbar,xPointArray=new Array(),globalX,globalY
-	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,appVersion="4.4.9 Aguascalientes";
+	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,appVersion="4.4.10 Bradford";
 
   //Route Event Variables
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
@@ -567,6 +567,7 @@
     	map.on("mouse-move", showZoom);
   		map.on("mouse-drag", showZoom);
   		map.on("extent-change", showZoom);
+      map.on("zoom-end", preventZoomOnImagery);
   		map.on("zoom-end", scaleDependentQueries);
 		});
 
@@ -2180,7 +2181,7 @@
 		}
 
 		function showZoom(evt) {
-      var zoomLev2 = map.getZoom(evt);
+      var zoomLev2 = map.getZoom(evt)+1 // fix zoom level display -mw;
       document.getElementById("info").innerHTML = "Level:  " + zoomLev2 + ", ";
     }
 
@@ -2188,6 +2189,20 @@
 				on(result, "click", changeBaseMap);
 		});
 
+    // the following 2 functions prevent basemap from zoom past 21 on imagery
+    // using 19 due to vector tiles setting wrong scale
+    function preventZoomOnImagery(evt) {
+      var basemap = map.getLayer(map.layerIds[0]);
+      if (basemap.id == "layer2"){
+        imageryZoomOut();
+      };
+    }
+    function imageryZoomOut() {
+      if (map.getZoom()>19){
+        console.log("Zoom Lv: "+map.getZoom()+"; Back Off!");
+        map.setLevel(19);
+      }
+    }
 		function changeBaseMap(event) {
 			getBasemapLayers();
 			clearStyle("tocMaps");
@@ -2199,6 +2214,7 @@
 				document.getElementById("credits").innerHTML = "TxDOT, TPP-GIS";
 			}
 			if (newMap=="Google") {
+        imageryZoomOut(); // prevent zoom past 21 on imagery -mw
 				map.addLayer(google);
 				document.getElementById("credits").innerHTML = "Texas Imagery Service";
 			}
@@ -4161,7 +4177,8 @@
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
-      <li>Updates to Shale Play layer</li>
+      <li>Bug fix for Imagery zoom level</li>
+      <li>(v.4.9.9)Updates to Shale Play layer</li>
       <li>(v4.4.8)AADT layer updates to add 2020 data</li>
       <li>(v4.4.7) Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li>
       <li>(v4.4.6) Bug fix related to Query tool</li>
