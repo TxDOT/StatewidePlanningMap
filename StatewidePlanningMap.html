@@ -636,20 +636,30 @@
         printLegend.push(theLayer);
       }
 
+      //get print info from user
+
+      let legendFlag = confirm("Include Legend?");
+
       //set print template (users will populate this)
       var printTemplate = new PrintTemplate();
       printTemplate.format = "PDF";
-      printTemplate.layout = "8x5x11_Landscape";
+      if(legendFlag){
+        printTemplate.layout = "8x5x11_Landscape_Legend";
+      }
+      else {
+        printTemplate.layout = "8x5x11_Landscape_No_Legend";
+      }
+      // printTemplate.layout = "8x5x11_Landscape_Legend";
+      // printTemplate.layout = "8x5x11_Landscape_No_Legend";
       printTemplate.layoutOptions = {
         legendLayers: printLegend,
-        titleText: "My Custom Map",
-        customTextElements: [{"HEADER - Custom Text": activeOverlaysArray[0]}]
+        titleText: "Custom Map Title",
+        customTextElements: [{"HEADER - Custom Text": "Custom Text"}]
       };
       console.log(printTemplate);
-      console.log(activeOverlaysArray);
 
       //set print task to service URL
-      var printURL = "https://testportal.txdot.gov/sstestarcgis/rest/services/CustomPrintService/GPServer/Export%20Web%20Map";
+      var printURL = "https://testportal.txdot.gov/sstestarcgis/rest/services/PrintTools/GPServer/Export%20Web%20Map";
       var printTask = new PrintTask(printURL);
       // //set print Parameters
       var printParams = new PrintParameters();
