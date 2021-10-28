@@ -482,7 +482,7 @@
 
   //Map and measure variables
 	var map,osmLayer,projectsRI,esri,measureClicked=false,gidWithMeasuresGeom,gidWithMeasuresGeomMPT,mapPoint,queryTaskDFO,queryTaskMPT,queryM,featurePartIndex,toolbar,xPointArray=new Array(),globalX,globalY
-	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,txAccessToken,appVersion="4.4.10 Bradford";
+	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,txAccessToken,appVersion="4.4.11 Singer";
 
   //Route Event Variables
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
@@ -4283,9 +4283,10 @@
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
-      <li>Bug fix for Imagery zoom level</li>
-      <li>(v.4.9.9)Updates to Shale Play layer</li>
-      <li>(v4.4.8)AADT layer updates to add 2020 data</li>
+      <li>Added INRIX Live Traffic layer</li>
+      <li>(v4.4.10) Bug fix for Imagery zoom level</li>
+      <li>(v.4.4.9) Updates to Shale Play layer</li>
+      <li>(v4.4.8) AADT layer updates to add 2020 data</li>
       <li>(v4.4.7) Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li>
       <li>(v4.4.6) Bug fix related to Query tool</li>
       <li>(v4.4.5) Updated AADT popups and labels for 2019 data</li>
@@ -4337,7 +4338,7 @@
 	  </div>
 	  <div id="mapTab">
 		<table id="tocMaps" class="tocTables">
-		  <tr><th>Base Maps</th></tr>
+		  <tr><th>Basemaps</th></tr>
           <tr><td class="Basemaps" id='TxDOT' style="color:red; font-weight: bold;">TxDOT</td></tr>
 		  <tr><td class="Basemaps" id='Google'>Texas Imagery Service</td></tr>
 		  <tr><td class="Basemaps" id='txdotLightGray'>TxDOT Light Gray</td></tr>
