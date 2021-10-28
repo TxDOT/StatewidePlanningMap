@@ -3616,7 +3616,9 @@
               var url = "https://tile-api.inrix.com/v1/tiles/"+quadKey+"?accessToken="+txAccessToken+"&penWidth="+penWidth+"&opacity=60&frcLevel="+frcLevel+"&roadsegmenttype=XDS";
               return url;
             }
-					  map.addLayer(inrixTrafficLyr);
+            // add layer with .25 second delay to wait for token
+            setTimeout(function(){map.addLayer(inrixTrafficLyr)},250);
+
             function queryRecordFromService(theServiceName,theQuery,theOrder,theFields) {
               var theRequest = theServiceName + "/query?f=json&orderByFields=" + theOrder + "&returnGeometry=false&where=" + theQuery + "&outFields=" + theFields;
               return theRequest;
