@@ -2616,8 +2616,7 @@
 					activeOverlaysArray.push(theLayer);
 				}
 				// popup an alert to warn the user that only 2 overlays may be turned on at a time
-				if (activeOverlaysArray.length > 2){
-					// alert ("Maximum of 2 layers on at a time. Please turn off a layer in order to select another.");
+				if (activeOverlaysArray.length > 4){
 					document.getElementById("maskDiv").style.display="block";
         			document.getElementById("overlaysWarningDiv").style.display="block";
 					activeOverlaysArray.pop();
@@ -4258,7 +4257,7 @@
 <div id="maskDiv"></div>
 <div id="overlaysWarningDiv">
 	<h1><strong>Whoops</strong></h1>
-	<p2><strong>2 Overlay Maximum</strong></p3>
+	<p2><strong>4 Overlay Maximum</strong></p3>
 	<br>
 	<br>
 	<p1>Please turn off at least one other overlay in order to turn on another.</p1>
@@ -4286,6 +4285,7 @@
 	<p3 id="version"></p3>
 	<ul>
       <li>Added INRIX Live Traffic layer</li>
+      <li>Increased Maximum Overlays to 4</li>
       <li>(v4.4.10) Bug fix for Imagery zoom level</li>
       <li>(v.4.4.9) Updates to Shale Play layer</li>
       <li>(v4.4.8) AADT layer updates to add 2020 data</li>
@@ -4367,7 +4367,7 @@
 		  <tr><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
 		  <tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>
 		  <tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr>
-	 	  <tr><td class="Overlay" id='INRIX_Traffic'>INRIX Live Traffic</td></tr>
+	 	  <tr><td class="Overlay" id='INRIX_Traffic'>Live Traffic</td></tr>
 	 	  <tr><td class="Overlay" id='Maintenance_Section_Routes'>Maintenance Section Routes</td></tr>
           <tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
 		  <tr><td class="Overlay" id='MPO'>Metropolitan Planning Organizations (MPO)</td></tr>
