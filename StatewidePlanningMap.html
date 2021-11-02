@@ -621,12 +621,12 @@
     function printMap() {
       //get visible layers and push to array of legendLayers
 
-       //-- remove graphicsLayer1 whatever the hell it is
+       //-- remove graphicsLayer1 (need to add back; its the RI layer)
       console.log(map);
-      var gL1 = map.graphicsLayerIds.indexOf('graphicsLayer1');
-      if (gL1 > -1) {
-        map.graphicsLayerIds.splice(gL1,1);
-      }
+      // var gL1 = map.graphicsLayerIds.indexOf('graphicsLayer1');
+      // if (gL1 > -1) {
+      //   map.graphicsLayerIds.splice(gL1,1);
+      // }
       console.log(map);
 
       var printLegend = [];
