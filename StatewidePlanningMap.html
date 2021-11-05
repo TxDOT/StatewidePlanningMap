@@ -1448,37 +1448,37 @@
             var br = document.createElement('br');
             var canv = document.createElement('canvas');
             canv.width = 225;
-            canv.height = 100;
+            canv.height = 130;
             var ctx = canv.getContext("2d");
             ctx.font = '11px sans-serif';
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 4;
             // Create legend using html5 canvas
             ctx.beginPath();
-            ctx.moveTo(0,80);
-            ctx.lineTo(125,80);
-            ctx.strokeStyle='black';
+            ctx.moveTo(2,120);
+            ctx.lineTo(35,120);
+            ctx.strokeStyle='#646464';
             ctx.stroke();
-            ctx.fillText('Most Congested', 135, 85);
+            ctx.fillText('Most Congested', 45, 122.5);
 
             ctx.beginPath();
-            ctx.moveTo(0,60);
-            ctx.lineTo(125,60);
-            ctx.strokeStyle='red';
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(0,40);
-            ctx.lineTo(125,40);
-            ctx.strokeStyle='yellow';
+            ctx.moveTo(2,90);
+            ctx.lineTo(35,90);
+            ctx.strokeStyle='#FD6464';
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.moveTo(0,20);
-            ctx.lineTo(125,20);
-            ctx.strokeStyle='green';
+            ctx.moveTo(2,60);
+            ctx.lineTo(35,60);
+            ctx.strokeStyle='#FDFD64';
             ctx.stroke();
-            ctx.fillText('Least Congested', 135, 25);
-            ctx.fillText('Live Traffic', 5, 10);
+
+            ctx.beginPath();
+            ctx.moveTo(2,30);
+            ctx.lineTo(35,30);
+            ctx.strokeStyle='#78B778';
+            ctx.stroke();
+            ctx.fillText('Least Congested', 45, 32.5);
+            ctx.fillText('Live Traffic', 2, 10);
 
             // Create legend div for INRIX
             var inrixDiv = document.createElement('div');
@@ -4342,7 +4342,7 @@
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
-      <li>Added INRIX Live Traffic layer</li>
+      <li>Added INRIX Traffic® layer</li>
       <li>Increased Maximum Overlays to 4</li>
       <li>(v4.4.10) Bug fix for Imagery zoom level</li>
       <li>(v.4.4.9) Updates to Shale Play layer</li>
