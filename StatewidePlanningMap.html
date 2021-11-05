@@ -1319,6 +1319,7 @@
 				div.innerHTML = '';
 				divDesc.innerHTML = '';
 				document.getElementById("legendNotesDiv").style.display="none";
+        clearInrixLegend();
 				array.forEach(activeOverlaysArray, function(name){
 					var para = document.createElement("P");
 					var link = document.createElement("a");
@@ -1433,15 +1434,61 @@
 						document.getElementById("legendNotesDiv").style.display="block";
 					}
 
-                    else if (name == "Bicycle_Trails") {
-                        var text = document.createTextNode("From January 2017 to July 2018, TxDOT's Bicycle Tourism Trails Study examined the potential for a statewide network of long-distance bicycle routes to accommodate tourism and local needs. This feature class shows the Example Network segments, which may indicate future demand for long distance and local bicycling. Example Network routes represent an application of the qualitative and quantitative criteria established as part of the study. A more thorough analysis of local conditions and extensive stakeholder engagement is needed to advance development of any route.");
-						para.appendChild(text);
-                        var linkText = document.createTextNode("For more information, please consult TxDOT's Bicycle Tourism Trails Study Final Report");
-						link.appendChild(linkText);
-						link.href = "https://www.txdot.gov/inside-txdot/modes-of-travel/bicycle/plan-design/tourism-study.html";
-						document.getElementById("legendNotesDiv").style.display="block";
-                    }
+          else if (name == "Bicycle_Trails") {
+            var text = document.createTextNode("From January 2017 to July 2018, TxDOT's Bicycle Tourism Trails Study examined the potential for a statewide network of long-distance bicycle routes to accommodate tourism and local needs. This feature class shows the Example Network segments, which may indicate future demand for long distance and local bicycling. Example Network routes represent an application of the qualitative and quantitative criteria established as part of the study. A more thorough analysis of local conditions and extensive stakeholder engagement is needed to advance development of any route.");
+					  para.appendChild(text);
+            var linkText = document.createTextNode("For more information, please consult TxDOT's Bicycle Tourism Trails Study Final Report");
+					  link.appendChild(linkText);
+					  link.href = "https://www.txdot.gov/inside-txdot/modes-of-travel/bicycle/plan-design/tourism-study.html";
+					  document.getElementById("legendNotesDiv").style.display="block";
+          }
 
+          else if (name == "INRIX_Traffic") {
+						var text = document.createTextNode('Data provided by INRIX Traffic®');
+            var br = document.createElement('br');
+            var canv = document.createElement('canvas');
+            canv.width = 225;
+            canv.height = 100;
+            var ctx = canv.getContext("2d");
+            ctx.font = '11px sans-serif';
+            ctx.lineWidth = 5;
+
+            ctx.beginPath();
+            ctx.moveTo(0,80);
+            ctx.lineTo(125,80);
+            ctx.strokeStyle='black';
+            ctx.stroke();
+            ctx.fillText('Most Congested', 135, 85);
+
+            ctx.beginPath();
+            ctx.moveTo(0,60);
+            ctx.lineTo(125,60);
+            ctx.strokeStyle='red';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0,40);
+            ctx.lineTo(125,40);
+            ctx.strokeStyle='yellow';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0,20);
+            ctx.lineTo(125,20);
+            ctx.strokeStyle='green';
+            ctx.stroke();
+            ctx.fillText('Least Congested', 135, 25);
+            ctx.fillText('Live Traffic', 5, 10);
+
+            // Create legend div for INRIX
+            var inrixDiv = document.createElement('div');
+            inrixDiv.id='inrixDiv';
+            inrixDiv.appendChild(canv);
+            inrixDiv.appendChild(br);
+            inrixDiv.appendChild(text);
+            inrixDiv.style.display="block";
+            document.getElementById('legendDiv').insertAdjacentElement('afterend',inrixDiv);
+					}
 
 					else {
 						div.innerHTML = '';
@@ -1459,6 +1506,13 @@
 				document.getElementById("legendNotesDiv").style.display="none";
 			}
 		}
+
+    // Remove INRIX legend on tab change
+    function clearInrixLegend() {
+      if (!!document.getElementById('inrixDiv')){
+        document.getElementById('inrixDiv').remove();
+      }
+    }
 
 		function logCoords() {
 		  if (document.getElementById("measureTab").style.display=="block"||document.getElementById("sketchTab").style.display=="block") {
@@ -2291,6 +2345,7 @@
         activeOverlaysArray=[];
 				document.getElementById("CLEAR").style.color = "red";
 				document.getElementById("radMile").checked = true;
+        clearInrixLegend();
 			}
 
 			clearStyle("tcTabs");
@@ -2315,6 +2370,7 @@
 			  polyline = {};
 	      activateTool("POLYLINE");
   			home.hide();
+        clearInrixLegend();
 			}
 			else {
 			  deActivateTool("POLYLINE");
@@ -2616,8 +2672,7 @@
 					activeOverlaysArray.push(theLayer);
 				}
 				// popup an alert to warn the user that only 2 overlays may be turned on at a time
-				if (activeOverlaysArray.length > 2){
-					// alert ("Maximum of 2 layers on at a time. Please turn off a layer in order to select another.");
+				if (activeOverlaysArray.length > 4){
 					document.getElementById("maskDiv").style.display="block";
         			document.getElementById("overlaysWarningDiv").style.display="block";
 					activeOverlaysArray.pop();
@@ -4258,7 +4313,7 @@
 <div id="maskDiv"></div>
 <div id="overlaysWarningDiv">
 	<h1><strong>Whoops</strong></h1>
-	<p2><strong>2 Overlay Maximum</strong></p3>
+	<p2><strong>4 Overlay Maximum</strong></p3>
 	<br>
 	<br>
 	<p1>Please turn off at least one other overlay in order to turn on another.</p1>
@@ -4286,6 +4341,7 @@
 	<p3 id="version"></p3>
 	<ul>
       <li>Added INRIX Live Traffic layer</li>
+      <li>Increased Maximum Overlays to 4</li>
       <li>(v4.4.10) Bug fix for Imagery zoom level</li>
       <li>(v.4.4.9) Updates to Shale Play layer</li>
       <li>(v4.4.8) AADT layer updates to add 2020 data</li>
@@ -4367,7 +4423,7 @@
 		  <tr><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
 		  <tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>
 		  <tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr>
-	 	  <tr><td class="Overlay" id='INRIX_Traffic'>INRIX Live Traffic</td></tr>
+	 	  <tr><td class="Overlay" id='INRIX_Traffic'>Live Traffic</td></tr>
 	 	  <tr><td class="Overlay" id='Maintenance_Section_Routes'>Maintenance Section Routes</td></tr>
           <tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
 		  <tr><td class="Overlay" id='MPO'>Metropolitan Planning Organizations (MPO)</td></tr>
