@@ -1452,7 +1452,7 @@
             var ctx = canv.getContext("2d");
             ctx.font = '11px sans-serif';
             ctx.lineWidth = 5;
-
+            // Create legend using html5 canvas
             ctx.beginPath();
             ctx.moveTo(0,80);
             ctx.lineTo(125,80);
@@ -1486,7 +1486,9 @@
             inrixDiv.appendChild(canv);
             inrixDiv.appendChild(br);
             inrixDiv.appendChild(text);
+            inrixDiv.appendChild(br);
             inrixDiv.style.display="block";
+            inrixDiv.style.paddingBottom="20px";
             document.getElementById('legendDiv').insertAdjacentElement('afterend',inrixDiv);
 					}
 
