@@ -1444,6 +1444,7 @@
           }
 
           else if (name == "INRIX_Traffic") {
+            // Create legend using html5 canvas
 						var text = document.createTextNode('Data provided by INRIX Traffic®');
             var br = document.createElement('br');
             var canv = document.createElement('canvas');
@@ -1452,26 +1453,26 @@
             var ctx = canv.getContext("2d");
             ctx.font = '11px sans-serif';
             ctx.lineWidth = 4;
-            // Create legend using html5 canvas
+            // Black
             ctx.beginPath();
             ctx.moveTo(2,120);
             ctx.lineTo(35,120);
             ctx.strokeStyle='#646464';
             ctx.stroke();
             ctx.fillText('Most Congested', 45, 122.5);
-
+            // Red
             ctx.beginPath();
             ctx.moveTo(2,90);
             ctx.lineTo(35,90);
             ctx.strokeStyle='#FD6464';
             ctx.stroke();
-
+            // Yellow
             ctx.beginPath();
             ctx.moveTo(2,60);
             ctx.lineTo(35,60);
-            ctx.strokeStyle='#FDFD64';
+            ctx.strokeStyle='#F9F960';
             ctx.stroke();
-
+            // Green
             ctx.beginPath();
             ctx.moveTo(2,30);
             ctx.lineTo(35,30);
@@ -1479,7 +1480,6 @@
             ctx.stroke();
             ctx.fillText('Least Congested', 45, 32.5);
             ctx.fillText('Live Traffic', 2, 10);
-
             // Create legend div for INRIX
             var inrixDiv = document.createElement('div');
             inrixDiv.id='inrixDiv';
