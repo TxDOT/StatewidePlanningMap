@@ -488,9 +488,9 @@
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
 
 	//Overlay variables
-  var aadtLyr,labelLayerAADT,areaOfficeLyr,COGLyr,FCLyr,fcLastEditDate,UZAlyr,NatlFreightLyr,TXFreightLyr,NHSLyr,maintOfficeLyr,maintSecRoutesLyr,txTrunkLyr,MarkerLyr,labelLayerMarker,MPOLyr,nonAttainLyr,controlSectionLyr,energySectorLyr,
+  var aadtLyr,labelLayerAADT,areaOfficeLyr,COGLyr,FCLyr,fcLastEditDate,UZAlyr,NatlFreightLyr,TXFreightLyr,NHSLyr,maintOfficeLyr,maintSecRoutesLyr,txTrunkLyr,MarkerLyr,labelLayerMarker,MPOLyr,airQualityLyrs=[],controlSectionLyr,energySectorLyr,
   labelLayerCS,USHouseLyr,railRoadLyr,speedLimitLyr,StateHouseLyr,StateSenateLyr,futureTrafficLyr,longTermPlanLyr,constScheduledLyr,finalForConstLyr,underDevLyr,minuteOrderLyr,pavementConditionLyr,VerticalLyr,permStationLyr,
-  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
+  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,rumbleStripLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
 
   //Measure, tab, coords, url and marker offset variables
 	var currentMeasure=0,activeTab='tcMap',deLength=0,coords,url,markerAndOffset;
@@ -2591,6 +2591,7 @@
 		function hideAllOverlays() {
 			activeOverlay = "";
 			if (aadtLyr) {aadtLyr.hide(); labelLayerAADT.hide()}
+      if (airQualityLyrs) {for (var i=0; i<airQualityLyrs.length; i++){airQualityLyrs[i].hide();}}
 			if (areaOfficeLyr) {areaOfficeLyr.hide();}
 			if (COGLyr) {COGLyr.hide();}
 			if (FCLyr) {FCLyr.hide();}
@@ -2604,7 +2605,6 @@
 			if (MPOLyr) {MPOLyr.hide();}
 			if (NHSLyr) {NHSLyr.hide();}
 			if (NHSLyr) {MAP21Lyr.hide();}
-			if (nonAttainLyr) {nonAttainLyr.hide();}
 			if (MarkerLyr) {MarkerLyr.hide(); labelLayerMarker.hide();}
 			if (controlSectionLyr) {controlSectionLyr.hide(); labelLayerCS.hide();}
 			if (USHouseLyr) {USHouseLyr.hide();}
@@ -2625,6 +2625,7 @@
 			if (rdwyInvLyr) {rdwyInvLyr.hide();}
 			if (cemeteryLyr) {cemeteryLyr.hide();}
 			if (energySectorLyr) {energySectorLyr.hide();}
+      if (rumbleStripLyr) {rumbleStripLyr.hide();}
 			if (shalePlaysLyr) {shalePlaysLyr.hide();} //if (shalePlaysLyr) {shalePlaysLyr.hide(); shaleBasinsLyr.hide();}
 			if (RMAlyr) {RMAlyr.hide();}
 			if (tollLyr) {tollLyr.hide();}
@@ -2870,22 +2871,87 @@
 					layerInfo.push({layer:railRoadLyr, title:"Mainline Railroads"});
 				}
 
-				if (activeOverlaysArray.indexOf("Non_Attainment")> -1) {
-					var pos = activeOverlaysArray.indexOf("Non_Attainment");
-					if (nonAttainLyr) {
-						nonAttainLyr.show();
-						map.reorderLayer(nonAttainLyr,pos);
+				// if (activeOverlaysArray.indexOf("Non_Attainment")> -1) {
+				// 	var pos = activeOverlaysArray.indexOf("Non_Attainment");
+				// 	if (nonAttainLyr) {
+				// 		nonAttainLyr.show();
+				// 		map.reorderLayer(nonAttainLyr,pos);
+				// 	}
+				// 	else {
+        //     var tableText = makeTableFromArrayNoHeader([["FIPS","${FIPS}"],["Region","${REGION}"],["Status","${STATUS}"]]);
+				// 		var infoTemplate = new InfoTemplate("Non Attainment:",tableText);
+				// 		var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_NonAttainment_Areas/FeatureServer/0";
+        //
+				// 		nonAttainLyr = new FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});
+				// 		map.addLayer(nonAttainLyr);
+				// 	}
+				// 	activeOverlay = nonAttainLyr;
+				// 	layerInfo.push({layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"});
+				// }
+
+        ////////////ADDING AIR QUALITY LAYERS HERE///////////////////
+        if (activeOverlaysArray.indexOf("Air_Quality")> -1) {
+					var pos = activeOverlaysArray.indexOf("Air_Quality");
+					if (airQualityLyrs.length>0) {
+            // iterate array and show each layer
+            for (var i=0; i<airQualityLyrs.length; i++) {
+              airQualityLyrs[i].show();
+            }
+            // iterate array and reorder all layers on top
+						//map.reorderLayer(nonAttainLyr,pos);
 					}
 					else {
-            var tableText = makeTableFromArrayNoHeader([["FIPS","${FIPS}"],["Region","${REGION}"],["Status","${STATUS}"]]);
-						var infoTemplate = new InfoTemplate("Non Attainment:",tableText);
-						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_NonAttainment_Areas/FeatureServer/0";
 
-						nonAttainLyr = new FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});
-						map.addLayer(nonAttainLyr);
+            var svcURL = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/nonattainment_and_maintenance_areas/FeatureServer/";
+
+            // CO Layer
+            var coLyrTableText = makeTableFromArrayNoHeader([["Name","${Name}"],["Status","${Status}"]]);
+            var coLyrInfoTemplate = new InfoTemplate("Carbon Monoxide:", coLyrTableText);
+            var coLyr = new FeatureLayer(svcURL+"/0",{
+              id: "Carbon_Monoxide",
+              outFields: ["Name","Status"],
+              infoTemplate: coLyrInfoTemplate
+            });
+            // PM Layer
+            var pmLyrTableText = makeTableFromArrayNoHeader([["Name","${CNTY_NM}"],["Status","${Status}"]]);
+            var pmLyrInfoTemplate = new InfoTemplate("Moderate Particulate Matter:", pmLyrTableText);
+            var pmLyr = new FeatureLayer(svcURL+"/1",{
+              id: "Particulate_Matter",
+              outFields: ["County Name","Status"],
+              infoTemplate: pmLyrInfoTemplate
+            });
+            // 1997 and 2008/2015 Layer Non Attain
+            var nonAttainTableText = makeTableFromArrayNoHeader([
+              ["Name","${CNTY_NM}"],
+              ["Status 1997","${NAAQS_1997}"],
+              ["Status 2008","${NAAQS_2008}"],
+              ["Status 2008","${NAAQS_2015}"],
+              ["Attainment","${Attainment}"],
+              ["Non-Attainment","${Nonattainm}"]
+            ]);
+            var lyr97InfoTemplate = new InfoTemplate("1997 Non-Attainment:", nonAttainTableText);
+            var lyr97 = new FeatureLayer(svcURL+"/2",{
+              id: "97_Non_Attain",
+              outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015","Attainment","Nonattainm"],
+              infoTemplate: lyr97InfoTemplate
+            });
+
+            var lyr08_15InfoTemplate = new InfoTemplate("2008/2015 Non-Attainment:", nonAttainTableText);
+            var lyr08_15 = new FeatureLayer(svcURL+"/3",{
+              id: "08_15_Non_Attain",
+              outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015","Attainment","Nonattainm"],
+              infoTemplate: lyr08_15InfoTemplate
+            });
+
+            // make array of sub-layers in service:
+            airQualityLyrs.push(lyr08_15,lyr97,pmLyr,coLyr);
+            for (var i=0; i<airQualityLyrs.length; i++) {
+              map.addLayer(airQualityLyrs[i]);
+            }
+
 					}
-					activeOverlay = nonAttainLyr;
-					layerInfo.push({layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"});
+					activeOverlay = airQualityLyrs;
+					// layerInfo.push({layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"});
 				}
 
 				if (activeOverlaysArray.indexOf("Texas_Trunk")> -1) {
@@ -3374,6 +3440,23 @@
 					activeOverlay = energySectorLyr;
 					layerInfo.push({layer:energySectorLyr, title:"Energy Sector Corridors"});
 				}
+
+        if (activeOverlaysArray.indexOf("Rumble_Strips")> -1) {
+          var pos = activeOverlaysArray.indexOf("Rumble_Strips");
+            if (rumbleStripLyr) {
+              rumbleStripLyr.show();
+              map.reorderLayer(rumbleStripLyr,pos);
+            }
+            else {
+              var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"],["Begin DFO","${BEGIN_DFO}"],["END DFO","${END_DFO}"],["Location","${LOCN}"],["Type","${TYPE}"]]);
+              var infoTemplate = new InfoTemplate("TxDOT Rumble Strips:",tableText);
+              var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Rumble_Strips/FeatureServer/0";
+              rumbleStripLyr = new FeatureLayer(projectsUrl, {id:"Rumble_Strips",visible: true,outFields:["RTE_NM", "BEGIN_DFO", "END_DFO", "LOCN", "TYPE"], infoTemplate: infoTemplate});
+              map.addLayer(rumbleStripLyr);
+            }
+          activeOverlay = rumbleStripLyr;
+          layerInfo.push({layer:rumbleStripLyr, title:"TxDOT Rumble Strips"});
+        }
 
 				if (activeOverlaysArray.indexOf("Shale_Plays")> -1) {
 					var pos = activeOverlaysArray.indexOf("Shale_Plays");
@@ -4410,6 +4493,7 @@
 		  <tr><th>Overlays</th></tr>
 		  <tr><td class="Overlay" id="CLEAR" style="color:red; font-weight: bold;">Clear Overlays</td></tr>
 		  <tr><td class="Overlay" id='AADT'>AADT</td></tr>
+      <tr><td class="Overlay" id='Air_Quality'>Air Quality</td></tr>
 		  <tr><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 		  <tr><td class="Overlay" id='Bridges'>Bridges</td></tr>
 		  <tr><td class="Overlay" id='Cemetery'>Cemeteries</td></tr>
@@ -4427,20 +4511,20 @@
 		  <tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr>
 	 	  <tr><td class="Overlay" id='INRIX_Traffic'>Live Traffic</td></tr>
 	 	  <tr><td class="Overlay" id='Maintenance_Section_Routes'>Maintenance Section Routes</td></tr>
-          <tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
+      <tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
 		  <tr><td class="Overlay" id='MPO'>Metropolitan Planning Organizations (MPO)</td></tr>
 		  <tr><td class="Overlay" id='NHS'>National Highway System</td></tr>
-		  <tr><td class="Overlay" id='Non_Attainment'>Non-Attainment Areas</td></tr>
 		  <!-- <tr><td class="Overlay" id='Pavement_Conditions'>Pavement Conditions</td></tr> -->
 		  <tr><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>
-          <tr><td class="Overlay" id='Construction_Scheduled'>Projects - Construction underway or begins soon</td></tr>
+      <tr><td class="Overlay" id='Construction_Scheduled'>Projects - Construction underway or begins soon</td></tr>
 		  <tr><td class="Overlay" id='Finalizing_for_Construction'>Projects - Construction begins within 4 years</td></tr>
 		  <tr><td class="Overlay" id='Under_Development'>Projects - Construction begins in 5 to 10 years</td></tr>
-          <tr><td class="Overlay" id='Long_Term_Planning'>Projects - Corridor Studies, construction in 10+ years</td></tr>
+      <tr><td class="Overlay" id='Long_Term_Planning'>Projects - Corridor Studies, construction in 10+ years</td></tr>
 		  <tr><td class="Overlay" id='Railroads'>Railroads</td></tr>
-	      <tr><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
-	      <tr><td class="Overlay" id='RMA'>Regional Mobility Authorities (RMA)</td></tr>
-	      <tr><td class="Overlay" id='Roadway_Inventory'>Roadway Inventory - On-System Roadbeds</td></tr>
+	    <tr><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
+	    <tr><td class="Overlay" id='RMA'>Regional Mobility Authorities (RMA)</td></tr>
+	    <tr><td class="Overlay" id='Roadway_Inventory'>Roadway Inventory - On-System Roadbeds</td></tr>
+      <tr><td class="Overlay" id='Rumble_Strips'>Rumble Strips</td></tr>
 		  <tr><td class="Overlay" id='Shale_Plays'>Shale Plays</td></tr>
 		  <tr><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
 		  <tr><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
@@ -4450,7 +4534,7 @@
 		  <tr><td class="Overlay" id='Tolls'>Tolls</td></tr>
 		  <tr><td class="Overlay" id='Future_Tolls'>Tolls (Future & Proposed)</td></tr>
 		  <tr><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
-          <tr><td class="Overlay" id='Bicycle_Trails'>TxDOT Bicycle Tourism Example Network</td></tr>
+      <tr><td class="Overlay" id='Bicycle_Trails'>TxDOT Bicycle Tourism Example Network</td></tr>
 		  <tr><td class="Overlay" id='TxDOT_Facilities'>TxDOT Facilities</td></tr>
 		  <tr><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>
 		  <tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>
