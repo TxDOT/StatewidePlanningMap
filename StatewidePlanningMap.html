@@ -2661,7 +2661,7 @@
 		function hideAllOverlays() {
 			activeOverlay = "";
 			if (aadtLyr) {aadtLyr.hide(); labelLayerAADT.hide()}
-      if (airQualityLyrs) {for (var i=0; i<airQualityLyrs.length; i++){airQualityLyrs[i].hide();}}
+			if (airQualityLyrs) {for (var i=0; i<airQualityLyrs.length; i++){airQualityLyrs[i].hide();}}
 			if (areaOfficeLyr) {areaOfficeLyr.hide();}
 			if (COGLyr) {COGLyr.hide();}
 			if (FCLyr) {FCLyr.hide();}
@@ -2695,24 +2695,24 @@
 			if (rdwyInvLyr) {rdwyInvLyr.hide();}
 			if (cemeteryLyr) {cemeteryLyr.hide();}
 			if (energySectorLyr) {energySectorLyr.hide();}
-      if (rumbleStripLyr) {rumbleStripLyr.hide();}
+      		if (rumbleStripLyr) {rumbleStripLyr.hide();}
 			if (shalePlaysLyr) {shalePlaysLyr.hide();} //if (shalePlaysLyr) {shalePlaysLyr.hide(); shaleBasinsLyr.hide();}
 			if (RMAlyr) {RMAlyr.hide();}
 			if (tollLyr) {tollLyr.hide();}
 			if (futTollLyr) {futTollLyr.hide();}
 			if (hurrEvacLyr) {hurrEvacLyr.hide();}
-      if (inrixTrafficLyr) {inrixTrafficLyr.hide();}
-      if (memorialHighwayLyr) {memorialHighwayLyr.hide();}
-      if (curCongLyr) {curCongLyr.hide();}
-      if (futCongLyr) {futCongLyr.hide();}
-      if (facLyr) {facLyr.hide();}
-      if (bridgeLyr) {bridgeLyr.hide();}
-      if (connCorrLyr) {connCorrLyr.hide();}
-      if (STRAHNETLyr) {STRAHNETLyr.hide();}
-      if (bikeLayer) {bikeLayer.hide();}
-      if (projectsRI) {projectsRI.hide();}
+			if (inrixTrafficLyr) {inrixTrafficLyr.hide();}
+			if (memorialHighwayLyr) {memorialHighwayLyr.hide();}
+			if (curCongLyr) {curCongLyr.hide();}
+			if (futCongLyr) {futCongLyr.hide();}
+			if (facLyr) {facLyr.hide();}
+			if (bridgeLyr) {bridgeLyr.hide();}
+			if (connCorrLyr) {connCorrLyr.hide();}
+			if (STRAHNETLyr) {STRAHNETLyr.hide();}
+			if (bikeLayer) {bikeLayer.hide();}
+			if (projectsRI) {projectsRI.hide();}
 			clearStyle("tocData");
-      map.graphics.clear();
+      		map.graphics.clear();
 		}
 
 		dojo.query(".Overlay").forEach(function (result){
