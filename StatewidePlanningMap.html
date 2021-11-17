@@ -2661,7 +2661,7 @@
 		function hideAllOverlays() {
 			activeOverlay = "";
 			if (aadtLyr) {aadtLyr.hide(); labelLayerAADT.hide()}
-			if (airQualityLyrs) {for (var i=0; i<airQualityLyrs.length; i++){airQualityLyrs[i].hide();}}
+			if (airQualityLyrs) {airQualityLyrs.forEach((item, i)=>{item.hide()})}
 			if (areaOfficeLyr) {areaOfficeLyr.hide();}
 			if (COGLyr) {COGLyr.hide();}
 			if (FCLyr) {FCLyr.hide();}
@@ -2961,69 +2961,70 @@
 
         ////////////ADDING AIR QUALITY LAYERS HERE///////////////////
         if (activeOverlaysArray.indexOf("Air_Quality")> -1) {
-					var pos = activeOverlaysArray.indexOf("Air_Quality");
-					if (airQualityLyrs.length>0) {
-            // iterate array and show each layer
-            for (var i=0; i<airQualityLyrs.length; i++) {
-              airQualityLyrs[i].show();
-            }
-            // iterate array and reorder all layers on top
-						//map.reorderLayer(nonAttainLyr,pos);
-					}
-					else {
-
-            var svcURL = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/nonattainment_and_maintenance_areas/FeatureServer/";
-
-            // CO Layer
-            var coLyrTableText = makeTableFromArrayNoHeader([["Name","${Name}"],["Status","${Status}"]]);
-            var coLyrInfoTemplate = new InfoTemplate("Carbon Monoxide:", coLyrTableText);
-            var coLyr = new FeatureLayer(svcURL+"/0",{
-              id: "Carbon_Monoxide",
-              outFields: ["Name","Status"],
-              infoTemplate: coLyrInfoTemplate
+    			var pos = activeOverlaysArray.indexOf("Air_Quality");
+    			if (airQualityLyrs.length>0) {
+          	// iterate array and show each layer
+    				airQualityLyrs.forEach((item, i) => {
+              item.show();
+              layerInfo.push({layer:item, title:item.id})
             });
-            // PM Layer
-            var pmLyrTableText = makeTableFromArrayNoHeader([["Name","${CNTY_NM}"],["Status","${Status}"]]);
-            var pmLyrInfoTemplate = new InfoTemplate("Moderate Particulate Matter:", pmLyrTableText);
-            var pmLyr = new FeatureLayer(svcURL+"/1",{
-              id: "Particulate_Matter",
-              outFields: ["County Name","Status"],
-              infoTemplate: pmLyrInfoTemplate
-            });
-            // 1997 and 2008/2015 Layer Non Attain
-            var nonAttainTableText = makeTableFromArrayNoHeader([
-              ["Name","${CNTY_NM}"],
-              ["Status 1997","${NAAQS_1997}"],
-              ["Status 2008","${NAAQS_2008}"],
-              ["Status 2008","${NAAQS_2015}"],
-              ["Attainment","${Attainment}"],
-              ["Non-Attainment","${Nonattainm}"]
-            ]);
-            var lyr97InfoTemplate = new InfoTemplate("1997 Non-Attainment:", nonAttainTableText);
-            var lyr97 = new FeatureLayer(svcURL+"/2",{
-              id: "97_Non_Attain",
-              outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015","Attainment","Nonattainm"],
-              infoTemplate: lyr97InfoTemplate
-            });
+          // iterate array and reorder all layers on top
+  				//map.reorderLayer(nonAttainLyr,pos);
+  			  }
+    			else {
+    				// service URL
+    				var svcURL = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/nonattainment_and_maintenance_areas/FeatureServer/";
+    				// CO Layer
+    				var coLyrTableText = makeTableFromArrayNoHeader([["Name","${Name}"],["Status","${Status}"]]);
+    				var coLyrInfoTemplate = new InfoTemplate("Carbon Monoxide:", coLyrTableText);
+    				var coLyr = new FeatureLayer(svcURL+"/0", {
+    					id: "Carbon_Monoxide",
+    					outFields: ["Name","Status"],
+    					infoTemplate: coLyrInfoTemplate
+    				});
+  				// PM Layer
+  				var pmLyrTableText = makeTableFromArrayNoHeader([["Name","${CNTY_NM}"],["Status","${Status}"]]);
+  				var pmLyrInfoTemplate = new InfoTemplate("Moderate Particulate Matter:", pmLyrTableText);
+  				var pmLyr = new FeatureLayer(svcURL+"/1", {
+  					id: "Particulate_Matter",
+  					outFields: ["County Name","Status"],
+  					infoTemplate: pmLyrInfoTemplate
+        	});
+  				// 1997 and 2008/2015 Layer Non Attain
+  				var nonAttainTableText = makeTableFromArrayNoHeader([
+  					["Name","${CNTY_NM}"],
+  					["Status 1997","${NAAQS_1997}"],
+  					["Status 2008","${NAAQS_2008}"],
+  					["Status 2008","${NAAQS_2015}"],
+  					["Attainment","${Attainment}"],
+  					["Non-Attainment","${Nonattainm}"]
+  				]);
+  				var lyr97InfoTemplate = new InfoTemplate("1997 Non-Attainment:", nonAttainTableText);
+  				var lyr97 = new FeatureLayer(svcURL+"/2", {
+  					id: "97_Non_Attain",
+  					outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015","Attainment","Nonattainm"],
+  					infoTemplate: lyr97InfoTemplate
+  				});
+  				var lyr08_15InfoTemplate = new InfoTemplate("2008/2015 Non-Attainment:", nonAttainTableText);
+  				var lyr08_15 = new FeatureLayer(svcURL+"/3", {
+  					id: "08_15_Non_Attain",
+  					outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015","Attainment","Nonattainm"],
+  					infoTemplate: lyr08_15InfoTemplate
+  				});
+  				// make array of sub-layers in service:
+  				airQualityLyrs.push(lyr08_15,lyr97,pmLyr,coLyr);
 
-            var lyr08_15InfoTemplate = new InfoTemplate("2008/2015 Non-Attainment:", nonAttainTableText);
-            var lyr08_15 = new FeatureLayer(svcURL+"/3",{
-              id: "08_15_Non_Attain",
-              outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015","Attainment","Nonattainm"],
-              infoTemplate: lyr08_15InfoTemplate
-            });
+          // add to map
+          airQualityLyrs.forEach((item, i) => {
+            map.addLayer(item);
+            layerInfo.push({layer:item, title:item.id})
+          })}
+  			  activeOverlay = airQualityLyrs;
 
-            // make array of sub-layers in service:
-            airQualityLyrs.push(lyr08_15,lyr97,pmLyr,coLyr);
-            for (var i=0; i<airQualityLyrs.length; i++) {
-              map.addLayer(airQualityLyrs[i]);
-            }
+  			  // layerInfo.push({layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"});
 
-					}
-					activeOverlay = airQualityLyrs;
-					// layerInfo.push({layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"});
-				}
-
+          console.log(layerInfo)
+	      }
 				if (activeOverlaysArray.indexOf("Texas_Trunk")> -1) {
 					var pos = activeOverlaysArray.indexOf("Texas_Trunk");
 					if (txTrunkLyr) {
