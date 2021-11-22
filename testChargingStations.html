@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!-- This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License. To view a copy of this license, visit https://creativecommons.org/licenses/by-sa/4.0/ -->
+<!-- Created by TxDOT-TPP, Data Management Section -->
+<!-- Traffic Data Provided by INRIX -->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Texas Charging Station Map</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.37/esri/css/esri.css">
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script src="https://js.arcgis.com/3.37/"></script>
+    <script>
+      var map;
+
+      require([
+      "esri/map",
+      "esri/layers/VectorTileLayer",
+      "esri/request",
+      "esri/config",
+      "esri/geometry/Point",
+      "esri/symbols/SimpleMarkerSymbol",
+      "esri/Color",
+      "esri/graphic",
+      "esri/layers/GraphicsLayer",
+      "esri/basemaps",
+      "esri/geometry/webMercatorUtils",
+      "dojo/domReady!"
+    ], function (Map, VectorTileLayer, esriRequest, esriConfig,
+      Point, SimpleMarkerSymbol, Color, Graphic, GraphicsLayer, esriBasemaps, webMercatorUtils) {
+        
+        
+        map = new Map("map", {
+          //basemap: "topo",  //For full list of pre-defined basemaps, navigate to https://developers.arcgis.com/javascript/3/jsapi/esri.basemaps-amd.html
+          center: [-97.747, 30.31], // longitude, latitude
+          minZoom: 4,
+          maxZoom: 16,
+          zoom: 5,
+          logo: false
+        });
+
+        // Use CORS 
+        esriConfig.defaults.io.corsEnabledServers.push("https://developer.nrel.gov");
+      
+        // request all ELEC locations as geojson
+        const dataRequestPromise = esriRequest({
+            url: "https://developer.nrel.gov/api/alt-fuel-stations/v1.geojson?api_key=QnhomVJEoNJdkuSwUV1Kbz9FFsE70QBzuq3pZhoi&fuel_type=ELEC,LPG,HY,CNG,LNG&state=TX",
+            handleAs: 'json'
+        });
+
+        //TxDOT Vector Tile Basemap - Light Gray
+        var txdotLightGray = new VectorTileLayer("https://www.arcgis.com/sharing/rest/content/items/507a9905e7154ce484617c7327ee8bc4/resources/styles/root.json?f=pjson");
+      	map.addLayer(txdotLightGray);
+
+        map.on("load", () => {
+        //  graphicslayer
+        const graphicsLayer = new GraphicsLayer();
+        map.addLayer(graphicsLayer);
+        
+        // read the geojson data from esriRequest promise
+        dataRequestPromise.then((response) => {
+
+            // loop through geojson and process the data
+            response.features.map((feature, i) => {
+              const point = new Point(feature.geometry.coordinates);
+
+                // projection used in SPM
+                var chargeStationWebMer = webMercatorUtils.geographicToWebMercator(point);
+
+                // what else do we need? 
+                const attributes = {
+                    ObjectID: i,
+                    station_name: feature.properties.station_name,
+                    fuel_type_code: feature.properties.fuel_type_code
+                };
+            
+                // give each point type a color
+                const fuelTypeColor = [
+                  {fuelTypeCode : "CNG", fuelColor : [200 ,0, 0, 0.5]},
+                  {fuelTypeCode : "LPG", fuelColor : [0 ,0, 200, 0.5]},
+                  {fuelTypeCode : "HY", fuelColor : [0,200, 0, 0.5]},
+                  {fuelTypeCode : "LNG", fuelColor : [200 ,200, 200, 0.5]},
+                  {fuelTypeCode : "ELEC", fuelColor : [232 ,221 , 19, 0.5]}
+
+                ];
+
+                // function for symbolizing point color
+                let symbolizeAltFuels = (fuelPoint) => {
+                  if (attributes.fuel_type_code == fuelPoint.fuelTypeCode) {
+                    chargeStationMarker = new SimpleMarkerSymbol("solid", 5, null, new Color(fuelPoint.fuelColor))
+                    const graphic = new Graphic(chargeStationWebMer, chargeStationMarker, attributes);
+                    return graphicsLayer.add(graphic);
+                  }
+                }
+
+                fuelTypeColor.map(symbolizeAltFuels);          
+            });
+        })
+        .otherwise((error) => {
+            console.log("error happened while loading layer", error);
+        });
+      });
+
+      });
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+</html>
