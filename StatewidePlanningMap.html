@@ -654,7 +654,7 @@
       printTemplate.layoutOptions = {
         legendLayers: printLegend,
         titleText: "Custom Map Title",
-        customTextElements: [{"HEADER - Custom Text": "Custom Text"}]
+        customTextElements: [{"HEADER - Custom Text": "Custom Text Goes Here"}]
       };
       console.log(printTemplate);
 
@@ -2671,7 +2671,7 @@
 					activeOverlaysArray.push(theLayer);
 				}
 				// popup an alert to warn the user that only 2 overlays may be turned on at a time
-				if (activeOverlaysArray.length > 2){
+				if (activeOverlaysArray.length > 4){
 					// alert ("Maximum of 2 layers on at a time. Please turn off a layer in order to select another.");
 					document.getElementById("maskDiv").style.display="block";
         			document.getElementById("overlaysWarningDiv").style.display="block";
