@@ -2630,7 +2630,7 @@
 			if (rdwyInvLyr) {rdwyInvLyr.hide();}
 			if (cemeteryLyr) {cemeteryLyr.hide();}
 			if (energySectorLyr) {energySectorLyr.hide();}
-      if (rumbleStripLyr) {rumbleStripLyr.hide();}
+      		if (rumbleStripLyr) {rumbleStripLyr.hide();}
 			if (shalePlaysLyr) {shalePlaysLyr.hide();} //if (shalePlaysLyr) {shalePlaysLyr.hide(); shaleBasinsLyr.hide();}
 			if (RMAlyr) {RMAlyr.hide();}
 			if (tollLyr) {tollLyr.hide();}
@@ -2894,82 +2894,86 @@
 				// }
 
         ////////////ADDING AIR QUALITY LAYERS HERE///////////////////
-        if (activeOverlaysArray.indexOf("Air_Quality")> -1) {
-    			var pos = activeOverlaysArray.indexOf("Air_Quality");
-    			if (airQualityLyrs.length>0) {
-          	// iterate array show each layer, push to legend and reorder all
-    				airQualityLyrs.forEach((item, i) => {
-              item.show();
-              layerInfo.push({layer:item, title:item.id.replace(/_/g," ")});
-              map.reorderLayer(item,pos);
-            });
-            console.log("Overlay array position: "+ pos);
-            console.log(map.graphicsLayerIds);
-            // iterate array and reorder all layers on top
-  			  }
-    			else {
-    				// service URL
-    				var svcURL = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/nonattainment_and_maintenance_areas/FeatureServer/";
-    				// CO Layer
-    				var coLyrTableText = makeTableFromArrayNoHeader([["Name","${Name}"],["Status","${Status}"]]);
-    				var coLyrInfoTemplate = new InfoTemplate("Carbon Monoxide:", coLyrTableText);
-            // symbol and renderer
-            var coSymbol = new SimpleFillSymbol();
-            coSymbol.color = new Color([0,0,0,-1]);//set transparency 100%
-            coSymbol.outline = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SHORTDASHDOTDOT, new Color([30,203,225]), 2);
-            var coRender = new SimpleRenderer(coSymbol);
-    				var coLyr = new FeatureLayer(svcURL+"/0", {
-    					id: "Carbon_Monoxide",
-    					outFields: ["Name","Status"],
-    					infoTemplate: coLyrInfoTemplate
-    				});
-            coLyr.renderer = coRender;
-  				  // PM Layer
-    				var pmLyrTableText = makeTableFromArrayNoHeader([["Name","${CNTY_NM}"],["Status","${Status}"]]);
-    				var pmLyrInfoTemplate = new InfoTemplate("Moderate Particulate Matter:", pmLyrTableText);
-            // symbol and renderer
-            var pmSymbol = new SimpleFillSymbol();
-            pmSymbol.color = new Color([0,0,0,-1]);//set transparency 100%
-            pmSymbol.outline = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SHORTDASH, new Color([225,52,30]), 2);
-            var pmRender = new SimpleRenderer(pmSymbol);
-    				var pmLyr = new FeatureLayer(svcURL+"/1", {
-    					id: "Particulate_Matter",
-    					outFields: ["County Name","Status"],
-    					infoTemplate: pmLyrInfoTemplate
-          	});
-            pmLyr.renderer = pmRender;
-    				// 1997 and 2008/2015 Layer Non Attain
-    				var nonAttainTableText = makeTableFromArrayNoHeader([
-    					["Name","${CNTY_NM}"],
-    					["Status 1997","${NAAQS_1997}"],
-    					["Status 2008","${NAAQS_2008}"],
-    					["Status 2015","${NAAQS_2015}"]
-    				]);
-    				var lyr97InfoTemplate = new InfoTemplate("1997 Non-Attainment:", nonAttainTableText);
-    				var lyr97 = new FeatureLayer(svcURL+"/2", {
-    					id: "1997_Non-Attainment",
-    					outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015"],
-    					infoTemplate: lyr97InfoTemplate
-    				});
-            lyr97.setOpacity(.35);
-    				var lyr08_15InfoTemplate = new InfoTemplate("2008/2015 Non-Attainment:", nonAttainTableText);
-    				var lyr08_15 = new FeatureLayer(svcURL+"/3", {
-    					id: "2008/2015_Non-Attainment",
-    					outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015"],//remove last 2
-    					infoTemplate: lyr08_15InfoTemplate
-    				});
-            lyr08_15.setOpacity(.45);
+			if (activeOverlaysArray.indexOf("Air_Quality")> -1) {
+				var pos = activeOverlaysArray.indexOf("Air_Quality");
+				if (airQualityLyrs.length>0) {
+					// iterate array show each layer, push to legend and reorder all
+					airQualityLyrs.forEach((item, i) => {
+						item.show();
+						layerInfo.push({layer:item, title:item.id.replace(/_/g," ")});
+						map.reorderLayer(item,pos);
+					});
+					console.log("Overlay array position: "+ pos);
+					console.log(map.graphicsLayerIds);
+					// iterate array and reorder all layers on top
+				}
+				else {
+					// service URL
+					var svcURL = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/nonattainment_and_maintenance_areas/FeatureServer/";
+					
+					// CO Layer
+					var coLyrTableText = makeTableFromArrayNoHeader([["Name","${Name}"],["Status","${Status}"]]);
+					var coLyrInfoTemplate = new InfoTemplate("Carbon Monoxide:", coLyrTableText);
+					// symbol and renderer
+					var coSymbol = new SimpleFillSymbol();
+					coSymbol.color = new Color([0,0,0,-1]);//set transparency 100%
+					coSymbol.outline = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SHORTDASHDOTDOT, new Color([30,203,225]), 2);
+					var coRender = new SimpleRenderer(coSymbol);
+					var coLyr = new FeatureLayer(svcURL+"/0", {
+						id: "Carbon_Monoxide",
+						outFields: ["Name","Status"],
+						infoTemplate: coLyrInfoTemplate
+					});
+					coLyr.renderer = coRender;
 
-    				// make array of sub-layers in service:
-    				airQualityLyrs.push(lyr08_15,lyr97,pmLyr,coLyr);
+					// PM Layer
+					var pmLyrTableText = makeTableFromArrayNoHeader([["Name","${CNTY_NM}"],["Status","${Status}"]]);
+					var pmLyrInfoTemplate = new InfoTemplate("Moderate Particulate Matter:", pmLyrTableText);
+					// symbol and renderer
+					var pmSymbol = new SimpleFillSymbol();
+					pmSymbol.color = new Color([0,0,0,-1]); //set transparency 100%
+					pmSymbol.outline = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SHORTDASH, new Color([225,52,30]), 2);
+					var pmRender = new SimpleRenderer(pmSymbol);
+							var pmLyr = new FeatureLayer(svcURL+"/1", {
+								id: "Particulate_Matter",
+								outFields: ["County Name","Status"],
+								infoTemplate: pmLyrInfoTemplate
+					});
+					pmLyr.renderer = pmRender;
 
-            // add to map and push layers to legend
-            airQualityLyrs.forEach((item, i) => {
-              map.addLayer(item);
-              layerInfo.push({layer:item, title:item.id.replace(/_/g," ")})
-            })}
-    			  activeOverlay = airQualityLyrs;
-	      }
+					// 1997 and 2008/2015 Layer Non Attain
+					var nonAttainTableText = makeTableFromArrayNoHeader([
+						["Name","${CNTY_NM}"],
+						["Status 1997","${NAAQS_1997}"],
+						["Status 2008","${NAAQS_2008}"],
+						["Status 2015","${NAAQS_2015}"]
+					]);
+					var lyr97InfoTemplate = new InfoTemplate("1997 Non-Attainment:", nonAttainTableText);
+					var lyr97 = new FeatureLayer(svcURL+"/2", {
+						id: "1997_Non-Attainment",
+						outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015"],
+						infoTemplate: lyr97InfoTemplate
+					});
+					lyr97.setOpacity(.35);
+					var lyr08_15InfoTemplate = new InfoTemplate("2008/2015 Non-Attainment:", nonAttainTableText);
+					var lyr08_15 = new FeatureLayer(svcURL+"/3", {
+						id: "2008/2015_Non-Attainment",
+						outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015"],//remove last 2
+						infoTemplate: lyr08_15InfoTemplate
+					});
+					lyr08_15.setOpacity(.45);
+
+					// make array of sub-layers in service:
+					airQualityLyrs.push(lyr08_15,lyr97,pmLyr,coLyr);
+
+					// add to map and push layers to legend
+					airQualityLyrs.forEach((item, i) => {
+						map.addLayer(item);
+						layerInfo.push({layer:item, title:item.id.replace(/_/g," ")})
+					});
+				}
+				activeOverlay = airQualityLyrs;
+			}
 				if (activeOverlaysArray.indexOf("Texas_Trunk")> -1) {
 					var pos = activeOverlaysArray.indexOf("Texas_Trunk");
 					if (txTrunkLyr) {
