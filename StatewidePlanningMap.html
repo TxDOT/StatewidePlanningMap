@@ -2903,6 +2903,7 @@
 						layerInfo.push({layer:item, title:item.id.replace(/_/g," ")});
 						map.reorderLayer(item,pos);
 					});
+					console.log(activeOverlaysArray);
 					console.log("Overlay array position: "+ pos);
 					console.log(map.graphicsLayerIds);
 					// iterate array and reorder all layers on top
