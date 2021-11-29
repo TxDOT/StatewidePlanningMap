@@ -475,7 +475,7 @@
 
   //Map and measure variables
 	var map,osmLayer,projectsRI,esri,measureClicked=false,gidWithMeasuresGeom,gidWithMeasuresGeomMPT,mapPoint,queryTaskDFO,queryTaskMPT,queryM,featurePartIndex,toolbar,xPointArray=new Array(),globalX,globalY
-	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,txAccessToken,appVersion="4.4.11 Singer";
+	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,txAccessToken,appVersion="4.4.12 Pennsylvania";
 
   //Route Event Variables
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
@@ -2973,7 +2973,7 @@
 						layerInfo.push({layer:item, title:item.id.replace(/_/g," ")})
 					});
 				}
-				activeOverlay = airQualityLyrs;
+				factiveOverlay = airQualityLyrs;
 			}
 				if (activeOverlaysArray.indexOf("Texas_Trunk")> -1) {
 					var pos = activeOverlaysArray.indexOf("Texas_Trunk");
@@ -4446,8 +4446,10 @@
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
-      <li>Added INRIX Traffic® layer</li>
-      <li>Increased Maximum Overlays to 4</li>
+	  <li>Updated Non-Attainment (Air Quality) Layers</li>
+	  <li>Added Rumble Strip Layer</li>
+      <li>(v4.4.11) Added INRIX Traffic® layer</li>
+      <li>(v4.4.11) Increased Maximum Overlays to 4</li>
       <li>(v4.4.10) Bug fix for Imagery zoom level</li>
       <li>(v.4.4.9) Updates to Shale Play layer</li>
       <li>(v4.4.8) AADT layer updates to add 2020 data</li>
