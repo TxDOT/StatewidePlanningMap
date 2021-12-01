@@ -490,21 +490,20 @@
 	//Overlay variables
   var aadtLyr,labelLayerAADT,areaOfficeLyr,COGLyr,FCLyr,fcLastEditDate,UZAlyr,NatlFreightLyr,TXFreightLyr,NHSLyr,maintOfficeLyr,maintSecRoutesLyr,txTrunkLyr,MarkerLyr,labelLayerMarker,MPOLyr,nonAttainLyr,controlSectionLyr,energySectorLyr,
   labelLayerCS,USHouseLyr,railRoadLyr,speedLimitLyr,StateHouseLyr,StateSenateLyr,futureTrafficLyr,longTermPlanLyr,constScheduledLyr,finalForConstLyr,underDevLyr,minuteOrderLyr,pavementConditionLyr,VerticalLyr,permStationLyr,
-  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
+  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr, altFuelPoints, inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
 
   //Measure, tab, coords, url and marker offset variables
 	var currentMeasure=0,activeTab='tcMap',deLength=0,coords,url,markerAndOffset;
 
 	require(["esri/map","esri/layers/OpenStreetMapLayer","esri/request","esri/renderers/Renderer","dojo/dom-construct","esri/layers/LayerInfo","esri/dijit/Scalebar","dojo/on","dojo/dom-class","dojo/query","dojo/dnd/Moveable",
 		"esri/dijit/HomeButton","esri/tasks/query","esri/tasks/QueryTask","esri/arcgis/utils","esri/domUtils","esri/dijit/Legend","esri/dijit/Search","esri/geometry/webMercatorUtils","dojo/dom","esri/layers/KMLLayer","dojo/parser",
-		"esri/toolbars/draw","esri/geometry/geometryEngine","esri/geometry/geodesicUtils","esri/units","esri/graphic","esri/graphicsUtils","esri/SpatialReference","esri/geometry/Extent","esri/layers/FeatureLayer","esri/symbols/SimpleLineSymbol",
+		"esri/toolbars/draw","esri/geometry/geometryEngine","esri/geometry/geodesicUtils","esri/units","esri/graphic","esri/layers/GraphicsLayer","esri/graphicsUtils","esri/SpatialReference","esri/geometry/Extent","esri/layers/FeatureLayer","esri/symbols/SimpleLineSymbol",
 		"esri/symbols/CartographicLineSymbol","esri/renderers/UniqueValueRenderer","esri/symbols/SimpleMarkerSymbol","esri/symbols/SimpleFillSymbol","esri/symbols/TextSymbol","esri/renderers/SimpleRenderer","esri/renderers/ClassBreaksRenderer",
 		"esri/layers/LabelLayer","esri/layers/LabelClass","esri/Color","esri/InfoTemplate","esri/layers/ArcGISTiledMapServiceLayer","esri/geometry/Polyline","esri/geometry/Point","esri/symbols/Font","esri/dijit/PopupTemplate",
-		"dojo/number","dojo/_base/array","esri/layers/VectorTileLayer","esri/layers/WMTSLayer","esri/layers/WMTSLayerInfo","esri/layers/WebTiledLayer","esri/geometry/Circle",
-		"dojo/domReady!"],
+		"dojo/number","dojo/_base/array","esri/layers/VectorTileLayer","esri/layers/WMTSLayer","esri/layers/WMTSLayerInfo","esri/layers/WebTiledLayer","esri/geometry/Circle", "esri/config","dojo/domReady!"],
     function (Map, OpenStreetMapLayer, esriRequest, Renderer, domConstruct, LayerInfo, Scalebar, on, domClass, query, Moveable, HomeButton,Query, QueryTask, arcgisUtils, domUtils, Legend, Search, webMercatorUtils, dom, KMLLayer, parser, Draw, geometryEngine,
-		geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
-		SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,Polyline, Point, Font, PopupTemplate, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo, WebTiledLayer, Circle)
+		geodesicUtils, Units, Graphic, GraphicsLayer, graphicsUtils, SpatialReference, Extent, FeatureLayer,SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
+		SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,Polyline, Point, Font, PopupTemplate, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo, WebTiledLayer, Circle, esriConfig)
     {
 
 		parser.parse();
@@ -2630,6 +2629,7 @@
 			if (tollLyr) {tollLyr.hide();}
 			if (futTollLyr) {futTollLyr.hide();}
 			if (hurrEvacLyr) {hurrEvacLyr.hide();}
+			if (altFuelPoints) {altFuelPoints.hide();}
       if (inrixTrafficLyr) {inrixTrafficLyr.hide();}
       if (memorialHighwayLyr) {memorialHighwayLyr.hide();}
       if (curCongLyr) {curCongLyr.hide();}
@@ -3628,6 +3628,84 @@
 					layerInfo.push({layer:hurrEvacLyr, title:"Hurricane Evacuation Routes"});
 				}
 
+				// da
+				if (activeOverlaysArray.indexOf("Alt_Fuel_Points")> -1) {
+					var pos = activeOverlaysArray.indexOf("Alt_Fuel_Points");
+					if (altFuelPoints) {
+						altFuelPoints.show();
+						map.reorderLayer(altFuelPoints,pos);
+					}
+					else {
+						
+						// handle CORS  
+						esriConfig.defaults.io.corsEnabledServers.push("https://developer.nrel.gov");
+
+						const altFuelsRequestPromise = esriRequest({
+							url: "https://developer.nrel.gov/api/alt-fuel-stations/v1.geojson?api_key=QnhomVJEoNJdkuSwUV1Kbz9FFsE70QBzuq3pZhoi&fuel_type=ELEC,LPG,HY,CNG,LNG&state=TX",
+							handleAs: 'json'
+        				});
+
+						// using graphics layer
+						let altFuelGrphLyr = new GraphicsLayer(projectsUrl, {id:"Alt_Fuel_Points",visible: true, styling: true, infoTemplate: infoTemplate});
+						// let altFuelGrphLyr = new FeatureLayer(projectsUrl, {id:"Alt_Fuel_Points",visible: true, infoTemplate: infoTemplate});
+
+						map.addLayer(altFuelGrphLyr);   
+
+
+						// read the geojson data from esriRequest promise
+						altFuelsRequestPromise.then((response) => {
+
+						response.features.map((feature, i) => {
+						const point = new Point(feature.geometry.coordinates);
+
+							var chargeStationWebMer = webMercatorUtils.geographicToWebMercator(point);
+
+							// attributes what else do we need? 
+							const attributes = {
+								ObjectID: i,
+								station_name: feature.properties.station_name,
+								fuel_type_code: feature.properties.fuel_type_code
+							};
+
+							// give each point type a color / size / ?
+							const fuelTypeColor = [
+								{fuelTypeCode : "CNG", fuelColor : [200 ,0, 0, 0.5]},
+								{fuelTypeCode : "LPG", fuelColor : [0 ,0, 200, 0.5]},
+								{fuelTypeCode : "HY", fuelColor : [0,200, 0, 0.5]},
+								{fuelTypeCode : "LNG", fuelColor : [200 ,200, 200, 0.5]},
+								{fuelTypeCode : "ELEC", fuelColor : [232 ,221 , 19, 0.5]}
+
+							];
+
+			
+							// function for symbolizing point color / size
+							let symbolizeAltFuels = (fuelPoint) => {
+							if (attributes.fuel_type_code == fuelPoint.fuelTypeCode) {
+								chargeStationMarker = new SimpleMarkerSymbol("solid", 5, null, new Color(fuelPoint.fuelColor))
+								const graphic = new Graphic(chargeStationWebMer, chargeStationMarker, attributes);
+								
+								var tableText = makeTableFromArrayNoHeader([["Station Name",attributes.station_name],["Fuel Type",attributes.fuel_type_code]]);
+								var infoTemplate = new InfoTemplate("Alternative Fuel Points:",tableText);
+								var projectsUrl = "https://developer.nrel.gov/api/alt-fuel-stations/v1.geojson?api_key=QnhomVJEoNJdkuSwUV1Kbz9FFsE70QBzuq3pZhoi&fuel_type=ELEC,LPG,HY,CNG,LNG&state=TX"
+								
+								return altFuelGrphLyr.add(graphic);
+								
+							}
+							}
+							fuelTypeColor.map(symbolizeAltFuels);
+ 
+							});
+						}).otherwise((error) => {
+							console.log("Error happened while loading alt fuels overlay", error);
+						});												
+					}
+
+					activeOverlay = altFuelPoints;
+					layerInfo.push({layer:altFuelPoints, title:"Alternative Fuel Points"});
+				}
+
+
+
         if (activeOverlaysArray.indexOf("INRIX_Traffic")> -1) {
 					var pos = activeOverlaysArray.indexOf("INRIX_Traffic");
 					if (inrixTrafficLyr) {
@@ -4410,6 +4488,7 @@
 		  <tr><th>Overlays</th></tr>
 		  <tr><td class="Overlay" id="CLEAR" style="color:red; font-weight: bold;">Clear Overlays</td></tr>
 		  <tr><td class="Overlay" id='AADT'>AADT</td></tr>
+		  <tr><td class="Overlay" id='Alt_Fuel_Points'>Alternative Fuel Points</td></tr>
 		  <tr><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 		  <tr><td class="Overlay" id='Bridges'>Bridges</td></tr>
 		  <tr><td class="Overlay" id='Cemetery'>Cemeteries</td></tr>
