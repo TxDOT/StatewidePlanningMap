@@ -12,290 +12,290 @@
   <link rel="stylesheet" href="https://js.arcgis.com/3.32/dijit/themes/claro/claro.css">
   <link rel="stylesheet" href="https://js.arcgis.com/3.32/esri/css/esri.css">
   <style>
-	 #maskDiv{
-	 	height: 100%;
-	 	width: 100%;
-	 	top: 0;
-  	left: 0;
-	 	background-color: rgba(0,0,0,.5);
-	 	position: fixed;
-	 	display: none;
-	 	z-index: 100;
-	 }
-	 #releaseNotesDiv{
-	 	height: auto;
-	 	width: 350px;
-    margin:auto;
-    transform: translate(0%,50%);
-	 	background-color: rgba(245,245,245,1);
-	 	color: #444444;
-	 	font-size: .8em;
-	 	text-align: center;
-	  border-radius: 5px;
-	  padding: 10px;
-	 	position: relative;
-	 	display: none;
-	 	z-index: 101;
-	 }
-	 #overlaysWarningDiv, #getCoordsDiv{
-	 	height: 160px;
-	 	width: 200px;
-	 	left:0;
-    right:0;
-    top: 0;
-    bottom: 0;
-    margin-left:auto;
-    margin-right:auto;
-    margin-top: auto;
-    margin-bottom: auto;
-	 	background-color: rgba(245,245,245,1);
-	 	color: #444444;
-	 	font-size: .8em;
-	 	text-align: center;
-	  border-radius: 5px;
-	  padding: 10px;
-	 	position: absolute;
-	 	display: none;
-	 	z-index: 101;
-	 }
-	 h1 {
-	    background-color: #143c5c;
-	    color: #FFFFFF;
-	    cursor: default;
-	    font-size: 1.5em;
-	    border-radius: 5px;
-	    padding: 5px;
-	    text-align: center;
-	    margin-top: auto;
-	 }
-	 li {
-	    color: #444444;
-	    cursor: default;
-	    font-size: 1.1em;
-	    padding: 5px;
-	    text-align: left;
-	 }
-	 #toc{
-	  border: 2px solid;
-	  border-radius: 5px;
-	  border-color: #FFFFFF;
-	  width:250px;
-	  position: absolute;
-	  left: 2px;
-	  top: 2px;
-	  bottom: 40px;
-	  overflow: auto;
-	 }
-	 #mapDiv{
-	  border: 2px solid;
-	  border-radius: 5px;
-	  border-color: #F8F8F8;
-	  height:99%;
-	  position: absolute;
-	  left: 255px;
-	  bottom: 2px;
-	  right: 2px;
-	  top: 2px;
-	  overflow: hidden;
-	 }
-	 span{
-	  display:block;
-	 }
-	 #info{
-	  position: absolute;
-	  bottom: 3px;
-	  left: 22px;
-	  z-index: 50;
-	  color: #303030;
-	  font-weight: bold;
-	  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
-	 }
-	 #info2{
-	  position: absolute;
-	  bottom: 3px;
-	  left: 90px;
-	  z-index: 50;
-	  color: #303030;
-	  font-weight: bold;
-	  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
-	 }
-	 #tcTabs{
-	  cursor: pointer;
-	  font-size: 15px;
-	 }
-	 #tcTabs td{
-	  text-align: -webkit-center;
-	  width: 10%;
-	 }
-	 #tcTabs td:hover{
-	  background: lightgrey !important;
-	 }
-	 #tocMaps tr:nth-child(odd) {
-	  color: #000000;
-      background-color: #F0F0F0;
-	 }
-	 #tocMaps td:hover{
-	  background: lightgrey;
-	 }
-	 #tocData tr:nth-child(odd) {
-	  color: #000000;
-      background-color: #F0F0F0;
-	 }
-	 #tocData td:hover{
-	  background: lightgrey;
-	 }
-	 th{
-	  background-color: #143c5c;
-      color: #FFFFFF;
-	  cursor: default;
-	  font-size: 15px;
-	  border-radius: 2px;
-	 }
-     .lrsTH{
-      background-color: #FFFFFF;
-      color: #143c5c;
-   	  cursor: default;
-   	  font-size: 15px;
-      border: solid;
-      border-color: #143c5c;
-   	  border-radius: 2px;
-     }
-	 td{
-	 border-radius: 2px;
-	 }
-	 .MeasureUnits{
-	 	cursor: pointer;
-	 }
-	 #mapTab{
-	  display: block;
-	 }
-	 #search {
-	  display: block;
-	  position: absolute;
-	  z-index: 31;
-	  top: 20px;
-	  left: 277px;
-     }
-     .arcgisSearch .searchMenu .menuHeader{
-       background:#143c5c;
-	 }
-	 .arcgisSearch .searchMenu li.active {
-	   background-color: #143c5c;
-	 }
-	 .arcgisSearch .searchClear{
-	 	color:#FFFF00;
-	 	background-color:#D3D3D3;
-	 }
-	 .arcgisSearch .searchBtn{
-	 	padding: 6px 5px;
-	 }
-	 .arcgisSearch .searchGroup .searchInput{
-	 	width: 214px;
-	 }
-	 #measureTab{
-	   display: none;
-	 }
-	 #queryTab{
-	   display: none;
-	 }
-     #lrsTab{
-       display: none;
-     }
-	 #sketchTab{
-	   display: none;
-	 }
-	 #legendTab{
+	#maskDiv {
+		height: 100%;
+		width: 100%;
+		top: 0;
+		left: 0;
+		background-color: rgba(0, 0, 0, .5);
+		position: fixed;
 		display: none;
-	    overflow: auto;
+		z-index: 100;
+	}
+	#releaseNotesDiv {
 		height: auto;
-	 }
-	 #aboutTab{
-	   display: none;
-	 }
-	 .tocTables{
-	  cursor: default;
-	  font-size: 13px;
-	  width: 98%;
-	 }
+		width: 350px;
+		margin: auto;
+		transform: translate(0%, 50%);
+		background-color: rgba(245, 245, 245, 1);
+		color: #444444;
+		font-size: .8em;
+		text-align: center;
+		border-radius: 5px;
+		padding: 10px;
+		position: relative;
+		display: none;
+		z-index: 101;
+	}
+	#overlaysWarningDiv, #getCoordsDiv {
+		height: 160px;
+		width: 200px;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: auto;
+		margin-bottom: auto;
+		background-color: rgba(245, 245, 245, 1);
+		color: #444444;
+		font-size: .8em;
+		text-align: center;
+		border-radius: 5px;
+		padding: 10px;
+		position: absolute;
+		display: none;
+		z-index: 101;
+	}
+	h1 {
+		background-color: #143c5c;
+		color: #FFFFFF;
+		cursor: default;
+		font-size: 1.5em;
+		border-radius: 5px;
+		padding: 5px;
+		text-align: center;
+		margin-top: auto;
+	}
+	li {
+		color: #444444;
+		cursor: default;
+		font-size: 1.1em;
+		padding: 5px;
+		text-align: left;
+	}
+	#toc {
+		border: 2px solid;
+		border-radius: 5px;
+		border-color: #FFFFFF;
+		width: 250px;
+		position: absolute;
+		left: 2px;
+		top: 2px;
+		bottom: 40px;
+		overflow: auto;
+	}
+	#mapDiv {
+		border: 2px solid;
+		border-radius: 5px;
+		border-color: #F8F8F8;
+		height: 99%;
+		position: absolute;
+		left: 255px;
+		bottom: 2px;
+		right: 2px;
+		top: 2px;
+		overflow: hidden;
+	}
+	span {
+		display: block;
+	}
+	#info {
+		position: absolute;
+		bottom: 3px;
+		left: 22px;
+		z-index: 50;
+		color: #303030;
+		font-weight: bold;
+		text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+	}
+	#info2 {
+		position: absolute;
+		bottom: 3px;
+		left: 90px;
+		z-index: 50;
+		color: #303030;
+		font-weight: bold;
+		text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+	}
+	#tcTabs {
+		cursor: pointer;
+		font-size: 15px;
+	}
+	#tcTabs td {
+		text-align: -webkit-center;
+		width: 10%;
+	}
+	#tcTabs td:hover {
+		background: lightgrey !important;
+	}
+	#tocMaps tr:nth-child(odd) {
+		color: #000000;
+		background-color: #F0F0F0;
+	}
+	#tocMaps td:hover {
+		background: lightgrey;
+	}
+	#tocData tr:nth-child(odd) {
+		color: #000000;
+		background-color: #F0F0F0;
+	}
+	#tocData td:hover {
+		background: lightgrey;
+	}
+	th {
+		background-color: #143c5c;
+		color: #FFFFFF;
+		cursor: default;
+		font-size: 15px;
+		border-radius: 2px;
+	}
+	.lrsTH {
+		background-color: #FFFFFF;
+		color: #143c5c;
+		cursor: default;
+		font-size: 15px;
+		border: solid;
+		border-color: #143c5c;
+		border-radius: 2px;
+	}
+	td {
+		border-radius: 2px;
+	}
+	.MeasureUnits {
+		cursor: pointer;
+	}
+	#mapTab {
+		display: block;
+	}
+	#search {
+		display: block;
+		position: absolute;
+		z-index: 31;
+		top: 20px;
+		left: 277px;
+	}
+	.arcgisSearch .searchMenu .menuHeader {
+		background: #143c5c;
+	}
+	.arcgisSearch .searchMenu li.active {
+		background-color: #143c5c;
+	}
+	.arcgisSearch .searchClear {
+		color: #FFFF00;
+		background-color: #D3D3D3;
+	}
+	.arcgisSearch .searchBtn {
+		padding: 6px 5px;
+	}
+	.arcgisSearch .searchGroup .searchInput {
+		width: 214px;
+	}
+	#measureTab {
+		display: none;
+	}
+	#queryTab {
+		display: none;
+	}
+	#lrsTab {
+		display: none;
+	}
+	#sketchTab {
+		display: none;
+	}
+	#legendTab {
+		display: none;
+		overflow: auto;
+		height: auto;
+	}
+	#aboutTab {
+		display: none;
+	}
+	.tocTables {
+		cursor: default;
+		font-size: 13px;
+		width: 98%;
+	}
 	select {
-	 display: block;
-     width: 98%;
-     cursor: pointer;
-    }
-    button {
-    	cursor: pointer;
-    }
-	#btnReleaseNotes{
+		display: block;
+		width: 98%;
+		cursor: pointer;
+	}
+	button {
+		cursor: pointer;
+	}
+	#btnReleaseNotes {
 		background: none;
 		cursor: pointer;
 		font-size: 13px;
-	    font-family: inherit;
+		font-family: inherit;
 		color: #3333ff;
 		border: none;
 		margin: 0px;
 		padding: 0px;
-	  	z-index: 50;
-    }
-    #btnSurvey{
-	  position: absolute;
-	  bottom: 10px;
-	  left: 70px;
-	  z-index: 50;
-    }
-    #btnOpenDataPortal {
-    	position: absolute;
-    	background-color: #143c5c;
+		z-index: 50;
+	}
+	#btnSurvey {
+		position: absolute;
+		bottom: 10px;
+		left: 70px;
+		z-index: 50;
+	}
+	#btnOpenDataPortal {
+		position: absolute;
+		background-color: #143c5c;
 		font-size: 15px;
-	    font-family: inherit;
+		font-family: inherit;
 		border: none;
 		margin: 0px;
 		padding: 0px;
-	 	z-index: 101;
-	 	bottom: 2px;
-	  	left: 2px;
-	  	width: 250px;
-    	margin-left:auto;
-    	margin-right:auto;
-    	margin-top: auto;
-    	margin-bottom: auto;
-	 	color: #fff;
-	 	text-align: center;
-	  	border-radius: 2px;
-	  	padding: 2px;
-	 	position: absolute;
-	 	display: block;
-	 }
-	 #btnOpenDataPortal:hover {
-	 	background: grey;
-	 }
-	 .HomeButton .home {
-        background-image: url("https://maps.dot.state.tx.us/Images/TexasIcon.png");
-        background-color: #143c5c;
-        background-size: 24px 24px;
-        width: 28px;
-      }
-      #HomeButton {
-        position: absolute;
-        left: 20px;
-        top: 133px;
-        z-index: 30;
-        display: block;
-      }
-    .Overlay, .Basemaps, .SearchResult, .clickable{
-    	cursor: pointer;
-    }
-	#searchResults{
-	 position: relative;
-	 overflow: auto;
-	 min-height: initial;
-	 color: blue;
-	 font-size: 15px;
+		z-index: 101;
+		bottom: 2px;
+		left: 2px;
+		width: 250px;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: auto;
+		margin-bottom: auto;
+		color: #fff;
+		text-align: center;
+		border-radius: 2px;
+		padding: 2px;
+		position: absolute;
+		display: block;
 	}
-	#queryResults{
-	 overflow: auto;
-	 height: 200px;
-	 color: blue;
-	 font-size: 15px;
+	#btnOpenDataPortal:hover {
+		background: grey;
+	}
+	.HomeButton .home {
+		background-image: url("https://maps.dot.state.tx.us/Images/TexasIcon.png");
+		background-color: #143c5c;
+		background-size: 24px 24px;
+		width: 28px;
+	}
+	#HomeButton {
+		position: absolute;
+		left: 20px;
+		top: 133px;
+		z-index: 30;
+		display: block;
+	}
+	.Overlay, .Basemaps, .SearchResult, .clickable {
+		cursor: pointer;
+	}
+	#searchResults {
+		position: relative;
+		overflow: auto;
+		min-height: initial;
+		color: blue;
+		font-size: 15px;
+	}
+	#queryResults {
+		overflow: auto;
+		height: 200px;
+		color: blue;
+		font-size: 15px;
 	}
 	.PRJFields {
 		width: 175px;
@@ -303,22 +303,20 @@
 	.queryFields {
 		width: 127px;
 	}
-
 	nav {
-	position: absolute;
-    top: 20px;
-    right: 20px;
-	text-align: center;
+		position: absolute;
+		top: 20px;
+		right: 20px;
+		text-align: center;
 	}
 	nav ul ul {
 		display: none;
 	}
-		nav ul li:hover > ul {
-			display: block;
-		}
+	nav ul li:hover>ul {
+		display: block;
+	}
 	nav ul {
 		background: #143c5c;
-		/*box-shadow: 0px 0px 10px rgba(0,0,0,0.5);*/
 		padding: 0 0px;
 		border-radius: 5px;
 		list-style: none;
@@ -326,59 +324,56 @@
 		display: inline-table;
 		margin: inherit;
 	}
-		nav ul:after {
-			content: "";
-			clear: both;
-			display: block;
-
-		}
-		nav ul li {
-			float: left;
-			font-size: .95em;
-		}
-			nav ul li a {
-				display: block;
-				padding: 0px 5px;
-				color: #fff;
-				text-decoration: none;
-			}
-		nav ul ul {
-			background: #5f6975;
-			border-radius: 0px 0px 5px 5px;
-			padding: 0;
-			position: absolute;
-			top: 88%;
-			left:0%;
-			right:0%;
-
-		}
-			nav ul ul li {
-				float: none;
-				border-radius: 0px 0px 5px 5px;
-				border-top: 1px solid #6b727c;
-				border-bottom: 1px solid #575f6a;
-				position: relative;
-				font-size: 0.8em;
-			}
-				nav ul ul li a {
-					padding: 0px 5px;
-					color: #fff;
-					border-radius: 5px;
-				}
-					nav ul ul li a:hover {
-						background: #4b545f;
-						border-radius: 0px;
-					}
-
+	nav ul:after {
+		content: "";
+		clear: both;
+		display: block;
+	}
+	nav ul li {
+		float: left;
+		font-size: .95em;
+	}
+	nav ul li a {
+		display: block;
+		padding: 0px 5px;
+		color: #fff;
+		text-decoration: none;
+	}
+	nav ul ul {
+		background: #5f6975;
+		border-radius: 0px 0px 5px 5px;
+		padding: 0;
+		position: absolute;
+		top: 88%;
+		left: 0%;
+		right: 0%;
+	}
+	nav ul ul li {
+		float: none;
+		border-radius: 0px 0px 5px 5px;
+		border-top: 1px solid #6b727c;
+		border-bottom: 1px solid #575f6a;
+		position: relative;
+		font-size: 0.8em;
+	}
+	nav ul ul li a {
+		padding: 0px 5px;
+		color: #fff;
+		border-radius: 5px;
+	}
+	nav ul ul li a:hover {
+		background: #4b545f;
+		border-radius: 0px;
+	}
 	#credits {
 		position: absolute;
 		right: 15px;
 		bottom: 10px;
 		font-size: .8em;
-	 	z-index: 51;
-	    color: #666666;
-    	background: rgba(255,255,255,0.7);
-    	padding: 0px 5px;
+		z-index: 51;
+		color: #666666;
+		background: rgba(255, 255, 255, 0.7);
+		padding: 0px 5px;
 	}
 	.esriAttributionList {
 		display: none;
@@ -390,69 +385,67 @@
 		z-index: 30;
 		width: 32px;
 		height: 32px;
-	    border: 1px solid #57585A;
-        background-color: rgb(255, 255, 184);
-	    color: #4C4C4C;
+		border: 1px solid #57585A;
+		background-color: rgb(255, 255, 184);
+		color: #4C4C4C;
 		border-radius: 5px;
 		text-align: center;
 		font-size: 20px;
-		font-family: verdana,helvetica;
+		font-family: verdana, helvetica;
 		line-height: 25px;
-	    direction: ltr;
-        outline: none;
-    	padding-bottom: 5px;
-    	background: radial-gradient(white, lightyellow, yellow);
+		direction: ltr;
+		outline: none;
+		padding-bottom: 5px;
+		background: radial-gradient(white, lightyellow, yellow);
 	}
-	.esriLegendLayerLabel td{
-	     display: none;
-	     font-weight:bold;
-	     color: #4C4C4C;
+	.esriLegendLayerLabel td {
+		display: none;
+		font-weight: bold;
+		color: #4C4C4C;
 	}
-	.esriLegendMsg{
-	 	display: none;
+	.esriLegendMsg {
+		display: none;
 	}
-	.esriSimpleSlider{
-	 	top:60px;
-	 	left:20px;
-	 	z-index:30;
+	.esriSimpleSlider {
+		top: 60px;
+		left: 20px;
+		z-index: 30;
 	}
 	.esriPopupWrapper .title {
-    	cursor: move;
+		cursor: move;
 	}
 	.esriPopup .hidden {
-    	display: none !important;
+		display: none !important;
+	}
+	.qryButton {
+		width: 100%;
+		background-color: gray;
+		color: white;
+		padding: 7px 10px;
+		margin: 4px 0;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-family: Arial;
+		font-size: 14px;
+	}
+	.qryInputs {
+		width: 100%;
+		padding: 7px 10px;
+		margin: 4px 0px;
+		display: inline-block;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		box-sizing: border-box;
+		font-family: Arial;
+		font-size: 14px;
+	}
+	.qryLabel {
+		font-family: Arial;
+		font-size: 14px;
 	}
 
-  /*CSS for Query Form*/
-  .qryButton {
-    width: 100%;
-    background-color: gray;
-    color: white;
-    padding: 7px 10px;
-    margin: 4px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: Arial;
-    font-size: 14px;
-  }
-  .qryInputs {
-    width: 100%;
-    padding: 7px 10px;
-    margin: 4px 0px;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-family: Arial;
-    font-size: 14px;
-  }
-  .qryLabel {
-    font-family: Arial;
-    font-size: 14px;
-  }
-  /*End CSS for Query Form*/
-
+  	/*End CSS for Query Form*/
   </style>
   <!-- Google Analystics -->
   <script>
@@ -482,15 +475,15 @@
 
   //Map and measure variables
 	var map,osmLayer,projectsRI,esri,measureClicked=false,gidWithMeasuresGeom,gidWithMeasuresGeomMPT,mapPoint,queryTaskDFO,queryTaskMPT,queryM,featurePartIndex,toolbar,xPointArray=new Array(),globalX,globalY
-	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,txAccessToken,appVersion="4.4.11 Singer";
+	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,txAccessToken,appVersion="4.4.12 Pennsylvania";
 
   //Route Event Variables
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
 
 	//Overlay variables
-  var aadtLyr,labelLayerAADT,areaOfficeLyr,COGLyr,FCLyr,fcLastEditDate,UZAlyr,NatlFreightLyr,TXFreightLyr,NHSLyr,maintOfficeLyr,maintSecRoutesLyr,txTrunkLyr,MarkerLyr,labelLayerMarker,MPOLyr,nonAttainLyr,controlSectionLyr,energySectorLyr,
+  var aadtLyr,labelLayerAADT,areaOfficeLyr,COGLyr,FCLyr,fcLastEditDate,UZAlyr,NatlFreightLyr,TXFreightLyr,NHSLyr,maintOfficeLyr,maintSecRoutesLyr,txTrunkLyr,MarkerLyr,labelLayerMarker,MPOLyr,airQualityLyrs=[],controlSectionLyr,energySectorLyr,
   labelLayerCS,USHouseLyr,railRoadLyr,speedLimitLyr,StateHouseLyr,StateSenateLyr,futureTrafficLyr,longTermPlanLyr,constScheduledLyr,finalForConstLyr,underDevLyr,minuteOrderLyr,pavementConditionLyr,VerticalLyr,permStationLyr,
-  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
+  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,rumbleStripLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
 
   //Measure, tab, coords, url and marker offset variables
 	var currentMeasure=0,activeTab='tcMap',deLength=0,coords,url,markerAndOffset;
@@ -1492,6 +1485,18 @@
             document.getElementById('legendDiv').insertAdjacentElement('afterend',inrixDiv);
 					}
 
+          else if (name == "Air_Quality") {
+						var text = document.createTextNode(`These layers outline nonattainment areas for the 1997,
+            2008, and 2015 8-hour ozone National Ambient Air Quality Standards (NAAQS).
+            Additionally, the layers outline nonattainment areas for the NAAQS for
+            carbon monoxide (CO) and particulate matter.`);
+						para.appendChild(text);
+						var linkText = document.createTextNode("View Item Details on ArcGIS Online");
+						link.appendChild(linkText);
+						link.href = "https://txdot.maps.arcgis.com/home/item.html?id=d73fc97ccab0492caea2c04b63e57917";
+						document.getElementById("legendNotesDiv").style.display="block";
+					}
+
 					else {
 						div.innerHTML = '';
 						theLegend.refresh();
@@ -2279,7 +2284,7 @@
 				map.addLayer(txdotLightGray);
 				document.getElementById("credits").innerHTML = "TxDOT, TPP-GIS";
 			}
-            if (newMap=="txdotDarkGray") {
+      if (newMap=="txdotDarkGray") {
 				txdotDarkGray = new VectorTileLayer("https://www.arcgis.com/sharing/rest/content/items/4bd376c56f314bc5a36446630db604a6/resources/styles/root.json?f=pjson");
 				map.addLayer(txdotDarkGray);
 				document.getElementById("credits").innerHTML = "TxDOT, TPP-GIS";
@@ -2299,9 +2304,9 @@
         map.reorderLayer(inrixTrafficLyr,1);
       }
 
-			if (activeOverlay) {
-				activeOverlay.show();
-			}
+			// if (activeOverlay) {
+			// 	activeOverlay.show();
+			// }
 		}
 
 		dojo.query(".Tabs").forEach(function (result){
@@ -2591,6 +2596,7 @@
 		function hideAllOverlays() {
 			activeOverlay = "";
 			if (aadtLyr) {aadtLyr.hide(); labelLayerAADT.hide()}
+			if (airQualityLyrs) {airQualityLyrs.forEach((item, i)=>{item.hide()})}
 			if (areaOfficeLyr) {areaOfficeLyr.hide();}
 			if (COGLyr) {COGLyr.hide();}
 			if (FCLyr) {FCLyr.hide();}
@@ -2604,7 +2610,6 @@
 			if (MPOLyr) {MPOLyr.hide();}
 			if (NHSLyr) {NHSLyr.hide();}
 			if (NHSLyr) {MAP21Lyr.hide();}
-			if (nonAttainLyr) {nonAttainLyr.hide();}
 			if (MarkerLyr) {MarkerLyr.hide(); labelLayerMarker.hide();}
 			if (controlSectionLyr) {controlSectionLyr.hide(); labelLayerCS.hide();}
 			if (USHouseLyr) {USHouseLyr.hide();}
@@ -2625,23 +2630,24 @@
 			if (rdwyInvLyr) {rdwyInvLyr.hide();}
 			if (cemeteryLyr) {cemeteryLyr.hide();}
 			if (energySectorLyr) {energySectorLyr.hide();}
+      		if (rumbleStripLyr) {rumbleStripLyr.hide();}
 			if (shalePlaysLyr) {shalePlaysLyr.hide();} //if (shalePlaysLyr) {shalePlaysLyr.hide(); shaleBasinsLyr.hide();}
 			if (RMAlyr) {RMAlyr.hide();}
 			if (tollLyr) {tollLyr.hide();}
 			if (futTollLyr) {futTollLyr.hide();}
 			if (hurrEvacLyr) {hurrEvacLyr.hide();}
-      if (inrixTrafficLyr) {inrixTrafficLyr.hide();}
-      if (memorialHighwayLyr) {memorialHighwayLyr.hide();}
-      if (curCongLyr) {curCongLyr.hide();}
-      if (futCongLyr) {futCongLyr.hide();}
-      if (facLyr) {facLyr.hide();}
-      if (bridgeLyr) {bridgeLyr.hide();}
-      if (connCorrLyr) {connCorrLyr.hide();}
-      if (STRAHNETLyr) {STRAHNETLyr.hide();}
-      if (bikeLayer) {bikeLayer.hide();}
-      if (projectsRI) {projectsRI.hide();}
+			if (inrixTrafficLyr) {inrixTrafficLyr.hide();}
+			if (memorialHighwayLyr) {memorialHighwayLyr.hide();}
+			if (curCongLyr) {curCongLyr.hide();}
+			if (futCongLyr) {futCongLyr.hide();}
+			if (facLyr) {facLyr.hide();}
+			if (bridgeLyr) {bridgeLyr.hide();}
+			if (connCorrLyr) {connCorrLyr.hide();}
+			if (STRAHNETLyr) {STRAHNETLyr.hide();}
+			if (bikeLayer) {bikeLayer.hide();}
+			if (projectsRI) {projectsRI.hide();}
 			clearStyle("tocData");
-      map.graphics.clear();
+      		map.graphics.clear();
 		}
 
 		dojo.query(".Overlay").forEach(function (result){
@@ -2673,10 +2679,10 @@
 					// push the selected overlay name into an array
 					activeOverlaysArray.push(theLayer);
 				}
-				// popup an alert to warn the user that only 2 overlays may be turned on at a time
+				// popup an alert to warn the user that only 4 overlays may be turned on at a time
 				if (activeOverlaysArray.length > 4){
 					document.getElementById("maskDiv").style.display="block";
-        			document.getElementById("overlaysWarningDiv").style.display="block";
+        	document.getElementById("overlaysWarningDiv").style.display="block";
 					activeOverlaysArray.pop();
 				}
 
@@ -2684,7 +2690,6 @@
 				array.forEach(activeOverlaysArray, function(item){
 					document.getElementById(item).style.color='red';
 				});
-
 				if (activeOverlaysArray.indexOf("Minute_Orders")> -1) {
 					var pos = activeOverlaysArray.indexOf("Minute_Orders");
 					if (minuteOrderLyr) {
@@ -2870,24 +2875,106 @@
 					layerInfo.push({layer:railRoadLyr, title:"Mainline Railroads"});
 				}
 
-				if (activeOverlaysArray.indexOf("Non_Attainment")> -1) {
-					var pos = activeOverlaysArray.indexOf("Non_Attainment");
-					if (nonAttainLyr) {
-						nonAttainLyr.show();
-						map.reorderLayer(nonAttainLyr,pos);
-					}
-					else {
-            var tableText = makeTableFromArrayNoHeader([["FIPS","${FIPS}"],["Region","${REGION}"],["Status","${STATUS}"]]);
-						var infoTemplate = new InfoTemplate("Non Attainment:",tableText);
-						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_NonAttainment_Areas/FeatureServer/0";
+				// if (activeOverlaysArray.indexOf("Non_Attainment")> -1) {
+				// 	var pos = activeOverlaysArray.indexOf("Non_Attainment");
+				// 	if (nonAttainLyr) {
+				// 		nonAttainLyr.show();
+				// 		map.reorderLayer(nonAttainLyr,pos);
+				// 	}
+				// 	else {
+        //     var tableText = makeTableFromArrayNoHeader([["FIPS","${FIPS}"],["Region","${REGION}"],["Status","${STATUS}"]]);
+				// 		var infoTemplate = new InfoTemplate("Non Attainment:",tableText);
+				// 		var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas_NonAttainment_Areas/FeatureServer/0";
+        //
+				// 		nonAttainLyr = new FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});
+				// 		map.addLayer(nonAttainLyr);
+				// 	}
+				// 	activeOverlay = nonAttainLyr;
+				// 	layerInfo.push({layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"});
+				// }
 
-						nonAttainLyr = new FeatureLayer(projectsUrl, {id:"Non_Attainment",visible: true,outFields:["FIPS","REGION","STATUS"], infoTemplate: infoTemplate});
-						map.addLayer(nonAttainLyr);
-					}
-					activeOverlay = nonAttainLyr;
-					layerInfo.push({layer:nonAttainLyr, title:"Non-Attainment or Near Non-Attainment Areas"});
+        ////////////ADDING AIR QUALITY LAYERS HERE///////////////////
+			if (activeOverlaysArray.indexOf("Air_Quality")> -1) {
+				var pos = activeOverlaysArray.indexOf("Air_Quality");
+				if (airQualityLyrs.length>0) {
+					// iterate array show each layer, push to legend and reorder all
+					airQualityLyrs.forEach((item, i) => {
+						item.show();
+						layerInfo.push({layer:item, title:item.id.replace(/_/g," ")});
+						map.reorderLayer(item,pos);
+					});
+					console.log(activeOverlaysArray);
+					console.log("Overlay array position: "+ pos);
+					console.log(map.graphicsLayerIds);
+					// iterate array and reorder all layers on top
 				}
+				else {
+					// service URL
+					var svcURL = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/nonattainment_and_maintenance_areas/FeatureServer/";
+					
+					// CO Layer
+					var coLyrTableText = makeTableFromArrayNoHeader([["Name","${Name}"],["Status","${Status}"]]);
+					var coLyrInfoTemplate = new InfoTemplate("Carbon Monoxide:", coLyrTableText);
+					// symbol and renderer
+					var coSymbol = new SimpleFillSymbol();
+					coSymbol.color = new Color([0,0,0,-1]);//set transparency 100%
+					coSymbol.outline = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SHORTDASHDOTDOT, new Color([30,203,225]), 2);
+					var coRender = new SimpleRenderer(coSymbol);
+					var coLyr = new FeatureLayer(svcURL+"/0", {
+						id: "Carbon_Monoxide",
+						outFields: ["Name","Status"],
+						infoTemplate: coLyrInfoTemplate
+					});
+					coLyr.renderer = coRender;
 
+					// PM Layer
+					var pmLyrTableText = makeTableFromArrayNoHeader([["Name","${CNTY_NM}"],["Status","${Status}"]]);
+					var pmLyrInfoTemplate = new InfoTemplate("Moderate Particulate Matter:", pmLyrTableText);
+					// symbol and renderer
+					var pmSymbol = new SimpleFillSymbol();
+					pmSymbol.color = new Color([0,0,0,-1]); //set transparency 100%
+					pmSymbol.outline = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SHORTDASH, new Color([225,52,30]), 2);
+					var pmRender = new SimpleRenderer(pmSymbol);
+							var pmLyr = new FeatureLayer(svcURL+"/1", {
+								id: "Particulate_Matter",
+								outFields: ["County Name","Status"],
+								infoTemplate: pmLyrInfoTemplate
+					});
+					pmLyr.renderer = pmRender;
+
+					// 1997 and 2008/2015 Layer Non Attain
+					var nonAttainTableText = makeTableFromArrayNoHeader([
+						["Name","${CNTY_NM}"],
+						["Status 1997","${NAAQS_1997}"],
+						["Status 2008","${NAAQS_2008}"],
+						["Status 2015","${NAAQS_2015}"]
+					]);
+					var lyr97InfoTemplate = new InfoTemplate("1997 Non-Attainment:", nonAttainTableText);
+					var lyr97 = new FeatureLayer(svcURL+"/2", {
+						id: "1997_Non-Attainment",
+						outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015"],
+						infoTemplate: lyr97InfoTemplate
+					});
+					lyr97.setOpacity(.35);
+					var lyr08_15InfoTemplate = new InfoTemplate("2008/2015 Non-Attainment:", nonAttainTableText);
+					var lyr08_15 = new FeatureLayer(svcURL+"/3", {
+						id: "2008/2015_Non-Attainment",
+						outFields: ["CNTY_NM","NAAQS_1997","NAAQS_2008","NAAQS_2015"],//remove last 2
+						infoTemplate: lyr08_15InfoTemplate
+					});
+					lyr08_15.setOpacity(.45);
+
+					// make array of sub-layers in service:
+					airQualityLyrs.push(lyr08_15,lyr97,pmLyr,coLyr);
+
+					// add to map and push layers to legend
+					airQualityLyrs.forEach((item, i) => {
+						map.addLayer(item);
+						layerInfo.push({layer:item, title:item.id.replace(/_/g," ")})
+					});
+				}
+				activeOverlay = airQualityLyrs;
+			}
 				if (activeOverlaysArray.indexOf("Texas_Trunk")> -1) {
 					var pos = activeOverlaysArray.indexOf("Texas_Trunk");
 					if (txTrunkLyr) {
@@ -3374,6 +3461,23 @@
 					activeOverlay = energySectorLyr;
 					layerInfo.push({layer:energySectorLyr, title:"Energy Sector Corridors"});
 				}
+
+        if (activeOverlaysArray.indexOf("Rumble_Strips")> -1) {
+          var pos = activeOverlaysArray.indexOf("Rumble_Strips");
+            if (rumbleStripLyr) {
+              rumbleStripLyr.show();
+              map.reorderLayer(rumbleStripLyr,pos);
+            }
+            else {
+              var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"],["Begin DFO","${BEGIN_DFO}"],["END DFO","${END_DFO}"],["Location","${LOCN}"],["Type","${TYPE}"]]);
+              var infoTemplate = new InfoTemplate("TxDOT Rumble Strips:",tableText);
+              var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Rumble_Strips/FeatureServer/0";
+              rumbleStripLyr = new FeatureLayer(projectsUrl, {id:"Rumble_Strips",visible: true,outFields:["RTE_NM", "BEGIN_DFO", "END_DFO", "LOCN", "TYPE"], infoTemplate: infoTemplate});
+              map.addLayer(rumbleStripLyr);
+            }
+          activeOverlay = rumbleStripLyr;
+          layerInfo.push({layer:rumbleStripLyr, title:"TxDOT Rumble Strips"});
+        }
 
 				if (activeOverlaysArray.indexOf("Shale_Plays")> -1) {
 					var pos = activeOverlaysArray.indexOf("Shale_Plays");
@@ -4342,8 +4446,10 @@
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
-      <li>Added INRIX Traffic® layer</li>
-      <li>Increased Maximum Overlays to 4</li>
+	  <li>Updated Non-Attainment (Air Quality) Layers</li>
+	  <li>Added Rumble Strip Layer</li>
+      <li>(v4.4.11) Added INRIX Traffic® layer</li>
+      <li>(v4.4.11) Increased Maximum Overlays to 4</li>
       <li>(v4.4.10) Bug fix for Imagery zoom level</li>
       <li>(v.4.4.9) Updates to Shale Play layer</li>
       <li>(v4.4.8) AADT layer updates to add 2020 data</li>
@@ -4410,6 +4516,7 @@
 		  <tr><th>Overlays</th></tr>
 		  <tr><td class="Overlay" id="CLEAR" style="color:red; font-weight: bold;">Clear Overlays</td></tr>
 		  <tr><td class="Overlay" id='AADT'>AADT</td></tr>
+      <tr><td class="Overlay" id='Air_Quality'>Air Quality</td></tr>
 		  <tr><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 		  <tr><td class="Overlay" id='Bridges'>Bridges</td></tr>
 		  <tr><td class="Overlay" id='Cemetery'>Cemeteries</td></tr>
@@ -4427,20 +4534,20 @@
 		  <tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr>
 	 	  <tr><td class="Overlay" id='INRIX_Traffic'>Live Traffic</td></tr>
 	 	  <tr><td class="Overlay" id='Maintenance_Section_Routes'>Maintenance Section Routes</td></tr>
-          <tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
+      <tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
 		  <tr><td class="Overlay" id='MPO'>Metropolitan Planning Organizations (MPO)</td></tr>
 		  <tr><td class="Overlay" id='NHS'>National Highway System</td></tr>
-		  <tr><td class="Overlay" id='Non_Attainment'>Non-Attainment Areas</td></tr>
 		  <!-- <tr><td class="Overlay" id='Pavement_Conditions'>Pavement Conditions</td></tr> -->
 		  <tr><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>
-          <tr><td class="Overlay" id='Construction_Scheduled'>Projects - Construction underway or begins soon</td></tr>
+      <tr><td class="Overlay" id='Construction_Scheduled'>Projects - Construction underway or begins soon</td></tr>
 		  <tr><td class="Overlay" id='Finalizing_for_Construction'>Projects - Construction begins within 4 years</td></tr>
 		  <tr><td class="Overlay" id='Under_Development'>Projects - Construction begins in 5 to 10 years</td></tr>
-          <tr><td class="Overlay" id='Long_Term_Planning'>Projects - Corridor Studies, construction in 10+ years</td></tr>
+      <tr><td class="Overlay" id='Long_Term_Planning'>Projects - Corridor Studies, construction in 10+ years</td></tr>
 		  <tr><td class="Overlay" id='Railroads'>Railroads</td></tr>
-	      <tr><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
-	      <tr><td class="Overlay" id='RMA'>Regional Mobility Authorities (RMA)</td></tr>
-	      <tr><td class="Overlay" id='Roadway_Inventory'>Roadway Inventory - On-System Roadbeds</td></tr>
+	    <tr><td class="Overlay" id='Reference_Markers'>Reference Markers</td></tr>
+	    <tr><td class="Overlay" id='RMA'>Regional Mobility Authorities (RMA)</td></tr>
+	    <tr><td class="Overlay" id='Roadway_Inventory'>Roadway Inventory - On-System Roadbeds</td></tr>
+      <tr><td class="Overlay" id='Rumble_Strips'>Rumble Strips</td></tr>
 		  <tr><td class="Overlay" id='Shale_Plays'>Shale Plays</td></tr>
 		  <tr><td class="Overlay" id='Speed_Limit'>Speed Limits</td></tr>
 		  <tr><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
@@ -4450,7 +4557,7 @@
 		  <tr><td class="Overlay" id='Tolls'>Tolls</td></tr>
 		  <tr><td class="Overlay" id='Future_Tolls'>Tolls (Future & Proposed)</td></tr>
 		  <tr><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
-          <tr><td class="Overlay" id='Bicycle_Trails'>TxDOT Bicycle Tourism Example Network</td></tr>
+      <tr><td class="Overlay" id='Bicycle_Trails'>TxDOT Bicycle Tourism Example Network</td></tr>
 		  <tr><td class="Overlay" id='TxDOT_Facilities'>TxDOT Facilities</td></tr>
 		  <tr><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>
 		  <tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>
