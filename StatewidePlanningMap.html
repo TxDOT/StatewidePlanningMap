@@ -649,11 +649,10 @@
       else {
         printTemplate.layout = "8x5x11_Landscape_No_Legend";
       }
-      // printTemplate.layout = "8x5x11_Landscape_Legend";
-      // printTemplate.layout = "8x5x11_Landscape_No_Legend";
+
       printTemplate.layoutOptions = {
         legendLayers: printLegend,
-        titleText: "Custom Map Title",
+        titleText: "",
         customTextElements: [{"HEADER - Custom Text": "Custom Text Goes Here"}]
       };
       console.log(printTemplate);
