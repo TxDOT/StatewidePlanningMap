@@ -483,7 +483,7 @@
 	//Overlay variables
   var aadtLyr,labelLayerAADT,areaOfficeLyr,COGLyr,FCLyr,fcLastEditDate,UZAlyr,NatlFreightLyr,TXFreightLyr,NHSLyr,maintOfficeLyr,maintSecRoutesLyr,txTrunkLyr,MarkerLyr,labelLayerMarker,MPOLyr,airQualityLyrs=[],controlSectionLyr,energySectorLyr,
   labelLayerCS,USHouseLyr,railRoadLyr,speedLimitLyr,StateHouseLyr,StateSenateLyr,futureTrafficLyr,longTermPlanLyr,constScheduledLyr,finalForConstLyr,underDevLyr,minuteOrderLyr,pavementConditionLyr,VerticalLyr,permStationLyr,
-  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,rumbleStripLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
+  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,rumbleStripLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,altFuelCorr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
 
   //Measure, tab, coords, url and marker offset variables
 	var currentMeasure=0,activeTab='tcMap',deLength=0,coords,url,markerAndOffset;
@@ -2597,6 +2597,7 @@
 			activeOverlay = "";
 			if (aadtLyr) {aadtLyr.hide(); labelLayerAADT.hide()}
 			if (airQualityLyrs) {airQualityLyrs.forEach((item, i)=>{item.hide()})}
+			if (altFuelCorr) {altFuelCorr.hide();}
 			if (areaOfficeLyr) {areaOfficeLyr.hide();}
 			if (COGLyr) {COGLyr.hide();}
 			if (FCLyr) {FCLyr.hide();}
@@ -3732,6 +3733,29 @@
 					layerInfo.push({layer:hurrEvacLyr, title:"Hurricane Evacuation Routes"});
 				}
 
+				// add altFuelCorridor
+				if (activeOverlaysArray.indexOf("Alt_Fuel_Corridor")> -1) {
+					var pos = activeOverlaysArray.indexOf("Alt_Fuel_Corridor");
+					if (altFuelCorr) {
+						altFuelCorr.show();
+						map.reorderLayer(altFuelCorr,pos);
+					}
+					else {
+                        var tableText = makeTableFromArrayNoHeader([["Local Name","${LOCAL_NAME}"], ["Road Type", "${ROADTYPE}"]]);
+						var infoTemplate = new InfoTemplate("Alternative Fuel Corridors:",tableText);
+						var projectsUrl = "https://geo.dot.gov/mapping/rest/services/NTAD/Alternative_Fuel_Corridors/MapServer/0";
+
+						altFuelCorr = new FeatureLayer(projectsUrl, {id:"Alt_Fuel_Corridor",visible: true,outFields:["*"], infoTemplate: infoTemplate});
+
+						altFuelCorr.setDefinitionExpression("STATE='TX'")
+						map.addLayer(altFuelCorr);
+					}
+					activeOverlay = altFuelCorr;
+					layerInfo.push({layer:altFuelCorr, title:"Alternative Fuel Corridors"});
+				}
+
+
+
         if (activeOverlaysArray.indexOf("INRIX_Traffic")> -1) {
 					var pos = activeOverlaysArray.indexOf("INRIX_Traffic");
 					if (inrixTrafficLyr) {
@@ -3787,6 +3811,7 @@
 
             //XML HTTP Request - With callback to handle follow up processing in the onreadystatechange function
             //---------------------------------------
+
             function xmlRequestWithProcessing(theService,callback) {
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.responseType = 'json';
@@ -4516,7 +4541,8 @@
 		  <tr><th>Overlays</th></tr>
 		  <tr><td class="Overlay" id="CLEAR" style="color:red; font-weight: bold;">Clear Overlays</td></tr>
 		  <tr><td class="Overlay" id='AADT'>AADT</td></tr>
-      <tr><td class="Overlay" id='Air_Quality'>Air Quality</td></tr>
+		  <tr><td class="Overlay" id='Air_Quality'>Air Quality</td></tr>
+		  <tr><td class="Overlay" id='Alt_Fuel_Corridor'>Alternative Fuel Corridors</td></tr>
 		  <tr><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 		  <tr><td class="Overlay" id='Bridges'>Bridges</td></tr>
 		  <tr><td class="Overlay" id='Cemetery'>Cemeteries</td></tr>
@@ -4531,7 +4557,7 @@
 		  <tr><td class="Overlay" id='Functional_Classification'>Functional Classification & Urban Areas</td></tr>
 		  <tr><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
 		  <tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>
-		  <tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr>
+		  <tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr> 
 	 	  <tr><td class="Overlay" id='INRIX_Traffic'>Live Traffic</td></tr>
 	 	  <tr><td class="Overlay" id='Maintenance_Section_Routes'>Maintenance Section Routes</td></tr>
       <tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
