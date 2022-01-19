@@ -475,7 +475,7 @@
 
   //Map and measure variables
 	var map,osmLayer,projectsRI,esri,measureClicked=false,gidWithMeasuresGeom,gidWithMeasuresGeomMPT,mapPoint,queryTaskDFO,queryTaskMPT,queryM,featurePartIndex,toolbar,xPointArray=new Array(),globalX,globalY
-	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,txAccessToken,appVersion="4.4.12 Pennsylvania";
+	,measureUnits="Miles",theDistMeasured=0,theLegend,tiled,polyline,activeOverlaysArray=[],vectorTileLayer,layerInfo=[],credits="TxDOT, TPP-GIS",credits,layer0,layer1,google,TxDOTVectorTileLayer,txAccessToken,appVersion="4.4.13 Brookton";
 
   //Route Event Variables
 	var dropbox,currentRoute="Nope",previousRoute="",currentGeometry;
@@ -1498,7 +1498,7 @@
 						document.getElementById("legendNotesDiv").style.display="block";
 					}
 
-			else if (name == "Alt_Fuel_Corridor_EV" || name == "Alt_Fuel_Corridor_HY" || name == "Alt_Fuel_Corridor_LPG" || name == "Alt_Fuel_Corridor_LNG"){
+			else if (name == "Alt_Fuel_Corridor_EV" || name == "Alt_Fuel_Corridor_HY" || name == "Alt_Fuel_Corridor_LPG" || name == "Alt_Fuel_Corridor_LNG" || name == "Alt_Fuel_Corridor_CNG"){
 				// only need to show text once, so look for empty element or if the text already exist
 				emptyP = document.getElementById("legendDescDiv").innerHTML;
 				if (emptyP == `<p></p><a target="_blank"></a><p><a target="_blank"></a></p>`|| emptyP.search('Alternative Fuel locations') == -1 ) {
@@ -4627,6 +4627,7 @@
 	<h1><strong>RELEASE NOTES</strong></h1>
 	<p3 id="version"></p3>
 	<ul>
+	  <li>(v4.4.13) Added alternative fuel corridors and stations, increased maximum overlays to 5</li>
 	  <li>Updated Non-Attainment (Air Quality) Layers</li>
 	  <li>Added Rumble Strip Layer</li>
       <li>(v4.4.11) Added INRIX Traffic® layer</li>
@@ -4634,7 +4635,7 @@
       <li>(v4.4.10) Bug fix for Imagery zoom level</li>
       <li>(v.4.4.9) Updates to Shale Play layer</li>
       <li>(v4.4.8) AADT layer updates to add 2020 data</li>
-      <li>(v4.4.7) Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li>
+      <!-- <li>(v4.4.7) Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li> -->
       <!-- <li>(v4.4.6) Bug fix related to Query tool</li> -->
       <!-- <li>(v4.4.5) Updated AADT popups and labels for 2019 data</li>
       <li>(v4.4.4) Added "TxDOT Bicycle Tourism Trails Example Network" layer</li>
