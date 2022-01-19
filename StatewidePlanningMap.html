@@ -483,7 +483,7 @@
 	//Overlay variables
   var aadtLyr,labelLayerAADT,areaOfficeLyr,COGLyr,FCLyr,fcLastEditDate,UZAlyr,NatlFreightLyr,TXFreightLyr,NHSLyr,maintOfficeLyr,maintSecRoutesLyr,txTrunkLyr,MarkerLyr,labelLayerMarker,MPOLyr,airQualityLyrs=[],controlSectionLyr,energySectorLyr,
   labelLayerCS,USHouseLyr,railRoadLyr,speedLimitLyr,StateHouseLyr,StateSenateLyr,futureTrafficLyr,longTermPlanLyr,constScheduledLyr,finalForConstLyr,underDevLyr,minuteOrderLyr,pavementConditionLyr,VerticalLyr,permStationLyr,
-  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,rumbleStripLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,altFuelCorrEvLyr,altFuelCorrStationEvLyr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
+  top100Lyr,labelLayerTop100,rdwyInvLyr,cemeteryLyr,rumbleStripLyr,shalePlaysLyr,shaleBasinsLyr,RMAlyr,tollLyr,futTollLyr,hurrEvacLyr,altFuelCorrEvLyr,altFuelCorrStationEvLyr,altFuelCorrHyLyr,altFuelCorrStationHyLyr,inrixTrafficLyr,memorialHighwayLyr,curCongLyr,futCongLyr,facLyr,bridgeLyr,connCorrLyr,MAP21Lyr,STRAHNETLyr,bikeLayer,activeOverlay;
 
   //Measure, tab, coords, url and marker offset variables
 	var currentMeasure=0,activeTab='tcMap',deLength=0,coords,url,markerAndOffset;
@@ -1497,10 +1497,14 @@
 						document.getElementById("legendNotesDiv").style.display="block";
 					}
 
-			else if (name == "Alt_Fuel_Corridor_EV"){
-				let text = document.createTextNode(`The Alternative Fuel Corridors dataset is from the Federal Highway Administration (FHWA), 
-				and part of the U.S. Department of Transportation (USDOT)/Bureau of Transportation Statistics’ (BTS’) National Transportation Atlas Database (NTAD).`);
-				para.append(text);
+			else if (name == "Alt_Fuel_Corridor_EV" || name == "Alt_Fuel_Corridor_HY"){
+				// only need to show text once, so look for empty element or if the text already exist
+				emptyP = document.getElementById("legendDescDiv").innerHTML;
+				if (emptyP == `<p></p><a target="_blank"></a><p><a target="_blank"></a></p>`|| emptyP.search('Alternative Fuel locations') == -1 ) {
+					let text = document.createTextNode(`Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.`);
+					para.append(text);
+				}
+
 				document.getElementById("legendNotesDiv").style.display="block";
 			}
 			
@@ -2607,6 +2611,8 @@
 			if (airQualityLyrs) {airQualityLyrs.forEach((item, i)=>{item.hide()})}
 			if (altFuelCorrEvLyr) {altFuelCorrEvLyr.hide();}
 			if (altFuelCorrEvLyr) {altFuelCorrStationEvLyr.hide();}
+			if (altFuelCorrHyLyr) {altFuelCorrHyLyr.hide();}
+			if (altFuelCorrHyLyr) {altFuelCorrStationHyLyr.hide();}
 			if (areaOfficeLyr) {areaOfficeLyr.hide();}
 			if (COGLyr) {COGLyr.hide();}
 			if (FCLyr) {FCLyr.hide();}
@@ -3773,6 +3779,36 @@
 					layerInfo.push({layer:altFuelCorrEvLyr, title:"Alternative Fuel Corridors - EV"}, {layer:altFuelCorrStationEvLyr, title:"Alternative Fuel Stations - EV"});
 				}
 
+					// add altFuel hydrogen
+					if (activeOverlaysArray.indexOf("Alt_Fuel_Corridor_HY")> -1) {
+					var pos = activeOverlaysArray.indexOf("Alt_Fuel_Corridor_HY");
+					if (altFuelCorrHyLyr) {
+						altFuelCorrHyLyr.show();
+						altFuelCorrStationHyLyr.show();
+						map.reorderLayer(altFuelCorrHyLyr,pos);
+					}
+					else {
+                        var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Route Prefix", "${RTE_PRFX}"], ["Route Number", "${RTE_NBR}"], 
+						["Alternative Fuel Corridor Type","${ALT_FUEL_CORRIDOR_HY}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
+						var altFuelCorrHyinfoTemplate = new InfoTemplate("Alternative Fuel Corridors - HY:",tableText);
+						var projectsUrlEvCorr = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Alternative_Fuel_Corridors_Hydrogen/FeatureServer/0";
+
+						
+						// add point layer for elec
+                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], [" Connector Type Count", "${ev_connector_types_count}"]]);
+						var altFuelPointHyinfoTemplate = new InfoTemplate("Alternative Fuel Stations - HY:",tableText);
+						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas Alternative Fuel Stations/FeatureServer/5";
+
+
+						altFuelCorrStationHyLyr = new FeatureLayer(projectsUrl, {id:"Alt_Fuel_Point_HY",visible: true,outFields:["*"], infoTemplate: altFuelPointHyinfoTemplate});
+						altFuelCorrHyLyr = new FeatureLayer(projectsUrlEvCorr, {id:"Alt_Fuel_Corridor_HY",visible: true,outFields:["*"], infoTemplate: altFuelCorrHyinfoTemplate});
+
+						map.addLayers([altFuelCorrHyLyr, altFuelCorrStationHyLyr]);
+					}
+
+					activeOverlay = altFuelCorrHyLyr;
+					layerInfo.push({layer:altFuelCorrHyLyr, title:"Alternative Fuel Corridors - HY"}, {layer:altFuelCorrStationHyLyr, title:"Alternative Fuel Stations - HY"});
+				}
 
 
         if (activeOverlaysArray.indexOf("INRIX_Traffic")> -1) {
@@ -4561,7 +4597,8 @@
 		  <tr><td class="Overlay" id="CLEAR" style="color:red; font-weight: bold;">Clear Overlays</td></tr>
 		  <tr><td class="Overlay" id='AADT'>AADT</td></tr>
 		  <tr><td class="Overlay" id='Air_Quality'>Air Quality</td></tr>
-		  <tr><td class="Overlay" id='Alt_Fuel_Corridor_EV'>Alternative Fuel Corridors - EV</td></tr>
+		  <tr><td class="Overlay" id='Alt_Fuel_Corridor_EV'>Alternative Fuel Corridors - Electric</td></tr>
+		  <tr><td class="Overlay" id='Alt_Fuel_Corridor_HY'>Alternative Fuel Corridors - Hydrogen</td></tr>
 		  <tr><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 		  <tr><td class="Overlay" id='Bridges'>Bridges</td></tr>
 		  <tr><td class="Overlay" id='Cemetery'>Cemeteries</td></tr>
