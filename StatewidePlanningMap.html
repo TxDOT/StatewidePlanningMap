@@ -1544,6 +1544,7 @@
 
 					
 				}
+				// logic to ensure notes only show once
 				let emptyDescDiv = document.getElementById("legendDescDiv").innerHTML
 				if (emptyDescDiv == '<p></p><a target="_blank"></a><p><a target="_blank"></a></p>' || emptyDescDiv.search('Alternative Fuel locations provided') == -1) {
 					let text = document.createTextNode(`Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.`);
@@ -1552,6 +1553,7 @@
 					para.appendChild(br);
 					br = document.createElement("br");
 					para.appendChild(br);
+					
 					let sourceText = document.createTextNode(`The alternative fuel corridors are from the Federal Highway Administration (FHWA), and part of the 
 					U.S. Department of Transportation (USDOT)/Bureau of Transportation Statistics’ (BTS’) National Transportation Atlas Database (NTAD). Alternative 
 					fuel station data comes from the National Renewable Energy Labatory (NREL). TxDOT will update the alternative fuel station layer on a weekly basis from the NREL.`)
@@ -1561,8 +1563,6 @@
 					link.append(linkTextStations);
 					link.href = "https://developer.nrel.gov/docs/transportation/alt-fuel-stations-v1/";
 
-
-					// document.getElementById("legendNotesDiv").style.display="block";
 					document.getElementById("legendNotesDiv").style.display="block";
 
 				} 
@@ -3848,9 +3848,10 @@
 							} else {
 								evConnType = 'Unknown'
 							}
+							evPlugCount = (graphic.attributes.ev_dc_fast_num + graphic.attributes.ev_level1_evse_num + graphic.attributes.ev_level2_evse_num)
 							// add point layer for elec
 							let tableText = makeTableFromArrayNoHeader([["Station Name", graphic.attributes.station_name], ["Access Days/Times", graphic.attributes.access_days_time], 
-							["Plug Type", evConnType],["Number of Plugs", graphic.attributes.ev_connector_types_count]]);
+							["Plug Type", evConnType],["Number of Plugs", evPlugCount]]);
 							tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
 							return tableText
 						}
@@ -3916,11 +3917,8 @@
 						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - LPG:",tableText);
 						var projectsUrlCorr = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Alternative_Fuel_Corridors_Propane/FeatureServer/0";
 
-						
-						// add point layer for LPG
-
-						
-						// grabbed this function to allow the string replacement for the plug type
+										
+						// grabbed this function to allow the string replacement for the nozzle type
 						let getTextContent = (graphic) => {
 							// needed to handle nulls
 							if (graphic.attributes.lpg_nozzle_types != null) {
