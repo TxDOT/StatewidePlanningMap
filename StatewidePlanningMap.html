@@ -1503,14 +1503,9 @@
 				// only need to show text once, so look for empty div
 				var altFuelDiv = document.createElement('div');
 				altFuelDiv.id='altFuelDiv';
-				console.log(altFuelDiv);
 				nullAltDiv = document.getElementById("altFuelDiv")
 				if (nullAltDiv == null) {
-					let text = document.createTextNode(`Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.`);
-					para.append(text);
-
 					// Create legend using html5 canvas
-					// var text = document.createTextNode('Data provided by INRIX Traffic®');
 					var br = document.createElement('br');
 					var canv = document.createElement('canvas');
 					canv.width = 225;
@@ -1518,14 +1513,6 @@
 					var ctx = canv.getContext("2d");
 					ctx.font = '11px sans-serif';
 					ctx.lineWidth = 4;			
-
-					// Orange -pending
-					ctx.beginPath();
-					ctx.moveTo(2,60);
-					ctx.lineTo(35,60);
-					ctx.strokeStyle='#f8b226';
-					ctx.stroke();
-					ctx.fillText('Corridor Pending', 45, 62.5);
 
 					// Green - ready
 					ctx.beginPath();
@@ -1536,20 +1523,50 @@
 					ctx.fillText('Corridor Ready', 45, 32.5);
 					ctx.fillText('Alt Fuel Corridors', 2, 10);
 
+					// Orange -pending
+					ctx.beginPath();
+					ctx.setLineDash([7,7])
+					ctx.moveTo(2,60);
+					ctx.lineTo(35,60);
+					ctx.strokeStyle='#f8b226';
+					ctx.stroke();
+					ctx.fillText('Corridor Pending', 45, 62.5);
+
 
 					// Create legend div for alt fuels
 					altFuelDiv.appendChild(canv);
 					altFuelDiv.appendChild(br);
-					altFuelDiv.appendChild(text);
+					// altFuelDiv.appendChild(text);
 					altFuelDiv.appendChild(br);
 					altFuelDiv.style.display="block";
-					altFuelDiv.style.paddingBottom="20px";
+					altFuelDiv.style.paddingBottom="5px";
 					document.getElementById('legendDiv').insertAdjacentElement('afterend',altFuelDiv);
 
 					
 				}
+				let emptyDescDiv = document.getElementById("legendDescDiv").innerHTML
+				if (emptyDescDiv == '<p></p><a target="_blank"></a><p><a target="_blank"></a></p>' || emptyDescDiv.search('Alternative Fuel locations provided') == -1) {
+					let text = document.createTextNode(`Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.`);
+					para.appendChild(text);
+					br = document.createElement("br");
+					para.appendChild(br);
+					br = document.createElement("br");
+					para.appendChild(br);
+					let sourceText = document.createTextNode(`The alternative fuel corridors are from the Federal Highway Administration (FHWA), and part of the 
+					U.S. Department of Transportation (USDOT)/Bureau of Transportation Statistics’ (BTS’) National Transportation Atlas Database (NTAD). Alternative 
+					fuel station data comes from the National Renewable Energy Labatory (NREL). TxDOT will update the alternative fuel station layer on a weekly basis from the NREL.`)
+					para.appendChild(sourceText);
+					
+					var linkTextStations = document.createTextNode("NREL Alternative Fuel Stations");
+					link.append(linkTextStations);
+					link.href = "https://developer.nrel.gov/docs/transportation/alt-fuel-stations-v1/";
 
-				// document.getElementById("legendNotesDiv").style.display="block";
+
+					// document.getElementById("legendNotesDiv").style.display="block";
+					document.getElementById("legendNotesDiv").style.display="block";
+
+				} 
+
 			}
 			
 
@@ -3818,15 +3835,26 @@
 						map.reorderLayer(altFuelCorrEvLyr,pos);
 					}
 					else {
-                        var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Route Prefix", "${RTE_PRFX}"], ["Route Number", "${RTE_NBR}"], 
-						["Alternative Fuel Corridor Type","${ALT_FUEL_CORRIDOR_EV}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
-						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - EV: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+                        var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
+						tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - EV:",tableText);
 						var projectsUrlEvCorr = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Alternative_Fuel_Corridors_Electric/FeatureServer/0";
 
-						
-						// add point layer for elec
-                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], ["EV Connector Type Count", "${ev_connector_types_count}"]]);
-						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - EV: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+						// grabbed this function to allow the string replacement for the plug type
+						let getTextContent = (graphic) => {
+							// needed to handle nulls
+							if (graphic.attributes.ev_connector_types != null) {
+								evConnType = graphic.attributes.ev_connector_types.replace(/"/g, '')
+							} else {
+								evConnType = 'Unknown'
+							}
+							// add point layer for elec
+							let tableText = makeTableFromArrayNoHeader([["Station Name", graphic.attributes.station_name], ["Access Days/Times", graphic.attributes.access_days_time], 
+							["Plug Type", evConnType],["Number of Plugs", graphic.attributes.ev_connector_types_count]]);
+							tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+							return tableText
+						}
+						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - EV:", getTextContent);
 						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas Alternative Fuel Stations/FeatureServer/4";
 
 
@@ -3851,15 +3879,16 @@
 						map.reorderLayer(altFuelCorrHyLyr,pos);
 					}
 					else {
-                        var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Route Prefix", "${RTE_PRFX}"], ["Route Number", "${RTE_NBR}"], 
-						["Alternative Fuel Corridor Type","${ALT_FUEL_CORRIDOR_HY}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
-						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - HY: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+						var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
+						tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - HY:",tableText);
 						var projectsUrlCorr = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Alternative_Fuel_Corridors_Hydrogen/FeatureServer/0";
 
 						
-						// add point layer for elec
-                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], [" Connector Type Count", "${ev_connector_types_count}"]]);
-						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - HY: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+						// add point layer for hydrogen
+                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], ["Access Days/Times", "${access_days_time}"]]);
+						tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - HY:",tableText);
 						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas Alternative Fuel Stations/FeatureServer/5";
 
 
@@ -3882,15 +3911,30 @@
 						map.reorderLayer(altFuelCorrLPGLyr,pos);
 					}
 					else {
-                        var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Route Prefix", "${RTE_PRFX}"], ["Route Number", "${RTE_NBR}"], 
-						["Alternative Fuel Corridor Type","${ALT_FUEL_CORRIDOR_HY}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
-						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - LPG: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+						var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
+						tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - LPG:",tableText);
 						var projectsUrlCorr = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Alternative_Fuel_Corridors_Propane/FeatureServer/0";
 
 						
 						// add point layer for LPG
-                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], [" Connector Type Count", "${ev_connector_types_count}"]]);
-						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - LPG: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+
+						
+						// grabbed this function to allow the string replacement for the plug type
+						let getTextContent = (graphic) => {
+							// needed to handle nulls
+							if (graphic.attributes.lpg_nozzle_types != null) {
+								nozzType = graphic.attributes.lpg_nozzle_types.replace(/"/g, '')
+							} else {
+								nozzType = 'Unknown'
+							}
+							let tableText = makeTableFromArrayNoHeader([["Station Name", graphic.attributes.station_name], ["Access Days/Times", graphic.attributes.access_days_time], 
+							["Nozzle Types", nozzType]]);
+							tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+							return tableText
+						}
+
+						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - LPG:",getTextContent);
 						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas Alternative Fuel Stations/FeatureServer/1";
 
 
@@ -3913,15 +3957,16 @@
 						map.reorderLayer(altFuelCorrLNGLyr,pos);
 					}
 					else {
-                        var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Route Prefix", "${RTE_PRFX}"], ["Route Number", "${RTE_NBR}"], 
-						["Alternative Fuel Corridor Type","${ALT_FUEL_CORRIDOR_HY}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
-						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - LNG: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+						var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
+						tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - LNG:",tableText);
 						var projectsUrlCorr = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Alternative_Fuel_Corridors_Liquefied_Natural_Gas/FeatureServer/0";
 
 						
 						// add point layer for LNG
-                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], [" Connector Type Count", "${ev_connector_types_count}"]]);
-						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - LNG: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], ["Access Days/Times", "${access_days_time}"]]);
+						tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - LNG:",tableText);
 						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas Alternative Fuel Stations/FeatureServer/6";
 
 
@@ -3944,15 +3989,16 @@
 						map.reorderLayer(altFuelCorrCNGLyr,pos);
 					}
 					else {
-                        var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Route Prefix", "${RTE_PRFX}"], ["Route Number", "${RTE_NBR}"], 
-						["Alternative Fuel Corridor Type","${ALT_FUEL_CORRIDOR_HY}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
-						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - CNG: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+						var tableText = makeTableFromArrayNoHeader([["Route Name","${RTE_NM}"], ["Corridor Status", "${CORRIDOR_STATUS}"]]);
+						tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+						var altFuelCorrinfoTemplate = new InfoTemplate("Alt Fuel Corridors - CNG:",tableText);
 						var projectsUrlCorr = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Alternative_Fuel_Corridors_Compressed_Natural_Gas/FeatureServer/0";
 
 						
 						// add point layer for CNG
-                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], [" Connector Type Count", "${ev_connector_types_count}"]]);
-						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - CNG: Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.",tableText);
+                        var tableText = makeTableFromArrayNoHeader([["Station Name","${station_name}"], ["Access Days/Times", "${access_days_time}"], ["PSI", "${cng_psi}"]]);
+						tableText += "<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+						var altFuelPointinfoTemplate = new InfoTemplate("Alt Fuel Stations - CNG:",tableText);
 						var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas Alternative Fuel Stations/FeatureServer/0";
 
 
