@@ -3844,7 +3844,7 @@
 						let getTextContent = (graphic) => {
 							// needed to handle nulls
 							if (graphic.attributes.ev_connector_types != null) {
-								evConnType = graphic.attributes.ev_connector_types.replace(/"/g, '')
+								evConnType = graphic.attributes.ev_connector_types
 							} else {
 								evConnType = 'Unknown'
 							}
