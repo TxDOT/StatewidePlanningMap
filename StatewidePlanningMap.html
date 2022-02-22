@@ -2168,7 +2168,11 @@
 
 				document.getElementById("refMarker").innerHTML = msg;
 				document.getElementById("offset").innerHTML = msg;
+
+				// dave, take info from here
 			}
+
+
 
 			function identRouteForM(event) {
 				// -mw
@@ -2473,8 +2477,10 @@
 				document.getElementById("beginDFO").innerHTML = attrs.BEGIN_DFO;
 				document.getElementById("endDFO").innerHTML = attrs.END_DFO;
 				document.getElementById("long").innerHTML = globalX;
-				document.getElementById("lat").innerHTML = globalY;
+				document.getElementById("lat").innerHTML = globalY;			
 			}
+			
+
 
 			function drawPoint(thePoint) {
 				var thePoint = new esri.geometry.Point(
@@ -3050,6 +3056,7 @@
 			on(dom.byId("resetReadout"), "click", resetReadout);
 			function resetReadout() {
 				map.graphics.clear();
+				let srdDataArry = []
 				document.getElementById("rteNM").innerHTML = "";
 				document.getElementById("csNBR").innerHTML = "";
 				document.getElementById("beginDFO").innerHTML = "";
@@ -3302,8 +3309,94 @@
 					map.hideZoomSlider();
 					search.hide();
 					home.hide();
-					document.getElementById("mapDiv_container").style.cursor =
-						"crosshair";
+					document.getElementById("mapDiv_container").style.cursor = "crosshair";	
+
+					// add button / function to send data to the simple roadway design 
+
+					// smplRdwyDiagramArray.push(smplRdwyDiagramObj)
+
+
+					// create div to hold data
+					// HARDCODE IN HTML, display == none
+					
+					const mapElement = document.getElementById("mapDiv")
+
+					// move outside of function and capture innerhtml
+					// make onclick - if lrs, capture left click
+					// array only two values at a time - check rte vlues etc.
+					// array.lenghth() == 1 get the buffer
+
+
+					srdDataArry = []
+					let timesClicked = 0;
+					mapElement.addEventListener("click", () => {
+						// timesClicked++
+						// console.log(timesClicked);
+
+
+							const waitForCalc = () => {
+								if ((document.getElementById("calculatedDFO").innerHTML == 'Calculating...' || document.getElementById("calculatedDFO").innerHTML == '') || 
+									document.getElementById("rteNM").innerHTML == '' || String(document.getElementById("csNBR").innerHTML) == '') {
+									setTimeout(waitForCalc, 100);
+								} 
+								else {
+									// routeName = String(document.getElementById("rteNM").innerHTML);
+									calculatedDFO = Number(document.getElementById("calculatedDFO").innerHTML);
+									// calculatedMilePoint = Number(document.getElementById("calculatedMPT").innerHTML);
+									// controlSectionNumber = String(document.getElementById("csNBR").innerHTML);
+
+									let srdButton = document.getElementById("srdButton").disabled = false;
+
+									// got the data
+									
+									// store data in a object, then push to array
+									let srdDataObject = {
+										route_name : String(document.getElementById("rteNM").innerHTML),
+										calculated_milePoint : Number(document.getElementById("calculatedMPT").innerHTML),
+										calculated_DFO : calculatedDFO,
+										controlSec_number : String(document.getElementById("csNBR").innerHTML)
+
+									};
+
+									srdDataArry.push(srdDataObject);
+
+									// when data is stored on click, create buffer of 0.5 miles
+									if (srdDataArry.length == 1) {
+										
+										routeName = srdDataArry[0].route_name;
+										newDFOBegin = srdDataArry[0].calculated_DFO - 0.5;
+										newDFOEnd = srdDataArry[0].calculated_DFO + 0.5;
+
+
+										console.log(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${routeName},${newDFOBegin},${newDFOEnd}`);
+										window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${routeName},${newDFOBegin},${newDFOEnd}`);
+
+									}
+									
+									// remove first element in array if it's greater than two
+									if (srdDataArry.length > 2) {
+										srdDataArry.shift();
+									}
+
+									// check for the scond array and account for the double up of array is the user clicks around the 
+									// map before clicking the route. Checking for matching DFO values seem pretty solid 
+									if (srdDataArry.length == 2 && srdDataArry[0].calculated_DFO != srdDataArry[1].calculated_DFO) {
+										console.log('Second ',srdDataArry);
+
+										// check route names
+										if (srdDataArry[0].route_name != srdDataArry[1].route_name) {
+											alert('Different Route Names');
+
+										}
+
+									}
+		
+								};
+
+							};
+							waitForCalc();				
+
+					});
 				}
 			}
 
@@ -7134,6 +7227,8 @@
 				document.getElementById("riAttributes").style.display = "block";
 				document.getElementById("refRoadway").style.display = "block";
 			}
+
+
 			//---------------------------------------
 
 			//HTML Table accepts a multi-dimensional array.  No field names.
@@ -7578,6 +7673,7 @@
 			<tr><td></td></tr>
 			<tr><td height="40px"></td></tr>
 
+			<tr><td><button title="Send To SRD" id="srdButton" disabled>View in Simple Roadway Diagram</button></td></tr>
 			<tr><td><button title="Reset Readout" id="resetReadout">Reset All</button></td></tr>
 			</table>
 		</div>
