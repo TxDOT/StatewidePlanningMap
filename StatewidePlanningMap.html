@@ -514,6 +514,10 @@
 			currentRoute = "Nope",
 			previousRoute = "",
 			currentGeometry;
+		
+		//SRD Varibales
+		let viewInSRD,
+			srdDataArry = []
 
 		//Overlay variables
 		var aadtLyr,
@@ -2168,7 +2172,11 @@
 
 				document.getElementById("refMarker").innerHTML = msg;
 				document.getElementById("offset").innerHTML = msg;
+
+				// dave, take info from here
 			}
+
+
 
 			function identRouteForM(event) {
 				// -mw
@@ -2473,8 +2481,10 @@
 				document.getElementById("beginDFO").innerHTML = attrs.BEGIN_DFO;
 				document.getElementById("endDFO").innerHTML = attrs.END_DFO;
 				document.getElementById("long").innerHTML = globalX;
-				document.getElementById("lat").innerHTML = globalY;
+				document.getElementById("lat").innerHTML = globalY;			
 			}
+			
+
 
 			function drawPoint(thePoint) {
 				var thePoint = new esri.geometry.Point(
@@ -3050,6 +3060,8 @@
 			on(dom.byId("resetReadout"), "click", resetReadout);
 			function resetReadout() {
 				map.graphics.clear();
+				srdDataArry.length = 0;
+				srdButton = document.getElementById("srdButton").disabled = true;
 				document.getElementById("rteNM").innerHTML = "";
 				document.getElementById("csNBR").innerHTML = "";
 				document.getElementById("beginDFO").innerHTML = "";
@@ -3302,8 +3314,87 @@
 					map.hideZoomSlider();
 					search.hide();
 					home.hide();
-					document.getElementById("mapDiv_container").style.cursor =
-						"crosshair";
+					document.getElementById("mapDiv_container").style.cursor = "crosshair";	
+
+					// add button / function to send data to the simple roadway design 
+					const mapElement = document.getElementById("mapDiv")
+									
+					mapElement.addEventListener("click", () => {
+						const waitForCalc = () => {
+							if ((document.getElementById("calculatedDFO").innerHTML == 'Calculating...' || document.getElementById("calculatedDFO").innerHTML == '') || 
+								document.getElementById("rteNM").innerHTML == '' || String(document.getElementById("csNBR").innerHTML) == '') {
+								setTimeout(waitForCalc, 100); // like a "while loop" waiting for condition to be false
+							} 
+							else {
+								// got the data								
+								// store data in a object, then push to array
+								let srdDataObject = {
+									route_name : String(document.getElementById("rteNM").innerHTML),
+									calculated_milePoint : Number(document.getElementById("calculatedMPT").innerHTML),
+									calculated_DFO : Math.round(Number(document.getElementById("calculatedDFO").innerHTML) * 1000) / 1000, // round to thousands
+									controlSec_number : String(document.getElementById("csNBR").innerHTML)
+
+								};
+
+								srdDataArry.push(srdDataObject);
+
+								// when data is stored on click, create buffer of 0.5 miles, thus 1 mile segment
+								if (srdDataArry.length == 1) {
+									// don't allow non -KG routes into array
+									if (srdDataObject.route_name.includes("-KG") == false) {
+										srdDataArry.length = 0;
+									}
+									else {	
+										// activate the button
+										let srdButton = document.getElementById("srdButton").disabled = false;
+
+										halfMiDFOBegin = srdDataArry[0].calculated_DFO - 0.5;
+										halfMiDFOEnd = srdDataArry[0].calculated_DFO + 0.5;
+
+										// global variable - what the button uses
+										viewInSRD = () => {
+											window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${halfMiDFOBegin},${halfMiDFOEnd}`);
+										};
+									}
+								};
+
+								// remove first element in array if it's greater than two
+								if (srdDataArry.length > 2) {
+									srdDataArry.shift();
+								};					
+
+								// check for the second array and account for the double up of array if the user clicks around the 
+								// map before clicking the route. Checking for matching DFO values seems pretty solid to get around that
+								if (srdDataArry.length == 2 && srdDataArry[0].calculated_DFO != srdDataArry[1].calculated_DFO) {
+									srdButton = document.getElementById("srdButton").disabled = false;
+
+									// assign begin and end DFO in array 
+									if (srdDataArry[0].calculated_DFO > srdDataArry[1].calculated_DFO) {
+										dfoBegin = Number(srdDataArry[1].calculated_DFO);
+										dfoEnd = Number(srdDataArry[0].calculated_DFO);
+									}
+									else {
+										dfoBegin = srdDataArry[0].calculated_DFO;
+										dfoEnd = srdDataArry[1].calculated_DFO
+									}
+
+									// what the button uses
+									viewInSRD = () => {
+										// don't allow different route names to be sent to the SRD
+										if (srdDataArry.length == 2 && srdDataArry[0].route_name != srdDataArry[1].route_name) {
+											alert('Different route name chosen. Please choose the same route for your next point. Or, click Reset All to start over.');
+											srdDataArry.pop()
+											srdButton = document.getElementById("srdButton").disabled = true;
+										}
+										else {	
+											window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${dfoBegin},${dfoEnd}`);
+										}
+									};
+								}
+							};
+						};
+						waitForCalc();				
+					});
 				}
 			}
 
@@ -7134,6 +7225,8 @@
 				document.getElementById("riAttributes").style.display = "block";
 				document.getElementById("refRoadway").style.display = "block";
 			}
+
+
 			//---------------------------------------
 
 			//HTML Table accepts a multi-dimensional array.  No field names.
@@ -7578,6 +7671,7 @@
 			<tr><td></td></tr>
 			<tr><td height="40px"></td></tr>
 
+			<tr><td><button title="Send To SRD" id="srdButton" onclick="viewInSRD()" disabled>View in SRD</button></td></tr>
 			<tr><td><button title="Reset Readout" id="resetReadout">Reset All</button></td></tr>
 			</table>
 		</div>
