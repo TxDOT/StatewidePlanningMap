@@ -3367,8 +3367,6 @@
 								// map before clicking the route. Checking for matching DFO values seems pretty solid to get around that
 								if (srdDataArry.length == 2 && srdDataArry[0].calculated_DFO != srdDataArry[1].calculated_DFO) {
 									srdButton = document.getElementById("srdButton").disabled = false;
-									console.log('Second ', srdDataArry);
-
 
 									// assign begin and end DFO in array 
 									if (srdDataArry[0].calculated_DFO > srdDataArry[1].calculated_DFO) {
@@ -3382,9 +3380,9 @@
 
 									// what the button uses
 									viewInSRD = () => {
-										// don't allow a different route name in the array
+										// don't allow different route names to be sent to the SRD
 										if (srdDataArry.length == 2 && srdDataArry[0].route_name != srdDataArry[1].route_name) {
-											alert('Different route name chosen. Please choose the same route for your next point. Or, click Reset All to begin a new route.');
+											alert('Different route name chosen. Please choose the same route for your next point. Or, click Reset All to start over.');
 											srdDataArry.pop()
 											srdButton = document.getElementById("srdButton").disabled = true;
 										}
