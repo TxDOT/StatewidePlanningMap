@@ -3344,12 +3344,15 @@
 								};
 
 								srdDataArry.push(srdDataObject);
+								
+								// variable test for a route name only containing numbers
+								let isCitySt = /^\d+$/.test(srdDataObject.route_name)
 
 								// when data is stored on click, create buffer of 0.5 miles, thus 1 mile segment
 								if (srdDataArry.length == 1) {
 									// only allow centerline routes and city streets
 									// only KG for on system and county rds for off system
-									let isCitySt = /^\d+$/.test(srdDataObject.route_name)
+									
 									if (srdDataObject.route_name.includes("-KG") == false && srdDataObject.route_name.includes("AA") == false && isCitySt == true) {
 										srdDataArry.length = 0;
 									}
@@ -3360,8 +3363,12 @@
 										// get 0.5 mile buffer and ensure DFOs are rounded
 										let halfMiDFOBegin = Number(srdDataArry[0].calculated_DFO) - 0.5;
 										let halfMiDFOEnd = Number(srdDataArry[0].calculated_DFO) + 0.5;
-										halfMiDFOBegin = halfMiDFOBegin.toFixed(3);
-										halfMiDFOEnd = halfMiDFOEnd.toFixed(3);
+										halfMiDFOBegin = Number(halfMiDFOBegin.toFixed(3));
+										halfMiDFOEnd = Number(halfMiDFOEnd.toFixed(3));
+
+										console.log(`${halfMiDFOBegin},${halfMiDFOEnd}`)
+										console.log(`${srdDataObject.begin_DFO},${srdDataObject.end_DFO}`)
+
 
 										// capture begin and end of dfo and make sure buffer does not go outside
 										if (halfMiDFOBegin < srdDataObject.begin_DFO) {
