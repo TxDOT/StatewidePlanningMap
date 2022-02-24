@@ -3332,7 +3332,9 @@
 									route_name : String(document.getElementById("rteNM").innerHTML),
 									calculated_milePoint : Number(document.getElementById("calculatedMPT").innerHTML),
 									calculated_DFO : Math.round(Number(document.getElementById("calculatedDFO").innerHTML) * 1000) / 1000, // round to thousands
-									controlSec_number : String(document.getElementById("csNBR").innerHTML)
+									controlSec_number : String(document.getElementById("csNBR").innerHTML),
+									begin_DFO : Math.round(Number(document.getElementById("beginDFO").innerHTML) * 1000) / 1000,
+									end_DFO : Math.round(Number(document.getElementById("endDFO").innerHTML) * 1000) / 1000
 
 								};
 
@@ -3340,8 +3342,10 @@
 
 								// when data is stored on click, create buffer of 0.5 miles, thus 1 mile segment
 								if (srdDataArry.length == 1) {
-									// don't allow non -KG routes into array
-									if (srdDataObject.route_name.includes("-KG") == false) {
+									// only allow centerline routes and city streets
+									// only KG for on system and county rds for off system
+									let isCityRte = /^\d+$/.test(srdDataObject.route_name)
+									if (srdDataObject.route_name.includes("-KG") == false && srdDataObject.route_name.includes("AA") == false && isCityRte == true) {
 										srdDataArry.length = 0;
 									}
 									else {	
@@ -3351,6 +3355,14 @@
 										halfMiDFOBegin = srdDataArry[0].calculated_DFO - 0.5;
 										halfMiDFOEnd = srdDataArry[0].calculated_DFO + 0.5;
 
+										// capture begin and end of dfo and make sure buffer does not go outside
+										if (halfMiDFOBegin < srdDataObject.begin_DFO) {
+											halfMiDFOBegin = srdDataObject.begin_DFO;
+										}; 
+										if (halfMiDFOEnd > srdDataObject.end_DFO) {
+											halfMiDFOEnd = srdDataObject.end_DFO;
+										};
+	
 										// global variable - what the button uses
 										viewInSRD = () => {
 											window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${halfMiDFOBegin},${halfMiDFOEnd}`);
@@ -3361,7 +3373,7 @@
 								// remove first element in array if it's greater than two
 								if (srdDataArry.length > 2) {
 									srdDataArry.shift();
-								};					
+								};		
 
 								// check for the second array and account for the double up of array if the user clicks around the 
 								// map before clicking the route. Checking for matching DFO values seems pretty solid to get around that
