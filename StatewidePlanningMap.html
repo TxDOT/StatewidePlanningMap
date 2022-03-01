@@ -3336,53 +3336,39 @@
 								let srdDataObject = {
 									route_name : String(document.getElementById("rteNM").innerHTML),
 									calculated_milePoint : Number(document.getElementById("calculatedMPT").innerHTML),
-									calculated_DFO : Number(document.getElementById("calculatedDFO").innerHTML).toFixed(3),
+									calculated_DFO : Number(parseFloat(document.getElementById("calculatedDFO").innerHTML).toFixed(3)),
 									controlSec_number : String(document.getElementById("csNBR").innerHTML),
-									begin_DFO : Number(document.getElementById("beginDFO").innerHTML).toFixed(3),
-									end_DFO : Number(document.getElementById("endDFO").innerHTML).toFixed(3)
+									begin_DFO : Number(parseFloat(document.getElementById("beginDFO").innerHTML).toFixed(3)),
+									end_DFO : Number(parseFloat(document.getElementById("endDFO").innerHTML).toFixed(3))
 
 								};
 
 								srdDataArry.push(srdDataObject);
 								
-								// variable test for a route name only containing numbers
-								let isCitySt = /^\d+$/.test(srdDataObject.route_name)
 
 								// when data is stored on click, create buffer of 0.5 miles, thus 1 mile segment
 								if (srdDataArry.length == 1) {
-									// only allow centerline routes and city streets
-									// only KG for on system and county rds for off system
-									
-									if (srdDataObject.route_name.includes("-KG") == false && srdDataObject.route_name.includes("AA") == false && isCitySt == true) {
-										srdDataArry.length = 0;
-									}
-									else {	
-										// activate the button
-										let srdButton = document.getElementById("srdButton").style = "display : inline";
+									// activate the button
+									let srdButton = document.getElementById("srdButton").style = "display : inline";
 
-										// get 0.5 mile buffer and ensure DFOs are rounded
-										let halfMiDFOBegin = Number(srdDataArry[0].calculated_DFO) - 0.5;
-										let halfMiDFOEnd = Number(srdDataArry[0].calculated_DFO) + 0.5;
-										halfMiDFOBegin = Number(halfMiDFOBegin.toFixed(3));
-										halfMiDFOEnd = Number(halfMiDFOEnd.toFixed(3));
+									// get 0.5 mile buffer and ensure DFOs are rounded
+									let halfMiDFOBegin = Number(srdDataArry[0].calculated_DFO) - 0.5;
+									let halfMiDFOEnd = Number(srdDataArry[0].calculated_DFO) + 0.5;
+									halfMiDFOBegin = Number(halfMiDFOBegin.toFixed(3));
+									halfMiDFOEnd = Number(halfMiDFOEnd.toFixed(3));
 
-										console.log(`${halfMiDFOBegin},${halfMiDFOEnd}`)
-										console.log(`${srdDataObject.begin_DFO},${srdDataObject.end_DFO}`)
+									// capture begin and end of dfo and make sure buffer does not go outside
+									if (halfMiDFOBegin < srdDataObject.begin_DFO) {
+										halfMiDFOBegin = srdDataObject.begin_DFO;
+									}; 
+									if (halfMiDFOEnd > srdDataObject.end_DFO) {
+										halfMiDFOEnd = srdDataObject.end_DFO;
+									};
 
-
-										// capture begin and end of dfo and make sure buffer does not go outside
-										if (halfMiDFOBegin < srdDataObject.begin_DFO) {
-											halfMiDFOBegin = srdDataObject.begin_DFO;
-										}; 
-										if (halfMiDFOEnd > srdDataObject.end_DFO) {
-											halfMiDFOEnd = srdDataObject.end_DFO;
-										};
-	
-										// global variable - what the button uses
-										viewInSRD = () => {
-											window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${halfMiDFOBegin},${halfMiDFOEnd}`);
-										};
-									}
+									// global variable - what the button uses
+									viewInSRD = () => {
+										window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${halfMiDFOBegin},${halfMiDFOEnd}`);
+									};
 								};
 
 								// remove first element in array if it's greater than two
@@ -3393,7 +3379,6 @@
 								// check for the second array and account for the double up of array if the user clicks around the 
 								// map before clicking the route. Checking for matching DFO values seems pretty solid to get around that
 								if (srdDataArry.length == 2 && srdDataArry[0].calculated_DFO != srdDataArry[1].calculated_DFO) {
-									// srdButton = document.getElementById("srdButton").display = "block";
 
 									// assign begin and end DFO in array 
 									if (srdDataArry[0].calculated_DFO > srdDataArry[1].calculated_DFO) {
@@ -3408,7 +3393,7 @@
 									// what the button uses
 									viewInSRD = () => {
 										// don't allow different route names or city streets to be sent to the SRD
-										if (srdDataArry.length == 2 && srdDataArry[0].route_name != srdDataArry[1].route_name || isCitySt == true) {
+										if (srdDataArry.length == 2 && srdDataArry[0].route_name != srdDataArry[1].route_name) {
 											alert('Multiple routes chosen. Please select points on the same route.');
 											srdDataArry.length = 0;
 											srdButton = document.getElementById("srdButton").style = "display : none";
@@ -7698,7 +7683,7 @@
 			<tr><td></td></tr>
 			<tr><td height="40px"></td></tr>
 
-			<tr><td><button title="Send To SRD" id="srdButton" onclick="viewInSRD()">View in SRD</button></td></tr>
+			<tr><td><button title="Send To SRD" id="srdButton" onclick="viewInSRD()">Diagram</button></td></tr>
 			<tr><td><button title="Reset Readout" id="resetReadout">Reset All</button></td></tr>
 			</table>
 		</div>
