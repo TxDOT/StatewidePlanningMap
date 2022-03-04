@@ -3066,7 +3066,7 @@
 			function resetReadout() {
 				map.graphics.clear();
 				srdDataArry.length = 0;
-				srdButton = document.getElementById("srdButton").style = "display : none";
+				document.getElementById("srdButton").style.display = "none";
 				document.getElementById("rteNM").innerHTML = "";
 				document.getElementById("csNBR").innerHTML = "";
 				document.getElementById("beginDFO").innerHTML = "";
@@ -3325,6 +3325,7 @@
 					const mapElement = document.getElementById("mapDiv")
 									
 					mapElement.addEventListener("click", () => {
+						srdDataArry.length = 0;//clear the array and reset for single click only
 						const waitForCalc = () => {
 							if ((document.getElementById("calculatedDFO").innerHTML == 'Calculating...' || document.getElementById("calculatedDFO").innerHTML == '') || 
 								document.getElementById("rteNM").innerHTML == '' || String(document.getElementById("csNBR").innerHTML) == '') {
@@ -3347,62 +3348,69 @@
 								
 
 								// when data is stored on click, create buffer of 0.5 miles, thus 1 mile segment
+								// only accept KG and single roadbed for off system
 								if (srdDataArry.length == 1) {
-									// activate the button
-									let srdButton = document.getElementById("srdButton").style = "display : inline";
+									console.log(srdDataObject);
+									if (srdDataObject.controlSec_number.includes("None Selected")){
+										document.getElementById("srdButton").style.display = "none";
+									}
+									// only activate the button if KG or single roadbed for off system
+									else {
+										document.getElementById("srdButton").style.display = "inline";
 
-									// get 0.5 mile buffer and ensure DFOs are rounded
-									let halfMiDFOBegin = Number(srdDataArry[0].calculated_DFO) - 0.5;
-									let halfMiDFOEnd = Number(srdDataArry[0].calculated_DFO) + 0.5;
-									halfMiDFOBegin = Number(halfMiDFOBegin.toFixed(3));
-									halfMiDFOEnd = Number(halfMiDFOEnd.toFixed(3));
+										// get 0.5 mile buffer and ensure DFOs are rounded
+										let halfMiDFOBegin = Number(srdDataArry[0].calculated_DFO) - 0.5;
+										let halfMiDFOEnd = Number(srdDataArry[0].calculated_DFO) + 0.5;
+										halfMiDFOBegin = Number(halfMiDFOBegin.toFixed(3));
+										halfMiDFOEnd = Number(halfMiDFOEnd.toFixed(3));
 
-									// capture begin and end of dfo and make sure buffer does not go outside
-									if (halfMiDFOBegin < srdDataObject.begin_DFO) {
-										halfMiDFOBegin = srdDataObject.begin_DFO;
-									}; 
-									if (halfMiDFOEnd > srdDataObject.end_DFO) {
-										halfMiDFOEnd = srdDataObject.end_DFO;
-									};
-
-									// global variable - what the button uses
-									viewInSRD = () => {
-										window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${halfMiDFOBegin},${halfMiDFOEnd}`);
+										// capture begin and end of dfo and make sure buffer does not go outside
+										if (halfMiDFOBegin < srdDataObject.begin_DFO) {
+											halfMiDFOBegin = srdDataObject.begin_DFO;
+										}; 
+										if (halfMiDFOEnd > srdDataObject.end_DFO) {
+											halfMiDFOEnd = srdDataObject.end_DFO;
+										};
+										
+										// global variable - what the button uses
+										viewInSRD = () => {
+											window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${halfMiDFOBegin},${halfMiDFOEnd}`);
+										};
 									};
 								};
-
+								// HANDLE MULTIPLE SELECTIONS
 								// remove first element in array if it's greater than two
-								if (srdDataArry.length > 2) {
-									srdDataArry.shift();
-								};		
+								// if (srdDataArry.length > 2) {
+								// 	srdDataArry.shift();
+								// };		
 
-								// check for the second array and account for the double up of array if the user clicks around the 
-								// map before clicking the route. Checking for matching DFO values seems pretty solid to get around that
-								if (srdDataArry.length == 2 && srdDataArry[0].calculated_DFO != srdDataArry[1].calculated_DFO) {
+								// // check for the second array and account for the double up of array if the user clicks around the 
+								// // map before clicking the route. Checking for matching DFO values
+								// if (srdDataArry.length == 2 && srdDataArry[0].calculated_DFO != srdDataArry[1].calculated_DFO) {
 
-									// assign begin and end DFO in array 
-									if (srdDataArry[0].calculated_DFO > srdDataArry[1].calculated_DFO) {
-										dfoBegin = Number(srdDataArry[1].calculated_DFO);
-										dfoEnd = Number(srdDataArry[0].calculated_DFO);
-									}
-									else {
-										dfoBegin = srdDataArry[0].calculated_DFO;
-										dfoEnd = srdDataArry[1].calculated_DFO
-									}
+								// 	// assign begin and end DFO in array 
+								// 	if (srdDataArry[0].calculated_DFO > srdDataArry[1].calculated_DFO) {
+								// 		dfoBegin = Number(srdDataArry[1].calculated_DFO);
+								// 		dfoEnd = Number(srdDataArry[0].calculated_DFO);
+								// 	}
+								// 	else {
+								// 		dfoBegin = srdDataArry[0].calculated_DFO;
+								// 		dfoEnd = srdDataArry[1].calculated_DFO;
+								// 	}
 
-									// what the button uses
-									viewInSRD = () => {
-										// don't allow different route names or city streets to be sent to the SRD
-										if (srdDataArry.length == 2 && srdDataArry[0].route_name != srdDataArry[1].route_name) {
-											alert('Multiple routes chosen. Please select points on the same route.');
-											srdDataArry.length = 0;
-											srdButton = document.getElementById("srdButton").style = "display : none";
-										}
-										else {	
-											window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${dfoBegin},${dfoEnd}`);
-										}
-									};
-								}
+								// 	// what the button uses
+								// 	viewInSRD = () => {
+								// 		// don't allow different route names or city streets to be sent to the SRD
+								// 		if (srdDataArry.length == 2 && srdDataArry[0].route_name != srdDataArry[1].route_name) {
+								// 			alert('Multiple routes chosen. Please select points on the same route.');
+								// 			srdDataArry.length = 0;
+								// 			document.getElementById("srdButton").style.display = "none";
+								// 		}
+								// 		else {	
+								// 			window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${dfoBegin},${dfoEnd}`);
+								// 		}
+								// 	};
+								// }
 							};
 						};
 						waitForCalc();				
