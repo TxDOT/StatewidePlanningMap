@@ -398,6 +398,11 @@
 			padding-bottom: 5px;
 			background: radial-gradient(white, lightyellow, yellow);
 		}
+		
+		#srdButton {
+			display: none;
+		}
+
 		.esriLegendLayerLabel td {
 			display: none;
 			font-weight: bold;
@@ -507,13 +512,17 @@
 			google,
 			TxDOTVectorTileLayer,
 			txAccessToken,
-			appVersion = "4.4.14 Brookton";
+			appVersion = "4.4.15 Sunflower";
 
 		//Route Event Variables
 		var dropbox,
 			currentRoute = "Nope",
 			previousRoute = "",
 			currentGeometry;
+		
+		//SRD Varibales
+		let viewInSRD,
+			srdDataArry = []
 
 		//Overlay variables
 		var aadtLyr,
@@ -2168,7 +2177,10 @@
 
 				document.getElementById("refMarker").innerHTML = msg;
 				document.getElementById("offset").innerHTML = msg;
+
 			}
+
+
 
 			function identRouteForM(event) {
 				// -mw
@@ -2473,8 +2485,10 @@
 				document.getElementById("beginDFO").innerHTML = attrs.BEGIN_DFO;
 				document.getElementById("endDFO").innerHTML = attrs.END_DFO;
 				document.getElementById("long").innerHTML = globalX;
-				document.getElementById("lat").innerHTML = globalY;
+				document.getElementById("lat").innerHTML = globalY;			
 			}
+			
+
 
 			function drawPoint(thePoint) {
 				var thePoint = new esri.geometry.Point(
@@ -3050,6 +3064,8 @@
 			on(dom.byId("resetReadout"), "click", resetReadout);
 			function resetReadout() {
 				map.graphics.clear();
+				srdDataArry.length = 0;
+				document.getElementById("srdButton").style.display = "none";
 				document.getElementById("rteNM").innerHTML = "";
 				document.getElementById("csNBR").innerHTML = "";
 				document.getElementById("beginDFO").innerHTML = "";
@@ -3302,8 +3318,102 @@
 					map.hideZoomSlider();
 					search.hide();
 					home.hide();
-					document.getElementById("mapDiv_container").style.cursor =
-						"crosshair";
+					document.getElementById("mapDiv_container").style.cursor = "crosshair";	
+
+					// add button / function to send data to the simple roadway design 
+					const mapElement = document.getElementById("mapDiv")
+									
+					mapElement.addEventListener("click", () => {
+						srdDataArry.length = 0;//clear the array and reset for single click only
+						const waitForCalc = () => {
+							if ((document.getElementById("calculatedDFO").innerHTML == 'Calculating...' || document.getElementById("calculatedDFO").innerHTML == '') || 
+								document.getElementById("rteNM").innerHTML == '' || String(document.getElementById("csNBR").innerHTML) == '') {
+								setTimeout(waitForCalc, 100); // like a "while loop" waiting for condition to be false
+							} 
+							else {
+								// got the data								
+								// store data in a object, then push to array
+								let srdDataObject = {
+									route_name : String(document.getElementById("rteNM").innerHTML),
+									calculated_milePoint : Number(document.getElementById("calculatedMPT").innerHTML),
+									calculated_DFO : Number(parseFloat(document.getElementById("calculatedDFO").innerHTML).toFixed(3)),
+									controlSec_number : String(document.getElementById("csNBR").innerHTML),
+									begin_DFO : Number(parseFloat(document.getElementById("beginDFO").innerHTML).toFixed(3)),
+									end_DFO : Number(parseFloat(document.getElementById("endDFO").innerHTML).toFixed(3))
+
+								};
+
+								srdDataArry.push(srdDataObject);
+								
+
+								// when data is stored on click, create buffer of 0.5 miles, thus 1 mile segment
+								// only accept KG and single roadbed for off system
+								if (srdDataArry.length == 1) {
+									console.log(srdDataObject);
+									if (srdDataObject.controlSec_number.includes("None Selected")){
+										document.getElementById("srdButton").style.display = "none";
+									}
+									// only activate the button if KG or single roadbed for off system
+									else {
+										document.getElementById("srdButton").style.display = "inline";
+
+										// get 0.5 mile buffer and ensure DFOs are rounded
+										let halfMiDFOBegin = Number(srdDataArry[0].calculated_DFO) - 0.5;
+										let halfMiDFOEnd = Number(srdDataArry[0].calculated_DFO) + 0.5;
+										halfMiDFOBegin = Number(halfMiDFOBegin.toFixed(3));
+										halfMiDFOEnd = Number(halfMiDFOEnd.toFixed(3));
+
+										// capture begin and end of dfo and make sure buffer does not go outside
+										if (halfMiDFOBegin < srdDataObject.begin_DFO) {
+											halfMiDFOBegin = srdDataObject.begin_DFO;
+										}; 
+										if (halfMiDFOEnd > srdDataObject.end_DFO) {
+											halfMiDFOEnd = srdDataObject.end_DFO;
+										};
+										
+										// global variable - what the button uses
+										viewInSRD = () => {
+											window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${halfMiDFOBegin},${halfMiDFOEnd}`);
+										};
+									};
+								};
+								// HANDLE MULTIPLE SELECTIONS
+								// remove first element in array if it's greater than two
+								// if (srdDataArry.length > 2) {
+								// 	srdDataArry.shift();
+								// };		
+
+								// // check for the second array and account for the double up of array if the user clicks around the 
+								// // map before clicking the route. Checking for matching DFO values
+								// if (srdDataArry.length == 2 && srdDataArry[0].calculated_DFO != srdDataArry[1].calculated_DFO) {
+
+								// 	// assign begin and end DFO in array 
+								// 	if (srdDataArry[0].calculated_DFO > srdDataArry[1].calculated_DFO) {
+								// 		dfoBegin = Number(srdDataArry[1].calculated_DFO);
+								// 		dfoEnd = Number(srdDataArry[0].calculated_DFO);
+								// 	}
+								// 	else {
+								// 		dfoBegin = srdDataArry[0].calculated_DFO;
+								// 		dfoEnd = srdDataArry[1].calculated_DFO;
+								// 	}
+
+								// 	// what the button uses
+								// 	viewInSRD = () => {
+								// 		// don't allow different route names or city streets to be sent to the SRD
+								// 		if (srdDataArry.length == 2 && srdDataArry[0].route_name != srdDataArry[1].route_name) {
+								// 			alert('Multiple routes chosen. Please select points on the same route.');
+								// 			srdDataArry.length = 0;
+								// 			document.getElementById("srdButton").style.display = "none";
+								// 		}
+								// 		else {	
+								// 			window.open(`https://apps3.txdot.gov/srd/?RIA_RTE_ID=${srdDataArry[0].route_name},${dfoBegin},${dfoEnd}`);
+								// 		}
+								// 	};
+								// }
+							};
+						};
+						waitForCalc();				
+					});
 				}
 			}
 
@@ -7134,6 +7244,8 @@
 				document.getElementById("riAttributes").style.display = "block";
 				document.getElementById("refRoadway").style.display = "block";
 			}
+
+
 			//---------------------------------------
 
 			//HTML Table accepts a multi-dimensional array.  No field names.
@@ -7251,13 +7363,14 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Added Alternative Fuel Layers</li>
-			<li>Increased Maximum Overlays to 5</li>
+			<li>Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li>
+			<li>(v4.4.14) Added Alternative Fuel Layers</li>
+			<li>(v4.4.14) Increased Maximum Overlays to 5</li>
 			<li>(v4.4.13) Updated Non-Attainment (Air Quality) Layers</li>
 			<li>(v4.4.12) Added Rumble Strip Layer</li>
 			<li>(v4.4.11) Added INRIX Traffic® Layer</li>
 			<li>(v4.4.11) Increased Maximum Overlays to 4</li>
-			<li>(v4.4.10) Bug fix for Imagery zoom level</li>
+			<!-- <li>(v4.4.10) Bug fix for Imagery zoom level</li> -->
 			<!-- <li>(v.4.4.9) Updates to Shale Play layer</li>
 			<li>(v4.4.8) AADT layer updates to add 2020 data</li> -->
 			<!-- <li>(v4.4.7) Added linear referencing Drag and Drop .csv support, updated Query Tab, bridge info box includes link to Bridge Report</li> -->
@@ -7578,6 +7691,7 @@
 			<tr><td></td></tr>
 			<tr><td height="40px"></td></tr>
 
+			<tr><td><button title="Send To SRD" id="srdButton" onclick="viewInSRD()">Diagram</button></td></tr>
 			<tr><td><button title="Reset Readout" id="resetReadout">Reset All</button></td></tr>
 			</table>
 		</div>
