@@ -572,6 +572,7 @@
 			hurrEvacLyr,
 			altFuelCorrEvLyr,
 			altFuelCorrStationEvLyr,
+			altFuelCorrStudyEvLyr,
 			altFuelCorrHyLyr,
 			altFuelCorrStationHyLyr,
 			altFuelCorrLPGLyr,
@@ -3690,6 +3691,9 @@
 				if (altFuelCorrEvLyr) {
 					altFuelCorrStationEvLyr.hide();
 				}
+				if (altFuelCorrStudyEvLyr) {
+					altFuelCorrStudyEvLyr.hide();
+				}
 				if (altFuelCorrHyLyr) {
 					altFuelCorrHyLyr.hide();
 				}
@@ -5981,8 +5985,11 @@
 						if (altFuelCorrEvLyr) {
 							altFuelCorrEvLyr.show();
 							altFuelCorrStationEvLyr.show();
+							altFuelCorrStudyEvLyr.show();
+							altFuelCorrStudyEvLyr.show();
 							map.reorderLayer(altFuelCorrEvLyr, pos);
-						} else {
+						} 
+						else {
 							var tableText = makeTableFromArrayNoHeader([
 								["Route Name", "${RTE_NM}"],
 								["Corridor Status", "${CORRIDOR_STATUS}"],
@@ -5996,31 +6003,51 @@
 							var projectsUrlEvCorr =
 								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Alternative_Fuel_Corridors_Electric/FeatureServer/0";
 
-							// grabbed this function to allow the string replacement for the plug type
+							// function to allow the string replacement for the plug type
+							// sets popup table based on layer id
 							let getTextContent = (graphic) => {
-								// needed to handle nulls
-								if (graphic.attributes.ev_connector_types != null) {
+								if (graphic._sourceLayer.id == "Alt_Fuel_Point_EV") {
+									// handle nulls
+									if (graphic.attributes.ev_connector_types != null) {
 									evConnType = graphic.attributes.ev_connector_types;
-								} else {
-									evConnType = "Unknown";
+									} else {
+										evConnType = "Unknown";
+									}
+									evPlugCount =
+										graphic.attributes.ev_dc_fast_num +
+										graphic.attributes.ev_level1_evse_num +
+										graphic.attributes.ev_level2_evse_num;
+									// add point layer for elec
+									let tableText = makeTableFromArrayNoHeader([
+										["Station Name", graphic.attributes.station_name],
+										[
+											"Access Days/Times",
+											graphic.attributes.access_days_time,
+										],
+										["Plug Type", evConnType],
+										["Number of Plugs", evPlugCount],
+									]);
+									tableText +=
+										"<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
+									return tableText;
 								}
-								evPlugCount =
-									graphic.attributes.ev_dc_fast_num +
-									graphic.attributes.ev_level1_evse_num +
-									graphic.attributes.ev_level2_evse_num;
-								// add point layer for elec
-								let tableText = makeTableFromArrayNoHeader([
-									["Station Name", graphic.attributes.station_name],
-									[
-										"Access Days/Times",
-										graphic.attributes.access_days_time,
-									],
-									["Plug Type", evConnType],
-									["Number of Plugs", evPlugCount],
-								]);
-								tableText +=
-									"<br><p>Alternative Fuel locations provided for informational purposes only. TxDOT makes no guarantee of station status or operation.</p>";
-								return tableText;
+								if (graphic._sourceLayer.id == "Alt_Fuel_Study_EV"){
+									let tableText = "<p>Study areas provided for planning purposes. Comments can be sent to <a href='mailto:TPP-GIS@txdot.gov'>TPP-GIS@txdot.gov</a>, include Location Name.</p>"; 
+									tableText += makeTableFromArrayNoHeader([
+										["Location Name", graphic.attributes.LOCATION_NAME],
+										["Number of Stations", graphic.attributes.NUMBER_OF_STATIONS],
+										["Connectors per Station", graphic.attributes.CONNECTORS_PER_STATION],
+										["Connector Type", graphic.attributes.CONNECTOR_TYPE],
+										["Max Power (kW)", graphic.attributes.MAX_POWER_kW],
+										["Estimated Cost", graphic.attributes.EST_COST],
+										["Funding Type", graphic.attributes.FUNDING_TYPE],
+										["MPO Status", graphic.attributes.MPO_STATUS],	
+										["Operational Status", graphic.attributes.OPERATIONAL_STATUS],
+										["Corridor Status", graphic.attributes.CORRIDOR_STATUS],
+									]);
+									return tableText;		
+								}
+								
 							};
 							var altFuelPointinfoTemplate = new InfoTemplate(
 								"Alt Fuel Stations - EV:",
@@ -6029,6 +6056,19 @@
 							var projectsUrl =
 								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas Alternative Fuel Stations/FeatureServer/4";
 
+							var altFuelCorrStudyEvInfoTemplate = new InfoTemplate(
+								"EV Station Study Areas",
+								getTextContent
+							);
+							var altFuelCorrStudyEvURL = 
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/EV_Charging_Study_Areas/FeatureServer/0";
+															
+							altFuelCorrStudyEvLyr = new FeatureLayer(altFuelCorrStudyEvURL, {
+								id: "Alt_Fuel_Study_EV",
+								visible: true,
+								outFields: ["*"],
+								infoTemplate: altFuelCorrStudyEvInfoTemplate,
+							});
 							altFuelCorrStationEvLyr = new FeatureLayer(projectsUrl, {
 								id: "Alt_Fuel_Point_EV",
 								visible: true,
@@ -6042,7 +6082,7 @@
 								infoTemplate: altFuelCorrinfoTemplate,
 							});
 
-							map.addLayers([altFuelCorrEvLyr, altFuelCorrStationEvLyr]);
+							map.addLayers([altFuelCorrEvLyr, altFuelCorrStationEvLyr, altFuelCorrStudyEvLyr]);
 						}
 
 						activeOverlay = altFuelCorrEvLyr;
@@ -6050,6 +6090,10 @@
 						layerInfo.push({
 							layer: altFuelCorrStationEvLyr,
 							title: "Alt Fuel Stations - Electric",
+						});
+						layerInfo.push({
+							layer: altFuelCorrStudyEvLyr,
+							title: "EV Station Study Areas"
 						});
 					}
 
