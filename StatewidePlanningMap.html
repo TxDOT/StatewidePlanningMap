@@ -512,7 +512,7 @@
 			google,
 			TxDOTVectorTileLayer,
 			txAccessToken,
-			appVersion = "4.4.15 Sunflower";
+			appVersion = "4.4.16 Toronto";
 
 		//Route Event Variables
 		var dropbox,
@@ -6039,13 +6039,15 @@
 										["Connectors per Station", graphic.attributes.CONNECTORS_PER_STATION],
 										["Connector Type", graphic.attributes.CONNECTOR_TYPE],
 										["Max Power (kW)", graphic.attributes.MAX_POWER_kW],
-										["Estimated Cost", graphic.attributes.EST_COST],
+										["Estimated Cost", "$"+graphic.attributes.EST_COST.toLocaleString('en-US')],
 										["Funding Type", graphic.attributes.FUNDING_TYPE],
 										["MPO Status", graphic.attributes.MPO_STATUS],	
 										["Operational Status", graphic.attributes.OPERATIONAL_STATUS],
 										["Corridor Status", graphic.attributes.CORRIDOR_STATUS],
 									]);
-									return tableText;		
+									console.log(typeof(graphic.attributes.EST_COST))
+									return tableText;
+											
 								}
 								
 							};
@@ -7407,7 +7409,8 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li>
+			<li>Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li>
+			<li>(v4.4.15) Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li>
 			<li>(v4.4.14) Added Alternative Fuel Layers</li>
 			<li>(v4.4.14) Increased Maximum Overlays to 5</li>
 			<li>(v4.4.13) Updated Non-Attainment (Air Quality) Layers</li>
