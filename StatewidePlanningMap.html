@@ -5986,7 +5986,6 @@
 							altFuelCorrEvLyr.show();
 							altFuelCorrStationEvLyr.show();
 							altFuelCorrStudyEvLyr.show();
-							altFuelCorrStudyEvLyr.show();
 							map.reorderLayer(altFuelCorrEvLyr, pos);
 						} 
 						else {
@@ -6032,7 +6031,7 @@
 									return tableText;
 								}
 								if (graphic._sourceLayer.id == "Alt_Fuel_Study_EV"){
-									let tableText = "<p>Study areas provided for planning purposes. Comments can be sent to <a href='mailto:TPP-GIS@txdot.gov'>TPP-GIS@txdot.gov</a>, include Location Name.</p>"; 
+									let tableText = "<span>Study areas provided for planning purposes. Comments can be sent to <br><a href='mailto:TPP-GIS@txdot.gov'>TPP-GIS@txdot.gov</a>.</span><br>"; 
 									tableText += makeTableFromArrayNoHeader([
 										["Location Name", graphic.attributes.LOCATION_NAME],
 										["Number of Stations", graphic.attributes.NUMBER_OF_STATIONS],
