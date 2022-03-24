@@ -6046,7 +6046,8 @@
 									return tableText;			
 								}
 								if (graphic._sourceLayer.id == "Alt_Fuel_VW_DC"){
-									let tableText = makeTableFromArrayNoHeader([
+									let tableText = "<span>Planned DC Fast Charge Stations (VW Settlement funds administered by TCEQ).</span><br>";
+									tableText += makeTableFromArrayNoHeader([
 										["Contract ID", graphic.attributes.Contract_ID],
 										["Grantee", graphic.attributes.Grantee],
 										["Grant Amount", "$"+graphic.attributes.Grant_Amount.toLocaleString('en-US')],
@@ -6057,8 +6058,6 @@
 										["Long", graphic.attributes.Long.toFixed(6)],	
 										["Comments", graphic.attributes.Comments],
 									]);
-									tableText += 
-										"<br><p>Planned DC Fast Charge Stations (VW Settlement funds administered by TCEQ).</p><br>";
 									return tableText;
 								}
 							}
