@@ -512,7 +512,7 @@
 			google,
 			TxDOTVectorTileLayer,
 			txAccessToken,
-			appVersion = "4.4.16 Toronto";
+			appVersion = "4.4.17 Springfield";
 
 		//Route Event Variables
 		var dropbox,
@@ -573,6 +573,7 @@
 			altFuelCorrEvLyr,
 			altFuelCorrStationEvLyr,
 			altFuelCorrStudyEvLyr,
+			altFuelVWDCFastLyr,
 			altFuelCorrHyLyr,
 			altFuelCorrStationHyLyr,
 			altFuelCorrLPGLyr,
@@ -1788,8 +1789,7 @@
 					div.innerHTML = "";
 					divDesc.innerHTML = "";
 					document.getElementById("legendNotesDiv").style.display = "none";
-					clearInrixLegend();
-					clearAltFuelLegend();
+					clearLegendCanvas();
 					array.forEach(activeOverlaysArray, function (name) {
 						var para = document.createElement("P");
 						var link = document.createElement("a");
@@ -2137,16 +2137,12 @@
 					document.getElementById("legendNotesDiv").style.display = "none";
 				}
 			}
-
-			// Remove INRIX legend on tab change
-			function clearInrixLegend() {
+			
+			// Remove html canvas items (inrix and alt fuels) from legend
+			function clearLegendCanvas() {
 				if (!!document.getElementById("inrixDiv")) {
 					document.getElementById("inrixDiv").remove();
 				}
-			}
-
-			// Remove INRIX legend on tab change
-			function clearAltFuelLegend() {
 				if (!!document.getElementById("altFuelDiv")) {
 					document.getElementById("altFuelDiv").remove();
 				}
@@ -3277,8 +3273,7 @@
 					activeOverlaysArray = [];
 					document.getElementById("CLEAR").style.color = "red";
 					document.getElementById("radMile").checked = true;
-					clearInrixLegend();
-					clearAltFuelLegend();
+					clearLegendCanvas();
 				}
 
 				clearStyle("tcTabs");
@@ -3303,8 +3298,7 @@
 					polyline = {};
 					activateTool("POLYLINE");
 					home.hide();
-					clearInrixLegend();
-					clearAltFuelLegend();
+					clearLegendCanvas();
 				} else {
 					deActivateTool("POLYLINE");
 					home.show();
@@ -3688,11 +3682,14 @@
 				if (altFuelCorrEvLyr) {
 					altFuelCorrEvLyr.hide();
 				}
-				if (altFuelCorrEvLyr) {
+				if (altFuelCorrStationEvLyr) {
 					altFuelCorrStationEvLyr.hide();
 				}
 				if (altFuelCorrStudyEvLyr) {
 					altFuelCorrStudyEvLyr.hide();
+				}
+				if (altFuelVWDCFastLyr) {
+					altFuelVWDCFastLyr.hide();
 				}
 				if (altFuelCorrHyLyr) {
 					altFuelCorrHyLyr.hide();
@@ -3862,6 +3859,7 @@
 				if (projectsRI) {
 					projectsRI.hide();
 				}
+				clearLegendCanvas()
 				clearStyle("tocData");
 				map.graphics.clear();
 			}
@@ -5986,6 +5984,7 @@
 							altFuelCorrEvLyr.show();
 							altFuelCorrStationEvLyr.show();
 							altFuelCorrStudyEvLyr.show();
+							altFuelVWDCFastLyr.show();
 							map.reorderLayer(altFuelCorrEvLyr, pos);
 						} 
 						else {
@@ -6044,16 +6043,30 @@
 										["Operational Status", graphic.attributes.OPERATIONAL_STATUS],
 										["Corridor Status", graphic.attributes.CORRIDOR_STATUS],
 									]);
-									return tableText;
-											
+									return tableText;			
 								}
-								
-							};
-							var altFuelPointinfoTemplate = new InfoTemplate(
+								if (graphic._sourceLayer.id == "Alt_Fuel_VW_DC"){
+									let tableText = makeTableFromArrayNoHeader([
+										["Contract ID", graphic.attributes.Contract_ID],
+										["Grantee", graphic.attributes.Grantee],
+										["Grant Amount", "$"+graphic.attributes.Grant_Amount.toLocaleString('en-US')],
+										["Number of Activities", graphic.attributes.Number_of_Activities],
+										["Project Location", graphic.attributes.Project_Location],
+										["County", graphic.attributes.County],
+										["Lat", graphic.attributes.Lat.toFixed(6)],
+										["Long", graphic.attributes.Long.toFixed(6)],	
+										["Comments", graphic.attributes.Comments],
+									]);
+									tableText += 
+										"<br><p>Planned DC Fast Charge Stations (VW Settlement funds administered by TCEQ).</p><br>";
+									return tableText;
+								}
+							}
+							var altFuelEVStationinfoTemplate = new InfoTemplate(
 								"Alt Fuel Stations - EV:",
 								getTextContent
 							);
-							var projectsUrl =
+							var altFuelCorrStationEvURL =
 								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Texas Alternative Fuel Stations/FeatureServer/4";
 
 							var altFuelCorrStudyEvInfoTemplate = new InfoTemplate(
@@ -6062,14 +6075,21 @@
 							);
 							var altFuelCorrStudyEvURL = 
 								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/EV_Charging_Study_Areas/FeatureServer/0";
-															
+							
+							var altFuelVWInfoTemplate = new InfoTemplate(
+								"Planned DC Stations",
+								getTextContent
+							);
+							var altFuelVWDCFastURL = 
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/VW_Settlement_DC_Fast/FeatureServer/0";
+								
 							altFuelCorrStudyEvLyr = new FeatureLayer(altFuelCorrStudyEvURL, {
 								id: "Alt_Fuel_Study_EV",
 								visible: true,
 								outFields: ["*"],
 								infoTemplate: altFuelCorrStudyEvInfoTemplate,
 							});
-							altFuelCorrStationEvLyr = new FeatureLayer(projectsUrl, {
+							altFuelCorrStationEvLyr = new FeatureLayer(altFuelCorrStationEvURL, {
 								id: "Alt_Fuel_Point_EV",
 								visible: true,
 								outFields: ["*"],
@@ -6081,8 +6101,14 @@
 								outFields: ["*"],
 								infoTemplate: altFuelCorrinfoTemplate,
 							});
+							altFuelVWDCFastLyr = new FeatureLayer(altFuelVWDCFastURL, {
+								id: "Alt_Fuel_VW_DC",
+								visible: true,
+								outFields: ["*"],
+								infoTemplate: altFuelVWInfoTemplate,
+							});
 
-							map.addLayers([altFuelCorrEvLyr, altFuelCorrStationEvLyr, altFuelCorrStudyEvLyr]);
+							map.addLayers([altFuelCorrEvLyr, altFuelCorrStationEvLyr, altFuelCorrStudyEvLyr, altFuelVWDCFastLyr]);
 						}
 
 						activeOverlay = altFuelCorrEvLyr;
@@ -6094,6 +6120,10 @@
 						layerInfo.push({
 							layer: altFuelCorrStudyEvLyr,
 							title: "EV Station Study Areas"
+						});
+						layerInfo.push({
+							layer: altFuelVWDCFastLyr,
+							title: "Planned DC Fast Charge Stations"
 						});
 					}
 
@@ -7407,14 +7437,16 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li>
+			<li>Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li>
+			<li>(v4.4.16) Updated text and link information</li>
+			<li>(v4.4.16) Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li>
 			<li>(v4.4.15) Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li>
 			<li>(v4.4.14) Added Alternative Fuel Layers</li>
 			<li>(v4.4.14) Increased Maximum Overlays to 5</li>
 			<li>(v4.4.13) Updated Non-Attainment (Air Quality) Layers</li>
 			<li>(v4.4.12) Added Rumble Strip Layer</li>
 			<li>(v4.4.11) Added INRIX Traffic® Layer</li>
-			<li>(v4.4.11) Increased Maximum Overlays to 4</li>
+			<!-- <li>(v4.4.11) Increased Maximum Overlays to 4</li> -->
 			<!-- <li>(v4.4.10) Bug fix for Imagery zoom level</li> -->
 			<!-- <li>(v.4.4.9) Updates to Shale Play layer</li>
 			<li>(v4.4.8) AADT layer updates to add 2020 data</li> -->
@@ -7561,7 +7593,7 @@
 				<br>
 		<a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank' id="refBridge" style="display:none;">Bridge Coding Guide</a>
 		<a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/e9d8d0e3a9794be19be6ecaf5a24c176/data' target='_blank' id="refBridgeDD" style="display:none;">Bridge Data Dictionary</a>
-		<a href="https://gis-txdot.opendata.arcgis.com/datasets/txdot-roadway-inventory-specifications-2018" target="_blank" id="refRoadway">Roadway Data Dictionary</a>
+		<a href="https://gis-txdot.opendata.arcgis.com/datasets/txdot-roadway-inventory-specifications-2020" target="_blank" id="refRoadway">Roadway Data Dictionary</a>
 		<br>
 		<br>
 				<input type="radio" id="radBridge" name="dataType" value="bridge" title="Select Bridge Data">
