@@ -250,22 +250,37 @@
 		border: none;
 		margin: 0px;
 		padding: 0px;
-	 	z-index: 101;
 	 	bottom: 2px;
-	  	left: 2px;
-	  	width: 250px;
-    	margin-left:auto;
-    	margin-right:auto;
-    	margin-top: auto;
-    	margin-bottom: auto;
+	  	left: 2px; 
+	  	width: 110px;
+		margin: 0 auto;
 	 	color: #fff;
 	 	text-align: center;
 	  	border-radius: 2px;
 	  	padding: 2px;
-	 	position: absolute;
-	 	display: block;
+	 	display: inline;
 	 }
 	 #btnOpenDataPortal:hover {
+	 	background: grey;
+	 }
+	 #btnPrintMap {
+    	position: absolute;
+    	background-color: #143c5c;
+		font-size: 15px;
+	    font-family: inherit;
+		border: none;
+		padding: 0px;
+	 	bottom: 2px;
+	  	left: 110px;
+	  	width: 110px;
+    	margin-left: 10px; 
+	 	color: #fff;
+	 	text-align: center;
+	  	border-radius: 2px;
+	  	padding: 2px;
+	 	display: inline;
+	 }
+	 #btnPrintMap:hover {
 	 	background: grey;
 	 }
 	 .HomeButton .home {
@@ -284,15 +299,6 @@
 
     .Overlay, .Basemaps, .SearchResult, .clickable{
     	cursor: pointer;
-    }
-    #PrintButton {
-      position: absolute;
-      left: 20px;
-      top: 180px;
-      z-index: 30;
-      display: block;
-      height: 48px;
-      width: 28px;
     }
 	#searchResults{
 	 position: relative;
@@ -593,7 +599,7 @@
     });
 
     // Print button
-    on(dom.byId("PrintButton"), "click", printMap);
+    on(dom.byId("btnPrintMap"), "click", printMap);
 
     //Query Tab buttons and events
     on(dom.byId("btnAddSecondCondition"), "click", addSecondCondition);
@@ -653,7 +659,7 @@
       printTemplate.layoutOptions = {
         legendLayers: printLegend,
         titleText: "Custom Map Title",
-        customTextElements: [{"HEADER - Custom Text": "Custom Text Goes Here"}]
+        customTextElements: [{"HEADER - Custom Text": ""}]
       };
       console.log(printTemplate);
 
@@ -667,14 +673,17 @@
 
       //execute the print task
       printTask.execute(printParams, printResult, printError);
-      //need a loading spinner here...
+      //disable Print Button while task runs
+	  dom.byId('btnPrintMap').style.cursor = "not-allowed"; 
       //callback for result
       function printResult(result) {
         console.log(result.url);
         window.open(result.url, "_blank");
+		dom.byId('btnPrintMap').style.cursor = "pointer";
       }
       function printError(result){
         console.log(result);
+		dom.byId('btnPrintMap').style.cursor = "pointer";
       }
     }
 
@@ -4624,9 +4633,6 @@
  <div id="search"></div>
  <div id="mapDiv" oncontextmenu="getCoords()">
 	 <div id="HomeButton" class="button"></div>
-   <div id="PrintButton" class="button">
-     <button> Print</button>
-   </div>
      <span id="info"></span>
      <span id="info2"></span>
 	 <button id="btnClearHighlighter" title="Clear Highlight" style="display:none">
@@ -4635,7 +4641,8 @@
  </div>
  <div id="credits"></div>
 <div class="divODP">
-	<button id="btnOpenDataPortal" title="Open Data Portal" target="_blank">Download Data</button>
+	<button id="btnOpenDataPortal" title="Open Data Portal" target="_blank">Download</button>
+	<button id="btnPrintMap" title="Print Map" target="_blank">Print Map</button>
 </div>
  <nav>
     <ul>
