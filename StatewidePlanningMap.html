@@ -674,16 +674,23 @@
       //execute the print task
       printTask.execute(printParams, printResult, printError);
       //disable Print Button while task runs
-	  dom.byId('btnPrintMap').style.cursor = "not-allowed"; 
+	 // dom.byId('btnPrintMap').style.cursor = "not-allowed";
+	  dom.byId('btnPrintMap').disabled = true;
+	  dom.byId('btnPrintMap').innerHTML = "Printing...";
+
       //callback for result
       function printResult(result) {
         console.log(result.url);
         window.open(result.url, "_blank");
-		dom.byId('btnPrintMap').style.cursor = "pointer";
+		// dom.byId('btnPrintMap').style.cursor = "pointer";
+		dom.byId('btnPrintMap').disabled = false;
+		dom.byId('btnPrintMap').innerHTML = "Print Map";
       }
       function printError(result){
         console.log(result);
 		dom.byId('btnPrintMap').style.cursor = "pointer";
+		// dom.byId('btnPrintMap').disabled = false;
+		dom.byId('btnPrintMap').innerHTML = "Print Map";
       }
     }
 
