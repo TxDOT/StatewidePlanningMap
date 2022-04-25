@@ -83,7 +83,7 @@
 	  position: absolute;
 	  left: 2px;
 	  top: 2px;
-	  bottom: 40px;
+	  bottom: 60px;
 	  overflow: auto;
 	 }
 	 #mapDiv{
@@ -250,7 +250,7 @@
 		border: none;
 		margin: 0px;
 		padding: 0px;
-	 	bottom: 2px;
+	 	bottom: 30px;
 	  	left: 2px; 
 	  	width: 110px;
 		margin: 0 auto;
@@ -270,7 +270,7 @@
 	    font-family: inherit;
 		border: none;
 		padding: 0px;
-	 	bottom: 2px;
+	 	bottom: 30px;
 	  	left: 110px;
 	  	width: 110px;
     	margin-left: 10px; 
@@ -282,6 +282,37 @@
 	 }
 	 #btnPrintMap:hover {
 	 	background: grey;
+	 }
+
+	 #btnOpenDataLink {
+		position: relative;
+		background-color: #143c5c;
+		font-size: 15px;
+		font-family: inherit;
+		border: none;
+		margin: 0px;
+		padding: 0px;
+		/* z-index: 101; */
+		bottom: 2px;
+		left: 2px;
+		width: 230px;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: auto;
+		margin-bottom: auto;
+		color: #fff;
+		text-align: center;
+		border-radius: 2px;
+		padding: 2px;
+		position: absolute;
+		display: block; 
+	 }
+	 .divODP{
+		 position: absolute;
+		 z-index: 101;
+		 height:100px;
+		 width: 230px;
+		 bottom: 0px
 	 }
 	 .HomeButton .home {
         background-image: url("https://maps.dot.state.tx.us/Images/TexasIcon.png");
@@ -516,11 +547,11 @@
 		"esri/toolbars/draw","esri/geometry/geometryEngine","esri/geometry/geodesicUtils","esri/units","esri/graphic","esri/graphicsUtils","esri/SpatialReference","esri/geometry/Extent","esri/layers/FeatureLayer","esri/symbols/SimpleLineSymbol",
 		"esri/symbols/CartographicLineSymbol","esri/renderers/UniqueValueRenderer","esri/symbols/SimpleMarkerSymbol","esri/symbols/SimpleFillSymbol","esri/symbols/TextSymbol","esri/renderers/SimpleRenderer","esri/renderers/ClassBreaksRenderer",
 		"esri/layers/LabelLayer","esri/layers/LabelClass","esri/Color","esri/InfoTemplate","esri/layers/ArcGISTiledMapServiceLayer","esri/geometry/Polyline","esri/geometry/Point","esri/symbols/Font","esri/dijit/PopupTemplate",
-		"esri/tasks/PrintTask","esri/tasks/PrintParameters","esri/tasks/PrintTemplate","esri/tasks/LegendLayer","dojo/number","dojo/_base/array","esri/layers/VectorTileLayer","esri/layers/WMTSLayer","esri/layers/WMTSLayerInfo","esri/geometry/Circle",
+		"esri/tasks/PrintTask","esri/tasks/PrintParameters","esri/tasks/PrintTemplate","esri/tasks/LegendLayer","esri/arcgis/Portal","dojo/number","dojo/_base/array","esri/layers/VectorTileLayer","esri/layers/WMTSLayer","esri/layers/WMTSLayerInfo","esri/geometry/Circle",
 		"dojo/domReady!"],
     function (Map, OpenStreetMapLayer, esriRequest, Renderer, domConstruct, LayerInfo, Scalebar, on, domClass, query, Moveable, HomeButton,Query, QueryTask, arcgisUtils, domUtils, Legend, Search, webMercatorUtils, dom, KMLLayer, parser, Draw, geometryEngine,
 		geodesicUtils, Units, Graphic, graphicsUtils, SpatialReference, Extent, FeatureLayer,SimpleLineSymbol, CartographicLineSymbol, UniqueValueRenderer, SimpleMarkerSymbol,
-		SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,Polyline, Point, Font, PopupTemplate, PrintTask, PrintParameters, PrintTemplate, LegendLayer, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo, Circle)
+		SimpleFillSymbol, TextSymbol, SimpleRenderer, ClassBreaksRenderer, LabelLayer, LabelClass, Color, InfoTemplate, Tiled,Polyline, Point, Font, PopupTemplate, PrintTask, PrintParameters, PrintTemplate, LegendLayer, arcgisPortal, number, array, VectorTileLayer, WMTSLayer, WMTSLayerInfo, Circle)
     {
 
 		parser.parse();
@@ -628,12 +659,11 @@
       //get visible layers and push to array of legendLayers
 
        //-- remove graphicsLayer1 (need to add back; its the RI layer)
-      console.log(map);
+      console.log(bridgeLyr.layerId);
       // var gL1 = map.graphicsLayerIds.indexOf('graphicsLayer1');
       // if (gL1 > -1) {
       //   map.graphicsLayerIds.splice(gL1,1);
       // }
-      console.log(map);
 
       var printLegend = [];
       for (let i=0; i<activeOverlaysArray.length; i++){
@@ -650,10 +680,10 @@
       var printTemplate = new PrintTemplate();
       printTemplate.format = "PDF";
       if(legendFlag){
-        printTemplate.layout = "8x5x11_Landscape_Legend";
+        printTemplate.layout = "8_5x11_Landscape_Legend";
       }
       else {
-        printTemplate.layout = "8x5x11_Landscape_No_Legend";
+        printTemplate.layout = "8_5x11_Landscape_No_Legend";
       }
 
       printTemplate.layoutOptions = {
@@ -4011,8 +4041,32 @@
     	}
     	on(dom.byId("btnOpenDataPortal"), "click", openODP);
         function openODP() {
-        	window.open("https://www.txdot.gov/opendata");
+			let files = [];
+			console.log(layerInfo);
+			// match serviceItemId from active layers with ODP download item id
+			for (let i=0; i<layerInfo.length; i++){
+				let obj = JSON.parse(layerInfo[i].layer._json);
+				// FGDB
+				let url = "https://opendata.arcgis.com/api/v3/datasets/"+obj.serviceItemId+"_"+obj.id+"/downloads/data?format=fgdb&spatialRefId=4326";
+				console.log(url)
+				window.open(url,"_blank");
+				// DATA URL (not using this method)
+				let dataUrl = "https://opendata.arcgis.com/api/v3/datasets/"+obj.serviceItemId+"_"+obj.id;
+				let xmlhttp = new XMLHttpRequest();
+				xmlhttp.responseType = 'json';
 
+				xmlhttp.onreadystatechange=function() {
+					if (xmlhttp.readyState==4 && xmlhttp.status==200)	{
+						console.log("Query completed...")
+						console.log(this.response);//pass this to GP download service and zip up?
+						files.push(this.responseURL);
+					}
+				};
+				let theService = dataUrl;
+				xmlhttp.open("GET",theService,true);
+				xmlhttp.send();
+			}
+			console.log(files);
         }
 
         //Play a sound---------------------------
@@ -4648,8 +4702,9 @@
  </div>
  <div id="credits"></div>
 <div class="divODP">
-	<button id="btnOpenDataPortal" title="Open Data Portal" target="_blank">Download</button>
+	<button id="btnOpenDataPortal" title="Download Data" target="_blank">Download</button>
 	<button id="btnPrintMap" title="Print Map" target="_blank">Print Map</button>
+	<button id="btnOpenDataLink" title="Open Data Portal">Open Data Portal</button>
 </div>
  <nav>
     <ul>
