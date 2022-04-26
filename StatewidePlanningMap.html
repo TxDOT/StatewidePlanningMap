@@ -536,6 +536,7 @@
 			TXFreightLyr,
 			NHSLyr,
 			maintOfficeLyr,
+			maintDistRoutesLyr,
 			maintSecRoutesLyr,
 			txTrunkLyr,
 			MarkerLyr,
@@ -3730,6 +3731,9 @@
 				if (maintOfficeLyr) {
 					maintOfficeLyr.hide();
 				}
+				if (maintDistRoutesLyr) {
+					maintDistRoutesLyr.hide();
+				}
 				if (maintSecRoutesLyr) {
 					maintSecRoutesLyr.hide();
 				}
@@ -4641,20 +4645,21 @@
 						);
 					}
 
-					if (
-						activeOverlaysArray.indexOf("Maintenance_Section_Routes") > -1
-					) {
+					if (activeOverlaysArray.indexOf("Maintenance_Section_Routes") > -1) {
 						var pos = activeOverlaysArray.indexOf(
 							"Maintenance_Section_Routes"
 						);
 						if (maintSecRoutesLyr) {
 							maintSecRoutesLyr.show();
 							map.reorderLayer(maintSecRoutesLyr, pos);
-						} else {
+						} 
+						else {
 							var tableText = makeTableFromArrayNoHeader([
-								["Section Number", "${NBR}"],
 								["Route Name", "${RTE_NM}"],
-								["District Name", "${DIST_NM}"],
+								["Section Number", "${MAINT_SEC_NBR}"],
+								["Section Name", "${MAINT_SEC_NM}"],
+								["Maintenance District Number", "${MAINT_DIST_NBR}"],
+								["Maintenance District Name", "${MAINT_DIST_NM}"],
 								["Begin DFO", "${BEGIN_DFO:NumberFormat(places:3)}"],
 								["End DFO", "${END_DFO:NumberFormat(places:3)}"],
 							]);
@@ -4663,15 +4668,17 @@
 								tableText
 							);
 							var projectsUrl =
-								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Maintenance_Section_Routes/FeatureServer/0";
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT Maintenance Section Routes Dev/FeatureServer/0";
 
 							maintSecRoutesLyr = new FeatureLayer(projectsUrl, {
 								id: "Maintenance_Section_Routes",
 								visible: true,
 								outFields: [
-									"NBR",
 									"RTE_NM",
-									"DIST_NM",
+									"MAINT_SEC_NBR",
+									"MAINT_SEC_NM",
+									"MAINT_DIST_NBR",
+									"MAINT_DIST_NM",
 									"BEGIN_DFO",
 									"END_DFO",
 								],
@@ -4683,6 +4690,51 @@
 						layerInfo.push({
 							layer: maintSecRoutesLyr,
 							title: "Maintenance Section Routes",
+						});
+						map.infoWindow.resize(300, 500);
+					}
+
+					if (activeOverlaysArray.indexOf("Maintenance_District_Routes") > -1) {
+						var pos = activeOverlaysArray.indexOf(
+							"Maintenance_District_Routes"
+						);
+						if (maintDistRoutesLyr) {
+							maintDistRoutesLyr.show();
+							map.reorderLayer(maintDistRoutesLyr, pos);
+						} 
+						else {
+							var tableText = makeTableFromArrayNoHeader([
+								["Route Name", "${RTE_NM}"],
+								["Maintenance District Number", "${MAINT_DIST_NBR}"],
+								["Maintenance District Name", "${MAINT_DIST_NM}"],
+								["Begin DFO", "${BEGIN_DFO:NumberFormat(places:3)}"],
+								["End DFO", "${END_DFO:NumberFormat(places:3)}"],
+							]);
+							var infoTemplate = new InfoTemplate(
+								"Maintenance District Route:",
+								tableText
+							);
+							var projectsUrl =
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT Maintenance Section Routes Dev/FeatureServer/0";
+
+								maintDistRoutesLyr = new FeatureLayer(projectsUrl, {
+									id: "Maintenance_District_Routes",
+									visible: true,
+									outFields: [
+										"RTE_NM",
+										"MAINT_DIST_NBR",
+										"MAINT_DIST_NM",
+										"BEGIN_DFO",
+										"END_DFO",
+									],
+									infoTemplate: infoTemplate,
+								});
+							map.addLayer(maintDistRoutesLyr);
+						}
+						activeOverlay = maintDistRoutesLyr;
+						layerInfo.push({
+							layer: maintDistRoutesLyr,
+							title: "Maintenance District Routes",
 						});
 						map.infoWindow.resize(300, 500);
 					}
@@ -7538,6 +7590,7 @@
 			<tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>
 			<tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr> 
 			<tr><td class="Overlay" id='INRIX_Traffic'>Live Traffic</td></tr>
+			<tr><td class="Overlay" id='Maintenance_District_Routes'>Maintenance District Routes</td></tr>
 			<tr><td class="Overlay" id='Maintenance_Section_Routes'>Maintenance Section Routes</td></tr>
 			<tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
 			<tr><td class="Overlay" id='MPO'>Metropolitan Planning Organizations (MPO)</td></tr>
