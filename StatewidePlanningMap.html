@@ -512,7 +512,7 @@
 			google,
 			TxDOTVectorTileLayer,
 			txAccessToken,
-			appVersion = "4.4.17 Springfield";
+			appVersion = "4.4.18 Teapot";
 
 		//Route Event Variables
 		var dropbox,
@@ -4668,7 +4668,7 @@
 								tableText
 							);
 							var projectsUrl =
-								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT Maintenance Section Routes Dev/FeatureServer/0";
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/TxDOT_Maintenance_Section_Routes/FeatureServer/0";
 
 							maintSecRoutesLyr = new FeatureLayer(projectsUrl, {
 								id: "Maintenance_Section_Routes",
@@ -4748,7 +4748,7 @@
 							renderer.addValue('Childress', new SimpleLineSymbol().setColor(new Color([66,4,191])).setWidth(2.25));
 
 							var projectsUrl =
-								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT Maintenance Section Routes Dev/FeatureServer/0";
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/TxDOT_Maintenance_Section_Routes/FeatureServer/0";
 
 								maintDistRoutesLyr = new FeatureLayer(projectsUrl, {
 									id: "Maintenance_District_Routes",
@@ -7525,7 +7525,8 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li>
+			<li> Added new Maintenace District Routes Layer</li>
+			<li>(v4.4.17) Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li>
 			<li>(v4.4.16) Updated text and link information</li>
 			<li>(v4.4.16) Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li>
 			<li>(v4.4.15) Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li>
