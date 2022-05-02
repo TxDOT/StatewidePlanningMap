@@ -242,7 +242,7 @@
 	  left: 70px;
 	  z-index: 50;
     }
-    #btnOpenDataPortal {
+    #btnDownloadData {
     	position: absolute;
     	background-color: #143c5c;
 		font-size: 15px;
@@ -260,9 +260,9 @@
 	  	padding: 2px;
 	 	display: inline;
 	 }
-	 #btnOpenDataPortal:hover {
+	 /* #btnDownloadData:hover {
 	 	background: grey;
-	 }
+	 } */
 	 #btnPrintMap {
     	position: absolute;
     	background-color: #143c5c;
@@ -280,9 +280,9 @@
 	  	padding: 2px;
 	 	display: inline;
 	 }
-	 #btnPrintMap:hover {
+	 /* #btnPrintMap:hover {
 	 	background: grey;
-	 }
+	 } */
 
 	 #btnOpenDataLink {
 		position: relative;
@@ -307,6 +307,13 @@
 		position: absolute;
 		display: block; 
 	 }
+
+	 #btnPrintMap:hover,
+	 #btnOpenDataLink:hover,
+	 #btnDownloadData:hover {
+	 	background: grey;
+	 }
+
 	 .divODP{
 		 position: absolute;
 		 z-index: 101;
@@ -4039,8 +4046,8 @@
         	document.getElementById("releaseNotesDiv").style.display="block";
         	document.getElementById('version').innerHTML = appVersion;
     	}
-    	on(dom.byId("btnOpenDataPortal"), "click", openODP);
-        function openODP() {
+    	on(dom.byId("btnDownloadData"), "click", dataDownload);
+        function dataDownload() {
 			let files = [];
 			console.log(layerInfo);
 			// match serviceItemId from active layers with ODP download item id
@@ -4068,6 +4075,11 @@
 			}
 			console.log(files);
         }
+
+		on(dom.byId("btnOpenDataLink"), "click", openDataLink);
+		function openDataLink(){
+			window.open("https://gis-txdot.opendata.arcgis.com/");
+		}
 
         //Play a sound---------------------------
         function beep() {
@@ -4702,9 +4714,9 @@
  </div>
  <div id="credits"></div>
 <div class="divODP">
-	<button id="btnOpenDataPortal" title="Download Data" target="_blank">Download</button>
+	<button id="btnDownloadData" title="Download Data" target="_blank">Download</button>
 	<button id="btnPrintMap" title="Print Map" target="_blank">Print Map</button>
-	<button id="btnOpenDataLink" title="Open Data Portal">Open Data Portal</button>
+	<button id="btnOpenDataLink" title="Open Data Portal" target="_blank">Open Data Portal</button>
 </div>
  <nav>
     <ul>
