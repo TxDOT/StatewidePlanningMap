@@ -1539,7 +1539,7 @@
 
 			sources.push({
 				featureLayer: new FeatureLayer(
-					"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects_BackupApp/FeatureServer/0"
+					"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0"
 				),
 				searchFields: ["CONTROL_SECT_JOB"],
 				displayField: "CONTROL_SECT_JOB",
@@ -4007,7 +4007,7 @@
 								tableText
 							);
 							var projectsUrl =
-								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects_BackupApp/FeatureServer/0";
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0";
 
 							var theSymbol = new SimpleLineSymbol(
 								SimpleLineSymbol.STYLE_SOLID,
@@ -4067,7 +4067,7 @@
 								tableText
 							);
 							var projectsUrl =
-								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects_BackupApp/FeatureServer/0";
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0";
 
 							var theSymbol = new SimpleLineSymbol(
 								SimpleLineSymbol.STYLE_SOLID,
@@ -4123,7 +4123,7 @@
 								tableText
 							);
 							var projectsUrl =
-								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects_BackupApp/FeatureServer/0";
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0";
 
 							var theSymbol = new SimpleLineSymbol(
 								SimpleLineSymbol.STYLE_SOLID,
@@ -4179,7 +4179,7 @@
 								tableText
 							);
 							var projectsUrl =
-								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects_BackupApp/FeatureServer/0";
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Projects/FeatureServer/0";
 
 							var theSymbol = new SimpleLineSymbol(
 								SimpleLineSymbol.STYLE_SOLID,
@@ -5700,7 +5700,7 @@
 									Math.round(parseFloat(graphic.attributes.DLAY_MILE))
 								);
 								var truckDelay = addCommas(
-									Math.round(parseFloat(graphic.attributes.TRK_DLAY))
+									Math.round(parseFloat(graphic.attributes.TRK_DLY))
 								);
 
 								var trkDelayRank;
@@ -5714,12 +5714,9 @@
 									["Route Name", graphic.attributes.RD_NM],
 									["TxDOT District", graphic.attributes.DIST_NM],
 									["Annual Cost of Delay", costDelay],
-									["Annual Hours of Delay per Mile", delayMile],
+									["Annual Person-Hours of Delay per Mile", delayMile],
 									["Truck Delay Rank", trkDelayRank],
-									[
-										"Annual Hours of Truck Delay per Mile",
-										truckDelay,
-									],
+									["Annual Person-Hours of Truck Delay per Mile", truckDelay],
 									["Annual Cost of Truck Delay", costTruck],
 									["TCI", graphic.attributes.TCI],
 								]);
@@ -5748,7 +5745,7 @@
 									"SEG_ID",
 									"RD_NM",
 									"DLAY_MILE",
-									"TRK_DLAY",
+									"TRK_DLY",
 									"TCI",
 									"COST_DLAY",
 									"COST_TRK",
