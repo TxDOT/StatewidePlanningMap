@@ -681,27 +681,27 @@
 
       //get print info from user
 
-      let legendFlag = confirm("Include Legend?");
+      let legendFlag = confirm("Landscape?");
 
       //set print template (users will populate this)
       var printTemplate = new PrintTemplate();
       printTemplate.format = "PDF";
       if(legendFlag){
-        printTemplate.layout = "8_5x11_Landscape_Legend";
+        printTemplate.layout = "8_5x11_Landscape_No_Legend_13June2022_REV";
       }
       else {
-        printTemplate.layout = "8_5x11_Landscape_No_Legend";
+        printTemplate.layout = "8_5x11_Portrait_No_Legend_13June2022_REV";
       }
 
       printTemplate.layoutOptions = {
         legendLayers: printLegend,
-        titleText: "Custom Map Title",
-        customTextElements: [{"HEADER - Custom Text": ""}]
+        titleText: "Lorem ipsum dolor",
+        customTextElements: [{"FOOTER - Author Name (DYNAMIC)": "Alan Klinzing"}]
       };
       console.log(printTemplate);
 
       //set print task to service URL
-      var printURL = "https://testportal.txdot.gov/createags/rest/services/CustomPrint/GPServer/Export%20Web%20Map";
+      var printURL = "https://testportal.txdot.gov/createags/rest/services/ExportWebMap_test/GPServer/Export%20Web%20Map";
       var printTask = new PrintTask(printURL);
       // //set print Parameters
       var printParams = new PrintParameters();
