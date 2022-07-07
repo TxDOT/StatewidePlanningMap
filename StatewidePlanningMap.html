@@ -681,16 +681,16 @@
 
       //get print info from user
 
-      let legendFlag = confirm("Landscape?");
+      let landscpFlag = confirm("Landscape?");
 
       //set print template (users will populate this)
       var printTemplate = new PrintTemplate();
       printTemplate.format = "PDF";
-      if(legendFlag){
-        printTemplate.layout = "8_5x11_Landscape_No_Legend_13June2022_REV";
+      if(landscpFlag){
+        printTemplate.layout = "8_5x11_Landscape_No_Legend_5July2022_REV4";
       }
       else {
-        printTemplate.layout = "8_5x11_Portrait_No_Legend_13June2022_REV";
+        printTemplate.layout = "8_5x11_Portrait_No_Legend_1July2022_REV1";
       }
 
       printTemplate.layoutOptions = {
