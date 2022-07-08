@@ -1109,7 +1109,7 @@
 
 					if (theData[0] == "RTE_NM" || theData[0] == "TE_NM") {
 						serviceString =
-							"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways/FeatureServer/0";
+							"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways_Unsegmented/FeatureServer/0";
 						paraString =
 							"/query?f=json&where=RTE_NM='" +
 							theData[1] +
@@ -1735,7 +1735,7 @@
 				// TxDOT Roadways layer, used only for identifying roadways in the basemap
 				var roadsInfoTemplate = new InfoTemplate("Roadway:", tableText);
 				roadwaysLyr = new FeatureLayer(
-					"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways/FeatureServer/0",
+					"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways_Unsegmented/FeatureServer/0",
 					{
 						opacity: 0.0,
 						outFields: [
@@ -2186,7 +2186,7 @@
 					calcMessage("Calculating...");
 
 					queryTaskDFO = new esri.tasks.QueryTask(
-						"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways/FeatureServer/0"
+						"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways_Unsegmented/FeatureServer/0"
 					);
 					queryTaskMPT = new esri.tasks.QueryTask(
 						"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Control_Sections/FeatureServer/0"
@@ -2240,7 +2240,7 @@
 					};
 
 					var serviceString =
-						"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways/FeatureServer/0";
+						"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Roadways_Unsegmented/FeatureServer/0";
 					var paraString =
 						"/query?f=json&where=GID=" +
 						results.features[0].attributes.GID +
