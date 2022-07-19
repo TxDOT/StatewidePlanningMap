@@ -37,7 +37,7 @@
 			display: none;
 			z-index: 101;
 		}
-		#overlaysWarningDiv, #getCoordsDiv {
+		#overlaysWarningDiv, #getCoordsDiv, #printOptionsDiv {
 			height: 160px;
 			width: 200px;
 			left: 0;
@@ -242,7 +242,7 @@
 			left: 70px;
 			z-index: 50;
 		}
-		#btnOpenDataPortal {
+		#btnDownloadData {
 			position: absolute;
 			background-color: #143c5c;
 			font-size: 15px;
@@ -250,10 +250,52 @@
 			border: none;
 			margin: 0px;
 			padding: 0px;
-			z-index: 101;
+			bottom: 30px;
+			left: 2px; 
+			width: 110px;
+			margin: 0 auto;
+			color: #fff;
+			text-align: center;
+			border-radius: 2px;
+			padding: 2px;
+			display: inline;
+		}
+		/* #btnDownloadData:hover {
+			background: grey;
+		} */
+		#btnPrintMap {
+			position: absolute;
+			background-color: #143c5c;
+			font-size: 15px;
+			font-family: inherit;
+			border: none;
+			padding: 0px;
+			bottom: 30px;
+			left: 110px;
+			width: 110px;
+			margin-left: 10px; 
+			color: #fff;
+			text-align: center;
+			border-radius: 2px;
+			padding: 2px;
+			display: inline;
+		}
+		/* #btnPrintMap:hover {
+			background: grey;
+		} */
+
+		#btnOpenDataLink {
+			position: relative;
+			background-color: #143c5c;
+			font-size: 15px;
+			font-family: inherit;
+			border: none;
+			margin: 0px;
+			padding: 0px;
+			/* z-index: 101; */
 			bottom: 2px;
 			left: 2px;
-			width: 250px;
+			width: 230px;
 			margin-left: auto;
 			margin-right: auto;
 			margin-top: auto;
@@ -263,10 +305,21 @@
 			border-radius: 2px;
 			padding: 2px;
 			position: absolute;
-			display: block;
+			display: block; 
 		}
-		#btnOpenDataPortal:hover {
+
+		#btnPrintMap:hover,
+		#btnOpenDataLink:hover,
+		#btnDownloadData:hover {
 			background: grey;
+		}
+
+		.divODP{
+			position: absolute;
+			z-index: 101;
+			height:100px;
+			width: 230px;
+			bottom: 0px
 		}
 		.HomeButton .home {
 			background-image: url("https://maps.dot.state.tx.us/Images/TexasIcon.png");
@@ -652,6 +705,11 @@
 			"esri/geometry/Point",
 			"esri/symbols/Font",
 			"esri/dijit/PopupTemplate",
+			"esri/tasks/PrintTask",
+			"esri/tasks/PrintParameters",
+			"esri/tasks/PrintTemplate",
+			"esri/tasks/LegendLayer",
+
 			"dojo/number",
 			"dojo/_base/array",
 			"esri/layers/VectorTileLayer",
@@ -709,6 +767,10 @@
 			Point,
 			Font,
 			PopupTemplate,
+			PrintTask,
+			PrintParameters,
+			PrintTemplate,
+			LegendLayer,
 			number,
 			array,
 			VectorTileLayer,
@@ -822,6 +884,10 @@
 				}
 			});
 
+			// Print buttons
+			on(dom.byId("btnPrintMap"), "click", getPrintOptions);//need to open printOptionsDiv
+			on(dom.byId("btnExecutePrint"),"click", printMap);
+
 			//Query Tab buttons and events
 			on(dom.byId("btnAddSecondCondition"), "click", addSecondCondition);
 			on(dom.byId("btnRemoveLastCondition"), "click", removeLastCondition);
@@ -848,6 +914,78 @@
 			map.on("click", clearMeasuredLineGraphic);
 			map.on("mouse-move", newCoords);
 
+			// Printing Tools
+			function printMap() {
+				let mapTitle = document.getElementById('titleDiv').innerHTML;
+				let mapAuthor = "Author: "+ document.getElementById('authorDiv').innerHTML;
+				let layout = document.getElementById('layouts').value;
+				console.log(mapTitle, mapAuthor, layout);
+				// handle blank values
+				if(mapTitle === ""){
+					mapTitle = " ";
+				}
+				if(mapAuthor === "Author: "){
+					mapAuthor = "Author: Public User";
+				}
+				closePrintOptionsDiv();
+				//get visible layers and push to array of legendLayers
+
+				//-- remove graphicsLayer1 (need to add back; its the RI layer)
+				// console.log(bridgeLyr.layerId);
+				// var gL1 = map.graphicsLayerIds.indexOf('graphicsLayer1');
+				// if (gL1 > -1) {
+				//   map.graphicsLayerIds.splice(gL1,1);
+				// }
+
+				var printLegend = [];
+				for (let i=0; i<activeOverlaysArray.length; i++){
+					var theLayer = new LegendLayer();
+					theLayer.layerId = activeOverlaysArray[i];
+					printLegend.push(theLayer);
+				}
+
+				//get print info from user
+				var printTemplate = new PrintTemplate();
+				printTemplate.format = "PDF";
+				printTemplate.layout = layout;
+
+				printTemplate.layoutOptions = {
+					legendLayers: printLegend,
+					titleText: mapTitle,
+					customTextElements: [{"FOOTER - Author Name (DYNAMIC)": mapAuthor}]
+				};
+				console.log(printTemplate);
+
+				//set print task to service URL
+				var printURL = "https://testportal.txdot.gov/createags/rest/services/ExportWebMap_test/GPServer/Export%20Web%20Map";
+				var printTask = new PrintTask(printURL);
+				// //set print Parameters
+				var printParams = new PrintParameters();
+				printParams.map = map;
+				printParams.template = printTemplate;
+
+				//execute the print task
+				printTask.execute(printParams, printResult, printError);
+				//disable Print Button while task runs
+				// dom.byId('btnPrintMap').style.cursor = "not-allowed";
+				dom.byId('btnPrintMap').disabled = true;
+				dom.byId('btnPrintMap').innerHTML = "Printing...";
+
+				//callback for result
+				function printResult(result) {
+					console.log(result.url);
+					window.open(result.url, "_blank");
+					// dom.byId('btnPrintMap').style.cursor = "pointer";
+					dom.byId('btnPrintMap').disabled = false;
+					dom.byId('btnPrintMap').innerHTML = "Print Map";
+				}
+				function printError(result){
+					console.log(result);
+					dom.byId('btnPrintMap').style.cursor = "pointer";
+					// dom.byId('btnPrintMap').disabled = false;
+					dom.byId('btnPrintMap').innerHTML = "Print Map";
+				}
+    		}
 			//- - - Drag and Drop Route Events - - -
 			map.on("load", addDropListeners);
 
@@ -7270,7 +7408,7 @@
 				document.getElementById("releaseNotesDiv").style.display = "block";
 				document.getElementById("version").innerHTML = appVersion;
 			}
-			on(dom.byId("btnOpenDataPortal"), "click", openODP);
+			on(dom.byId("btnOpenDataLink"), "click", openODP);
 			function openODP() {
 				window.open("https://www.txdot.gov/opendata");
 			}
@@ -7485,7 +7623,17 @@
 			document.getElementById("getCoordsDiv").style.display = "none";
 			document.getElementById("linkDisp").innerText = "";
 		}
-
+		function getPrintOptions(){
+		  document.getElementById("maskDiv").style.display="block";
+		  document.getElementById("printOptionsDiv").style.display="block";
+		  document.getElementById("printOptionsDiv").style.width="280px";
+		  document.getElementById("printOptionsDiv").style.height="340px";
+		}
+		function closePrintOptionsDiv(){
+		  document.getElementById("maskDiv").style.display="none";
+	      document.getElementById("printOptionsDiv").style.display="none";
+          document.getElementById("linkDisp").innerText = "";
+		}
 
 	</script>
 <!-- End of JavaScript -->
@@ -7517,6 +7665,25 @@
 		</div>
 		<br>
 		<button id="btnClose" style="padding: 5px 10px; top: 20px; " onclick="closegetCoordsDiv()">Close</button>
+	</div>
+	<div id="printOptionsDiv">
+		<h1><strong>Print Options</strong></h1>
+		<p><strong><h3 align="center">Map Title:</h3></strong></p>
+		<div id="titleDiv" contenteditable="true" style="padding-top: 5px; padding-bottom: 5px; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;"></div>
+		<p><strong><h3 align="center">Map Author:</h3></strong></p>
+		<div id="authorDiv" contenteditable style="padding-top: 5px; padding-bottom: 5px; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;"></div>
+		<p><strong><h3 align="center">Layout:</h3></strong></p>
+		<div id="layoutDiv">
+			<select name="layouts" id="layouts" style="padding-top: 5px; padding-bottom: 5px; text-align: center; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;">
+				<option value="8_5x11_Landscape_No_Legend">8.5 x 11 Landscape</option>
+				<option value="8_5x11_Portrait_No_Legend">8.5 x 11 Portrait</option>
+			</select>
+		</div>
+		<br>
+		<br>
+		<br>
+		<button id="btnCancelPrint" style="padding: 5px 10px; top: 30px;" onclick="closePrintOptionsDiv()">Cancel</button>
+		<button id="btnExecutePrint" style="padding: 5px 10px; top: 30px;">Print</button>
 	</div>
 	<div id="releaseNotesDiv">
 		<h1><strong>RELEASE NOTES</strong></h1>
@@ -7943,7 +8110,9 @@
 	</div>
 	<div id="credits"></div>
 	<div class="divODP">
-		<button id="btnOpenDataPortal" title="Open Data Portal" target="_blank">Download Data</button>
+		<button id="btnDownloadData" title="Download Data" target="_blank">Download</button>
+		<button id="btnPrintMap" title="Print Map" target="_blank">Print Map</button>
+		<button id="btnOpenDataLink" title="Open Data Portal" target="_blank">Open Data Portal</button>
 	</div>
 	<nav>
 		<ul>
