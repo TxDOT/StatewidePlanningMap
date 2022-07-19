@@ -37,23 +37,23 @@
 	 	display: none;
 	 	z-index: 101;
 	 }
-	 #overlaysWarningDiv, #getCoordsDiv{
+	 #overlaysWarningDiv, #getCoordsDiv, #printOptionsDiv{
 	 	height: 160px;
 	 	width: 200px;
 	 	left:0;
-    right:0;
-    top: 0;
-    bottom: 0;
-    margin-left:auto;
-    margin-right:auto;
-    margin-top: auto;
-    margin-bottom: auto;
+		right:0;
+		top: 0;
+		bottom: 0;
+		margin-left:auto;
+		margin-right:auto;
+		margin-top: auto;
+		margin-bottom: auto;
 	 	background-color: rgba(245,245,245,1);
 	 	color: #444444;
 	 	font-size: .8em;
 	 	text-align: center;
-	  border-radius: 5px;
-	  padding: 10px;
+		border-radius: 5px;
+		padding: 10px;
 	 	position: absolute;
 	 	display: none;
 	 	z-index: 101;
@@ -637,7 +637,8 @@
     });
 
     // Print button
-    on(dom.byId("btnPrintMap"), "click", printMap);
+    on(dom.byId("btnPrintMap"), "click", getPrintOptions);//need to open printOptionsDiv
+	on(dom.byId("btnExecutePrint"),"click", printMap);
 
     //Query Tab buttons and events
     on(dom.byId("btnAddSecondCondition"), "click", addSecondCondition);
@@ -663,10 +664,26 @@
     // Printing Tools
 
     function printMap() {
+		// let landscpFlag = confirm("Landscape?");
+	//   set options and close popup
+	// let landscape = "8_5x11_Landscape_No_Legend_5July2022_REV4"; //need to get dom by id
+	// let portrait = "8_5x11_Portrait_No_Legend_1July2022_REV1";
+	  let mapTitle = document.getElementById('titleDiv').innerHTML;
+	  let mapAuthor = "Author: "+ document.getElementById('authorDiv').innerHTML;
+	  let layout = document.getElementById('layouts').value;
+	  console.log(mapTitle, mapAuthor, layout);
+	//   handle blank values
+	  if(mapTitle === ""){
+		mapTitle = " ";
+	  }
+	  if(mapAuthor === "Author: "){
+		mapAuthor = "Author: Public User";
+	  }
+	  closePrintOptionsDiv();
       //get visible layers and push to array of legendLayers
 
        //-- remove graphicsLayer1 (need to add back; its the RI layer)
-      console.log(bridgeLyr.layerId);
+      // console.log(bridgeLyr.layerId);
       // var gL1 = map.graphicsLayerIds.indexOf('graphicsLayer1');
       // if (gL1 > -1) {
       //   map.graphicsLayerIds.splice(gL1,1);
@@ -681,22 +698,23 @@
 
       //get print info from user
 
-      let landscpFlag = confirm("Landscape?");
+    //   let landscpFlag = confirm("Landscape?");
 
       //set print template (users will populate this)
       var printTemplate = new PrintTemplate();
       printTemplate.format = "PDF";
-      if(landscpFlag){
-        printTemplate.layout = "8_5x11_Landscape_No_Legend_5July2022_REV4";
-      }
-      else {
-        printTemplate.layout = "8_5x11_Portrait_No_Legend_1July2022_REV1";
-      }
+	  printTemplate.layout = layout;
+    //   if(landscpFlag){
+    //     printTemplate.layout = "8_5x11_Landscape_No_Legend_final";
+    //   }
+    //   else {
+    //     printTemplate.layout = "8_5x11_Portrait_No_Legend_final_centered";
+    //   }
 
       printTemplate.layoutOptions = {
         legendLayers: printLegend,
-        titleText: "Lorem ipsum dolor",
-        customTextElements: [{"FOOTER - Author Name (DYNAMIC)": "Alan Klinzing"}]
+        titleText: mapTitle,
+        customTextElements: [{"FOOTER - Author Name (DYNAMIC)": mapAuthor}]
       };
       console.log(printTemplate);
 
@@ -2235,8 +2253,8 @@
 		on(dom.byId("btnCopy"), "click", copyText);
 		function copyText(){
 			document.querySelector("#coordDisp").focus();
-      document.execCommand("selectAll",false,null);
-  		document.execCommand("copy");
+      		document.execCommand("selectAll",false,null);
+			document.execCommand("copy");
 		}
 
     on(dom.byId("btnCopyURL"), "click", copyURL);
@@ -4050,6 +4068,10 @@
         function dataDownload() {
 			let files = [];
 			console.log(layerInfo);
+			if(!layerInfo.length){
+				alert("Select data to download in the Overlays section");
+				return;
+			}
 			// match serviceItemId from active layers with ODP download item id
 			for (let i=0; i<layerInfo.length; i++){
 				let obj = JSON.parse(layerInfo[i].layer._json);
@@ -4284,6 +4306,18 @@
 	      document.getElementById("getCoordsDiv").style.display="none";
           document.getElementById("linkDisp").innerText = "";
 		}
+		function getPrintOptions(){
+		  document.getElementById("maskDiv").style.display="block";
+		  document.getElementById("printOptionsDiv").style.display="block";
+		  document.getElementById("printOptionsDiv").style.width="280px";
+		  document.getElementById("printOptionsDiv").style.height="340px";
+		}
+		function closePrintOptionsDiv(){
+		  document.getElementById("maskDiv").style.display="none";
+	      document.getElementById("printOptionsDiv").style.display="none";
+          document.getElementById("linkDisp").innerText = "";
+		}
+		
 
   </script>
 </head>
@@ -4312,6 +4346,29 @@
     </div>
     <br>
     <button id="btnClose" style="padding: 5px 10px; top: 20px; " onclick="closegetCoordsDiv()">Close</button>
+
+</div>
+<div id="printOptionsDiv">
+	<h1><strong>Print Options</strong></h1>
+	<p><strong><h3 align="center">Map Title:</h3></strong></p>
+	<!-- <button id="btnCopy" style="padding: 5px 10px; top: 20px; margin-left: 5px; float: right;">Copy Lat/Long</button> -->
+	<div id="titleDiv" contenteditable="true" style="padding-top: 5px; padding-bottom: 5px; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;"></div>
+    <p><strong><h3 align="center">Map Author:</h3></strong></p>
+	<!-- <button id="btnCopyURL" style="padding: 5px 10px; top: 20px; margin-left: 5px; float: right;">Copy Link</button> -->
+	<div id="authorDiv" contenteditable style="padding-top: 5px; padding-bottom: 5px; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;"></div>
+	<p><strong><h3 align="center">Layout:</h3></strong></p>
+	<div id="layoutDiv">
+		<select name="layouts" id="layouts" style="padding-top: 5px; padding-bottom: 5px; text-align: center; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;">
+			<option value="8_5x11_Landscape_No_Legend">8.5 x 11 Landscape</option>
+			<option value="8_5x11_Portrait_No_Legend">8.5 x 11 Portrait</option>
+		</select>
+	</div>
+	<br>
+	<br>
+	<br>
+    <button id="btnCancelPrint" style="padding: 5px 10px; top: 30px;" onclick="closePrintOptionsDiv()">Cancel</button>
+	<button id="btnExecutePrint" style="padding: 5px 10px; top: 30px;">Print</button>
+
 
 </div>
 <div id="releaseNotesDiv">
