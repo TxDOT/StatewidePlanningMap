@@ -4035,8 +4035,7 @@
 					// popup an alert to warn the user that only 5 overlays may be turned on at a time, max overlay
 					if (activeOverlaysArray.length > 5) {
 						document.getElementById("maskDiv").style.display = "block";
-						document.getElementById("overlaysWarningDiv").style.display =
-							"block";
+						document.getElementById("overlaysWarningDiv").style.display = "block";
 						activeOverlaysArray.pop();
 					}
 
@@ -6596,11 +6595,13 @@
 								outFields: ["*"],
 								infoTemplate: altFuelCorrinfoTemplate,
 							});
+							
 
 							map.addLayers([
 								altFuelCorrCNGLyr,
 								altFuelCorrStationCNGLyr,
 							]);
+							console.log(altFuelCorrCNGLyr)
 						}
 
 						activeOverlay = altFuelCorrCNGLyr;
@@ -7408,38 +7409,100 @@
 				document.getElementById("releaseNotesDiv").style.display = "block";
 				document.getElementById("version").innerHTML = appVersion;
 			}
+			
 			on(dom.byId("btnDownloadData"), "click", dataDownload);
 			function dataDownload() {
+				let downloadList = layerInfo;
 				let files = [];
+				let goodFiles = [];
+				let badFiles = [];
+				let msgList = [];
+				
 				console.log(layerInfo);
-				if(!layerInfo.length){
+
+				// iterate layerInfo array to remove incompatible data urls and push rest to new array
+				for (let i=0; i<downloadList.length; i++){
+					if (downloadList[i].layer.id === "INRIX Traffic"){ //need to handle outside for loop
+						console.log("inrix", i);
+						badFiles.push(downloadList[i].layer.id);
+						downloadList.splice(i,1);
+					}
+				}
+
+				if(!downloadList.length){
 					alert("Select data to download in the Overlays section");
 					return;
 				}
+				console.log(downloadList);
+				
 				// match serviceItemId from active layers with ODP download item id
-				for (let i=0; i<layerInfo.length; i++){
-					let obj = JSON.parse(layerInfo[i].layer._json);
-					// FGDB
-					let url = "https://opendata.arcgis.com/api/v3/datasets/"+obj.serviceItemId+"_"+obj.id+"/downloads/data?format=fgdb&spatialRefId=4326";
-					console.log(url)
-					window.open(url,"_blank");
-					// DATA URL (not using this method)
-					let dataUrl = "https://opendata.arcgis.com/api/v3/datasets/"+obj.serviceItemId+"_"+obj.id;
+				for (let j=0; j<downloadList.length; j++){
+					let obj = JSON.parse(downloadList[j].layer._json);
+					
+					let url = "https://opendata.arcgis.com/api/v3/datasets/"+obj.serviceItemId+"_"+obj.id;
+					
 					let xmlhttp = new XMLHttpRequest();
-					xmlhttp.responseType = 'json';
-
+					// xmlhttp.responseType = 'json';
 					xmlhttp.onreadystatechange=function() {
-						if (xmlhttp.readyState==4 && xmlhttp.status==200)	{
-							console.log("Query completed...")
-							console.log(this.response);//pass this to GP download service and zip up?
-							files.push(this.responseURL);
+						if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+							// pushToArray(this.responseURL);
+							// files.push(this.responseURL);
+							console.log(JSON.parse(this.response));
+							let resp = JSON.parse(this.response);
+							files.push({
+								layer: resp.data.attributes.name, 
+								url: this.responseURL,
+								groups: resp.data.attributes.groupIds
+							});
 						}
 					};
-					let theService = dataUrl;
-					xmlhttp.open("GET",theService,true);
+					let theService = url;
+					xmlhttp.open("GET",theService,false);
 					xmlhttp.send();
 				}
-				console.log(files);
+
+				for (let f=0; f<files.length; f++){
+					let file = files[f];
+					if (!file.groups.includes("2e13a5d4ab324424a12431b0a6d21304")){
+						// console.log(file, "not on ODP")
+						badFiles.push(file.layer);
+					}
+					else {
+						goodFiles.push(file.url);
+						msgList.push(file.layer);
+					}
+
+					
+				}
+
+				function filterDupes (value, index, self){
+						return self.indexOf(value) === index;
+				}
+				let noDupes = goodFiles.filter(filterDupes);
+				let noDupesMsg = msgList.filter(filterDupes);
+				let noDupesBadURL = badFiles.filter(filterDupes);
+				let downloadFlag;
+				if(noDupesBadURL.length){
+					downloadFlag = confirm(
+						"The following layers will be downloaded: \n"+
+						JSON.stringify(noDupesMsg).split(',').join("\r\n").replace(/"|]/g,'').replace("[",'')+
+						"\n\nThese layers are not available for download on the Open Data Portal: \n"+
+						JSON.stringify(noDupesBadURL).split(',').join("\r\n").replace(/"|]/g,'').replace("[",'')
+					);
+				}
+				else {
+					downloadFlag = confirm(
+						"The following layers will be downloaded: \n"+
+						JSON.stringify(noDupesMsg).split(',').join("\r\n").replace(/"|]/g,'').replace("[",'')
+					);	
+				}
+
+				if (downloadFlag){
+
+					for (let k=0; k<noDupes.length; k++){
+						window.open(noDupes[k]+"/downloads/data?format=fgdb&spatialRefId=4326&where=1=1", "_blank");;;;;
+					}
+				}
 			}	
 			on(dom.byId("btnOpenDataLink"), "click", openODP);
 			function openODP() {
