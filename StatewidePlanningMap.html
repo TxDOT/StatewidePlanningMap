@@ -930,13 +930,6 @@
 				closePrintOptionsDiv();
 				//get visible layers and push to array of legendLayers
 
-				//-- remove graphicsLayer1 (need to add back; its the RI layer)
-				// console.log(bridgeLyr.layerId);
-				// var gL1 = map.graphicsLayerIds.indexOf('graphicsLayer1');
-				// if (gL1 > -1) {
-				//   map.graphicsLayerIds.splice(gL1,1);
-				// }
-
 				var printLegend = [];
 				for (let i=0; i<activeOverlaysArray.length; i++){
 					var theLayer = new LegendLayer();
@@ -959,7 +952,7 @@
 				//set print task to service URL
 				var printURL = "https://testportal.txdot.gov/createags/rest/services/ExportWebMap_test/GPServer/Export%20Web%20Map";
 				var printTask = new PrintTask(printURL);
-				// //set print Parameters
+				//set print Parameters
 				var printParams = new PrintParameters();
 				printParams.map = map;
 				printParams.template = printTemplate;
@@ -967,7 +960,6 @@
 				//execute the print task
 				printTask.execute(printParams, printResult, printError);
 				//disable Print Button while task runs
-				// dom.byId('btnPrintMap').style.cursor = "not-allowed";
 				dom.byId('btnPrintMap').disabled = true;
 				dom.byId('btnPrintMap').innerHTML = "Printing...";
 
@@ -981,8 +973,8 @@
 				}
 				function printError(result){
 					console.log(result);
-					dom.byId('btnPrintMap').style.cursor = "pointer";
-					// dom.byId('btnPrintMap').disabled = false;
+					// dom.byId('btnPrintMap').style.cursor = "pointer";
+					dom.byId('btnPrintMap').disabled = false;
 					dom.byId('btnPrintMap').innerHTML = "Print Map";
 				}
     		}
@@ -7410,7 +7402,16 @@
 				document.getElementById("version").innerHTML = appVersion;
 			}
 			
-			on(dom.byId("btnDownloadData"), "click", dataDownload);
+			on(dom.byId("btnDownloadData"), "click", runDownload);
+
+			function runDownload(){
+					//don't run download function until button is disabled and html updated
+					let off = dom.byId('btnDownloadData').disabled = true;
+					let msg = dom.byId('btnDownloadData').innerHTML = "Processing...";
+					if(off === true){
+						setTimeout(dataDownload,3000);
+					}
+				}
 			function dataDownload() {
 				// set up arrays to route valid layers and provide messages to user
 				let downloadList = layerInfo;
@@ -7457,22 +7458,21 @@
 					xmlhttp.send();
 				}
 
+				// make sure data is shared to ODP group
 				for (let f=0; f<files.length; f++){
 					let file = files[f];
 					if (!file.groups.includes("2e13a5d4ab324424a12431b0a6d21304")){
-						// console.log(file, "not on ODP")
 						badFiles.push(file.layer);
 					}
 					else {
 						goodFiles.push(file.url);
 						msgList.push(file.layer);
 					}
-
-					
 				}
 
+				// filter out duplicate layers
 				function filterDupes (value, index, self){
-						return self.indexOf(value) === index;
+					return self.indexOf(value) === index;
 				}
 				let noDupes = goodFiles.filter(filterDupes);
 				let noDupesMsg = msgList.filter(filterDupes);
@@ -7493,12 +7493,15 @@
 					);	
 				}
 
+				// download valid files
 				if (downloadFlag){
-
 					for (let k=0; k<noDupes.length; k++){
-						window.open(noDupes[k]+"/downloads/data?format=fgdb&spatialRefId=4326&where=1=1", "_blank");;;;;
+						window.open(noDupes[k]+"/downloads/data?format=fgdb&spatialRefId=4326&where=1=1", "_blank");
 					}
 				}
+				// reset button status
+				dom.byId('btnDownloadData').disabled = false;
+				dom.byId('btnDownloadData').innerHTML = "Download";
 			}	
 			on(dom.byId("btnOpenDataLink"), "click", openODP);
 			function openODP() {
