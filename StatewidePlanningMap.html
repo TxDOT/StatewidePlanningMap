@@ -565,7 +565,7 @@
 			google,
 			TxDOTVectorTileLayer,
 			txAccessToken,
-			appVersion = "4.4.19 Toledo";
+			appVersion = "4.5.0 East Texas";
 
 		//Route Event Variables
 		var dropbox,
@@ -7412,6 +7412,7 @@
 			
 			on(dom.byId("btnDownloadData"), "click", dataDownload);
 			function dataDownload() {
+				// set up arrays to route valid layers and provide messages to user
 				let downloadList = layerInfo;
 				let files = [];
 				let goodFiles = [];
@@ -7420,11 +7421,10 @@
 				
 				console.log(layerInfo);
 
-				// iterate layerInfo array to remove incompatible data urls and push rest to new array
+				// iterate download array to remove incompatible data urls and push rest to new array
 				for (let i=0; i<downloadList.length; i++){
-					if (downloadList[i].layer.id === "INRIX Traffic"){ //need to handle outside for loop
-						console.log("inrix", i);
-						badFiles.push(downloadList[i].layer.id);
+					if (downloadList[i].layer.id === "INRIX Traffic"){ 
+						badFiles.push(downloadList[i].layer.id); //push to error array then remove
 						downloadList.splice(i,1);
 					}
 				}
@@ -7433,8 +7433,6 @@
 					alert("Select data to download in the Overlays section");
 					return;
 				}
-				console.log(downloadList);
-				
 				// match serviceItemId from active layers with ODP download item id
 				for (let j=0; j<downloadList.length; j++){
 					let obj = JSON.parse(downloadList[j].layer._json);
@@ -7442,11 +7440,9 @@
 					let url = "https://opendata.arcgis.com/api/v3/datasets/"+obj.serviceItemId+"_"+obj.id;
 					
 					let xmlhttp = new XMLHttpRequest();
-					// xmlhttp.responseType = 'json';
+					// xmlhttp.responseType = 'json'; //running async won't allow response type choice
 					xmlhttp.onreadystatechange=function() {
 						if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-							// pushToArray(this.responseURL);
-							// files.push(this.responseURL);
 							console.log(JSON.parse(this.response));
 							let resp = JSON.parse(this.response);
 							files.push({
@@ -7785,14 +7781,15 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li> Optimized TxDOT Roadways layer (unsegmented geometry)</li>
-			<li>(v4.4.18)Added new Maintenance District Routes Layer</li>
+			<li> Added custom map printing and data download tools</li>
+			<li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li>
+			<li>(v4.4.18) Added new Maintenance District Routes Layer</li>
 			<li>(v4.4.17) Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li>
 			<li>(v4.4.16) Updated text and link information</li>
 			<li>(v4.4.16) Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li>
 			<li>(v4.4.15) Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li>
-			<li>(v4.4.14) Added Alternative Fuel Layers</li>
-			<li>(v4.4.14) Increased Maximum Overlays to 5</li>
+			<!-- <li>(v4.4.14) Added Alternative Fuel Layers</li>
+			<li>(v4.4.14) Increased Maximum Overlays to 5</li> -->
 			<!-- <li>(v4.4.13) Updated Non-Attainment (Air Quality) Layers</li>
 			<li>(v4.4.12) Added Rumble Strip Layer</li> -->
 			<!-- <li>(v4.4.11) Added INRIX Traffic® Layer</li> -->
