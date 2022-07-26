@@ -5194,11 +5194,12 @@
 								["AADT 2001", "${AADT_2001:NumberFormat}"],
 							]);
 
-							var infoTemplate = new InfoTemplate(
-								"Traffic Count Station:",
-								"This count includes frontage roads when present.<br><br>" +
-									tableText
-							);
+							// var infoTemplate = new InfoTemplate(
+							// 	"Traffic Count Station:",
+							// 	"This count includes frontage roads when present.<br><br>" +
+							// 		tableText
+							// );
+							var infoTemplate = new InfoTemplate("Traffic Count Station:", tableText);
 							var projectsUrl =
 								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_AADT_Annuals/FeatureServer/0";
 
@@ -5224,7 +5225,7 @@
 							labelLayerAADT.addFeatureLayer(
 								aadtLyr,
 								label_renderer,
-								"{AADT_2020}"
+								"{AADT_2021}"
 							);
 							map.addLayer(labelLayerAADT);
 						}
@@ -7784,7 +7785,8 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li> Added custom map printing and data download tools</li>
+			<li> Added custom printing and data download tools</li>
+			<li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li>
 			<li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li>
 			<li>(v4.4.18) Added new Maintenance District Routes Layer</li>
 			<li>(v4.4.17) Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li>
