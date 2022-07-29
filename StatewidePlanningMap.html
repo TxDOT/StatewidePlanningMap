@@ -7408,7 +7408,7 @@
 			on(dom.byId("btnDownloadData"), "click", runDownload);
 			function runDownload(){
 				// don't run with no overlays selected
-				if(!layerInfo.length) {
+				if(!activeOverlaysArray.length) {
 					alert("Select data to download in the Overlays section");
 					return;
 				}
