@@ -22,7 +22,7 @@
 			display: none;
 			z-index: 100;
 		}
-		#releaseNotesDiv {
+		#releaseNotesDiv, #dataDownloadDiv {
 			height: auto;
 			width: 350px;
 			margin: auto;
@@ -2255,9 +2255,10 @@
 						} else {
 							div.innerHTML = "";
 							theLegend.refresh();
+							
 						}
 					});
-
+					// add memorial highways back to layerinfo
 					theLegend.refresh();
 				} else {
 					var div = document.getElementById("legendDiv");
@@ -3541,6 +3542,7 @@
 						waitForCalc();				
 					});
 				}
+
 			}
 
 			function panTo(theX, theY) {
@@ -4893,14 +4895,13 @@
 								});
 								// maintDistRoutesLyr.setWebGLEnabled(false);
 								maintDistRoutesLyr.setRenderer(renderer);
-							map.addLayer(maintDistRoutesLyr);
+								map.addLayer(maintDistRoutesLyr);
 						}
 						activeOverlay = maintDistRoutesLyr;
 						layerInfo.push({
 							layer: maintDistRoutesLyr,
 							title: "Maintenance District Routes",
 						});
-						console.log(theLegend.layerInfos)
 						map.infoWindow.resize(325, 500);
 					}
 
@@ -7405,15 +7406,19 @@
 			}
 			
 			on(dom.byId("btnDownloadData"), "click", runDownload);
-
 			function runDownload(){
-					//don't run download function until button is disabled and html updated
-					let off = dom.byId('btnDownloadData').disabled = true;
-					let msg = dom.byId('btnDownloadData').innerHTML = "Processing...";
-					if(off === true){
-						setTimeout(dataDownload,3000);
-					}
+				// don't run with no overlays selected
+				if(!layerInfo.length) {
+					alert("Select data to download in the Overlays section");
+					return;
 				}
+				//don't run download function until button is disabled and html updated
+				let off = dom.byId('btnDownloadData').disabled = true;
+				let msg = dom.byId('btnDownloadData').innerHTML = "Processing...";
+				if(off === true){
+					setTimeout(dataDownload,2000);
+				}
+			}
 			function dataDownload() {
 				// set up arrays to route valid layers and provide messages to user
 				let downloadList = layerInfo;
@@ -7421,20 +7426,22 @@
 				let goodFiles = [];
 				let badFiles = [];
 				let msgList = [];
-				
-				console.log(layerInfo);
+				let msg;
 
-				// iterate download array to remove incompatible data urls and push rest to new array
+				// clean up stray or missing layers
 				for (let i=0; i<downloadList.length; i++){
 					if (downloadList[i].layer.id === "INRIX Traffic"){ 
 						badFiles.push(downloadList[i].layer.id); //push to error array then remove
 						downloadList.splice(i,1);
 					}
 				}
-
-				if(!downloadList.length){
-					alert("Select data to download in the Overlays section");
-					return;
+				for (let i=0; i<activeOverlaysArray.length; i++){
+					if (activeOverlaysArray[i] === "Memorial_Highway"){ 
+						downloadList.push({
+							layer: memorialHighwayLyr,
+							title: "Memorial Highways"
+						})
+					}
 				}
 				// match serviceItemId from active layers with ODP download item id
 				for (let j=0; j<downloadList.length; j++){
@@ -7479,31 +7486,70 @@
 				let noDupes = goodFiles.filter(filterDupes);
 				let noDupesMsg = msgList.filter(filterDupes);
 				let noDupesBadURL = badFiles.filter(filterDupes);
-				let downloadFlag;
-				if(noDupesBadURL.length){
-					downloadFlag = confirm(
-						"The following layers will be downloaded: \n"+
-						JSON.stringify(noDupesMsg).split(',').join("\r\n").replace(/"|]/g,'').replace("[",'')+
-						"\n\nThese layers are not available for download on the Open Data Portal: \n"+
-						JSON.stringify(noDupesBadURL).split(',').join("\r\n").replace(/"|]/g,'').replace("[",'')
-					);
+				// let downloadFlag;
+				// let msg;
+				//both valid and invalid files
+				if(noDupesMsg.length && noDupesBadURL.length){
+					// downloadFlag = confirm(
+					// 	"The following layers will be downloaded: \n"+
+					// 	JSON.stringify(noDupesMsg).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')+
+					// 	"\n\nThese layers are not available for download on the Open Data Portal: \n"+
+					// 	JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')
+					// );
+					msg = "The following layers will be downloaded: \n\n"+
+						JSON.stringify(noDupesMsg).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')+
+						"\n\nThese layers are not available for download on the Open Data Portal: \n\n"+
+						JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')
+					// msg = JSON.stringify(noDupesMsg)
 				}
+				// only valid files
+				else if (noDupes.length) {
+					// downloadFlag = confirm(
+					// 	"The following layers will be downloaded: \n"+
+					// 	JSON.stringify(noDupesMsg).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')
+					// );
+					msg = 
+						"The following layers will be downloaded: \n\n"+
+						JSON.stringify(noDupesMsg).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')	
+					// msg = JSON.stringify(noDupesMsg)
+				}
+				// only invalid files
 				else {
-					downloadFlag = confirm(
-						"The following layers will be downloaded: \n"+
-						JSON.stringify(noDupesMsg).split(',').join("\r\n").replace(/"|]/g,'').replace("[",'')
-					);	
+					// downloadFlag = confirm(
+					// 	"These layers are not available for download on the Open Data Portal: \n"+
+					// 	JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')
+					// );
+					msg = 
+						"These layers are not available for download on the Open Data Portal: \n\n"+
+						JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')
+					// msg = JSON.stringify(noDupesBadURL)
 				}
-
+				
 				// download valid files
-				if (downloadFlag){
-					for (let k=0; k<noDupes.length; k++){
-						window.open(noDupes[k]+"/downloads/data?format=fgdb&spatialRefId=4326&where=1=1", "_blank");
-					}
-				}
+				showDataDownload(msg, noDupes)
+
 				// reset button status
 				dom.byId('btnDownloadData').disabled = false;
 				dom.byId('btnDownloadData').innerHTML = "Download";
+				// closeDataDownload()
+				// noDupes = []
+			}
+			function showDataDownload(message, layers) {
+				document.getElementById("maskDiv").style.display = "block";
+				document.getElementById("dataDownloadDiv").style.display = "block";
+				document.getElementById("dataLayers").innerText = message;
+				console.log(layers)
+				on(dom.byId("btnDownloadExecute"), "click", function(){
+					for (let k=0; k<layers.length; k++){
+						window.open(layers[k]+"/downloads/data?format=fgdb&spatialRefId=4326&where=1=1", "_blank");
+					}
+					layers = [];
+					closeDataDownload();
+				});
+				on(dom.byId("btnDownloadCancel"), "click", function(){
+					layers = [];
+					closeDataDownload();
+				});
 			}	
 			on(dom.byId("btnOpenDataLink"), "click", openODP);
 			function openODP() {
@@ -7687,6 +7733,11 @@
 			document.getElementById("releaseNotesDiv").style.display = "none";
 		}
 
+		function closeDataDownload() {
+			document.getElementById("maskDiv").style.display = "none";
+			document.getElementById("dataDownloadDiv").style.display = "none";
+		}
+
 		function closeOverlaysWarningDiv() {
 			document.getElementById("maskDiv").style.display = "none";
 			document.getElementById("overlaysWarningDiv").style.display = "none";
@@ -7781,6 +7832,12 @@
 		<br>
 		<button id="btnCancelPrint" style="padding: 5px 10px; top: 30px;" onclick="closePrintOptionsDiv()">Cancel</button>
 		<button id="btnExecutePrint" style="padding: 5px 10px; top: 30px;">Print</button>
+	</div>
+	<div id="dataDownloadDiv">
+		<h1><strong>Data Download</strong></h1>
+		<p id="dataLayers" style="word-wrap: break-word; text-align: left;"></p>
+		<button id="btnDownloadCancel" style="padding: 5px 10px; position:relative; bottom: 5px; ">Cancel</button>
+		<button id="btnDownloadExecute" style="padding: 5px 10px; position:relative; bottom: 5px; ">Download</button>
 	</div>
 	<div id="releaseNotesDiv">
 		<h1><strong>RELEASE NOTES</strong></h1>
