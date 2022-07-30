@@ -7506,9 +7506,9 @@
 					// 	JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')
 					// );
 					msg = "The following layers will be downloaded: \n\n"+
-						JSON.stringify(noDupesMsg).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')+
+						JSON.stringify(noDupesMsg).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'  -')+
 						"\n\nThese layers are not available for download on the Open Data Portal: \n\n"+
-						JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')
+						JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'  -')
 					// msg = JSON.stringify(noDupesMsg)
 				}
 				// only valid files
@@ -7519,7 +7519,7 @@
 					// );
 					msg = 
 						"The following layers will be downloaded: \n\n"+
-						JSON.stringify(noDupesMsg).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')	
+						JSON.stringify(noDupesMsg).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'  -')	
 					// msg = JSON.stringify(noDupesMsg)
 				}
 				// only invalid files
@@ -7530,7 +7530,7 @@
 					// );
 					msg = 
 						"These layers are not available for download on the Open Data Portal: \n\n"+
-						JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'-')
+						JSON.stringify(noDupesBadURL).split(',').join("\r\n-").replace(/"|]/g,'').replace("[",'  -')
 					// msg = JSON.stringify(noDupesBadURL)
 				}
 				
