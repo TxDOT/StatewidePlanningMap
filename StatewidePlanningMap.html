@@ -916,8 +916,8 @@
 
 			// Printing Tools
 			function printMap() {
-				let mapTitle = document.getElementById('titleDiv').innerHTML;
-				let mapAuthor = "Author: "+ document.getElementById('authorDiv').innerHTML;
+				let mapTitle = document.getElementById('titleDiv').innerText;
+				let mapAuthor = "Author: "+ document.getElementById('authorDiv').innerText;
 				let layout = document.getElementById('layouts').value;
 				console.log(mapTitle, mapAuthor, layout);
 				// handle blank values
@@ -950,7 +950,8 @@
 				console.log(printTemplate);
 
 				//set print task to service URL
-				var printURL = "https://testportal.txdot.gov/createags/rest/services/ExportWebMap_test/GPServer/Export%20Web%20Map";
+				var printURL = "https://testportal.txdot.gov/createags/rest/services/ExportWebMap_test/GPServer/Export%20Web%20Map"; //TEST
+				// var printURL = "https://maps.txdot.gov/createags/rest/services/CustomPrint/GPServer/Export%20Web%20Map"; //PROD
 				var printTask = new PrintTask(printURL);
 				//set print Parameters
 				var printParams = new PrintParameters();
@@ -7421,13 +7422,21 @@
 			}
 			function dataDownload() {
 				// set up arrays to route valid layers and provide messages to user
-				let downloadList = layerInfo;
+				let downloadList = [];
 				let files = [];
 				let goodFiles = [];
 				let badFiles = [];
 				let msgList = [];
 				let msg;
 
+				// create download list from legend array
+				for (let i=0; i<layerInfo.length; i++){
+					downloadList.push(layerInfo[i]);
+					if (downloadList[i].layer.id === "INRIX Traffic"){ 
+						badFiles.push(downloadList[i].layer.id); //push to error array then remove
+						downloadList.splice(i,1);
+					}
+				}
 				// clean up stray or missing layers
 				for (let i=0; i<downloadList.length; i++){
 					if (downloadList[i].layer.id === "INRIX Traffic"){ 
