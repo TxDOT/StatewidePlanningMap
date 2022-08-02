@@ -5139,7 +5139,7 @@
 							map.reorderLayer(permStationLyr, pos);
 						} else {
 							var tableText = makeTableFromArrayNoHeader([
-								["Station ID", "${T_FLAG}"],
+								["Station ID", "${F_T_FLAG}"],
 								["Station Type", "${STATION_TYPE}"],
 							]);
 							var infoTemplate = new InfoTemplate(
@@ -5152,7 +5152,7 @@
 							permStationLyr = new FeatureLayer(projectsUrl, {
 								id: "Permanent Stations",
 								visible: true,
-								outFields: ["T_FLAG", "STATION_TYPE"],
+								outFields: ["F_T_FLAG", "STATION_TYPE"],
 								infoTemplate: infoTemplate,
 							});
 							map.addLayer(permStationLyr);
