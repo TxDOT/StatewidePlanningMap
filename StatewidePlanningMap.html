@@ -916,14 +916,18 @@
 
 			// Printing Tools
 			function printMap() {
-				let mapTitle = document.getElementById('titleDiv').innerText;
+				let mapTitle = document.getElementById('titleDiv');
+				mapTitle.style.outlineColor = "initial";
 				let mapAuthor = "Author: "+ document.getElementById('authorDiv').innerText;
 				let layout = document.getElementById('layouts').value;
-				console.log(mapTitle, mapAuthor, layout);
-				// handle blank values
-				if(mapTitle === ""){
-					mapTitle = " ";
+
+				// handle empty string or only whitespace
+				if(!mapTitle.textContent || !mapTitle.textContent.trim() ){
+					mapTitle.style.outlineColor = "#ff0000";
+					mapTitle.textContent = ''; //replace whitespaces
+					return;
 				}
+
 				if(mapAuthor === "Author: "){
 					mapAuthor = "Author: Public User";
 				}
@@ -944,7 +948,7 @@
 
 				printTemplate.layoutOptions = {
 					legendLayers: printLegend,
-					titleText: mapTitle,
+					titleText: mapTitle.innerText,
 					customTextElements: [{"FOOTER - Author Name (DYNAMIC)": mapAuthor}]
 				};
 				console.log(printTemplate);
@@ -7784,11 +7788,21 @@
 		  document.getElementById("printOptionsDiv").style.display="block";
 		  document.getElementById("printOptionsDiv").style.width="280px";
 		  document.getElementById("printOptionsDiv").style.height="340px";
+		  document.getElementById("titleDiv").focus();
 		}
 		function closePrintOptionsDiv(){
 		  document.getElementById("maskDiv").style.display="none";
 	      document.getElementById("printOptionsDiv").style.display="none";
-          document.getElementById("linkDisp").innerText = "";
+          document.getElementById("titleDiv").style.outlineColor = "initial";
+		}
+		function requiredFields(el){
+			let element = document.getElementById(el);
+			if(!element.textContent || !element.textContent.trim() ){
+					element.style.outlineColor = "#ff0000";
+					element.textContent = ''; 
+					return;
+				}
+			element.style.outlineColor = "initial";
 		}
 
 	</script>
@@ -7824,8 +7838,8 @@
 	</div>
 	<div id="printOptionsDiv">
 		<h1><strong>Print Options</strong></h1>
-		<p><strong><h3 align="center">Map Title:</h3></strong></p>
-		<div id="titleDiv" contenteditable="true" style="padding-top: 5px; padding-bottom: 5px; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;"></div>
+		<p><strong><h3 align="center">Map Title (required):</h3></strong></p>
+		<div id="titleDiv" onblur="requiredFields(this.id)" contenteditable="true" style="padding-top: 5px; padding-bottom: 5px; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;"></div>
 		<p><strong><h3 align="center">Map Author:</h3></strong></p>
 		<div id="authorDiv" contenteditable style="padding-top: 5px; padding-bottom: 5px; font-size: larger; overflow:hidden; white-space: nowrap; outline: auto;"></div>
 		<p><strong><h3 align="center">Layout:</h3></strong></p>
