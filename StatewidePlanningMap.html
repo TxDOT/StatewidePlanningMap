@@ -969,15 +969,14 @@
 
 				//callback for result
 				function printResult(result) {
-					console.log(result.url);
-					window.open(result.url, "_blank");
-					// dom.byId('btnPrintMap').style.cursor = "pointer";
+					if (result.url){
+						window.open(result.url, "_blank");
+					}
 					dom.byId('btnPrintMap').disabled = false;
 					dom.byId('btnPrintMap').innerHTML = "Print Map";
 				}
 				function printError(result){
 					console.log(result);
-					// dom.byId('btnPrintMap').style.cursor = "pointer";
 					dom.byId('btnPrintMap').disabled = false;
 					dom.byId('btnPrintMap').innerHTML = "Print Map";
 				}
