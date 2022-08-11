@@ -4366,7 +4366,7 @@
 								["24 Hour Truck Percentage", "${TRK_AADT_PCT}"],
 							]);
 							tableText +=
-								"<br>Future Traffic and Percent Truck data is for main lanes only.";
+								"<br><strong>Note: Future AADT and Truck Percentage statistics are programmatically derived system-wide. Project-specific forecasts provided by TPP on the <u><i>Traffic Analysis for Highway Design</u></i> forms are generated on a project-by-project basis and will likely differ from the values presented here.</strong>";
 							var infoTemplate = new InfoTemplate(
 								"Future Traffic:",
 								tableText
@@ -7865,6 +7865,7 @@
 		<p3 id="version"></p3>
 		<ul>
 			<li> Added custom printing and data download tools</li>
+			<li>(v4.4.20) Updated Future Traffic popup</li>
 			<li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li>
 			<li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li>
 			<li>(v4.4.18) Added new Maintenance District Routes Layer</li>
