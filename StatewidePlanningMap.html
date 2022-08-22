@@ -565,7 +565,7 @@
 			google,
 			TxDOTVectorTileLayer,
 			txAccessToken,
-			appVersion = "4.5.0 East Texas";
+			appVersion = "4.5.1 Fahrenheit";
 
 		//Route Event Variables
 		var dropbox,
@@ -7786,7 +7786,7 @@
 		  document.getElementById("maskDiv").style.display="block";
 		  document.getElementById("printOptionsDiv").style.display="block";
 		  document.getElementById("printOptionsDiv").style.width="280px";
-		  document.getElementById("printOptionsDiv").style.height="340px";
+		  document.getElementById("printOptionsDiv").style.height="410px";
 		  document.getElementById("titleDiv").focus();
 		}
 		function closePrintOptionsDiv(){
@@ -7851,14 +7851,18 @@
 		<br>
 		<br>
 		<br>
-		<button id="btnCancelPrint" style="padding: 5px 10px; top: 30px; margin: 5px;" onclick="closePrintOptionsDiv()">Cancel</button>
+		<div style="text-align: left;">Note: Printout usually takes 10-15 seconds to complete and will open a new tab. Popups must be enabled to view.</div>
+		<br>
 		<button id="btnExecutePrint" style="padding: 5px 10px; top: 30px; margin: 5px;">Print</button>
+		<button id="btnCancelPrint" style="padding: 5px 10px; top: 30px; margin: 5px;" onclick="closePrintOptionsDiv()">Cancel</button>
 	</div>
 	<div id="dataDownloadDiv">
 		<h1><strong>Data Download</strong></h1>
 		<p id="dataLayers" style="word-wrap: break-word; text-align: left; font-size: larger;"></p>
-		<button id="btnDownloadCancel" style="padding: 5px 10px; position:relative; bottom: 5px; margin: 5px; ">Cancel</button>
+		<div style="text-align: left;">Note: Each download will open in a new tab. Popups must be enabled to view.</div>
+		<br>
 		<button id="btnDownloadExecute" style="padding: 5px 10px; position:relative; bottom: 5px; margin: 5px; ">Download</button>
+		<button id="btnDownloadCancel" style="padding: 5px 10px; position:relative; bottom: 5px; margin: 5px; ">Cancel</button>
 	</div>
 	<div id="releaseNotesDiv">
 		<h1><strong>RELEASE NOTES</strong></h1>
