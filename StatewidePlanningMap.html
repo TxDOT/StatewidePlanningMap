@@ -582,6 +582,7 @@
 			labelLayerAADT,
 			areaOfficeLyr,
 			COGLyr,
+			disadTractsLyr,
 			FCLyr,
 			fcLastEditDate,
 			UZAlyr,
@@ -3851,6 +3852,9 @@
 				if (COGLyr) {
 					COGLyr.hide();
 				}
+				if (disadTractsLyr) {
+					disadTractsLyr.hide();
+				}
 				if (FCLyr) {
 					FCLyr.hide();
 				}
@@ -6818,6 +6822,57 @@
 							title: "Congestion (Forecast Year)",
 						});
 					}
+
+					if (activeOverlaysArray.indexOf("Disadvanted_Tracts") > -1) {
+						var pos = activeOverlaysArray.indexOf("Disadvanted_Tracts");
+						if (disadTractsLyr) {
+							disadTractsLyr.show();
+							map.reorderLayer(disadTractsLyr, pos);
+						} else {
+							var tableText = "<span>${CF}<br>Census Tract: ${GEOID10}</span><br>"
+							tableText += makeTableFromArrayNoHeader([
+								["Critical Clean Water and Waste Infrastructure Disadvantaged", "${M_WTR}"],
+								["Training and Workforce Development Disadvantaged", "${M_WKFC}"],
+								["Climate Change Disadvantaged", "${M_CLT}"],
+								["Clean Energy and Energy Efficiency Disadvantaged", "${M_ENY}"],
+								["Clean Transit Disadvantaged", "${M_TRN}"],
+								["Affordable and Sustainable Housing Disadvantaged", "${M_HSG}"],
+								["Reduction and Remediation of Legacy Pollution Disadvantaged", "${M_PLN}"],
+								["Health Burdens Disadvantaged", "${M_HLTH}"],
+								["Total categories exceeded", "${CC}"]
+							]);
+							tableText += "<br>This layer assesses and identifies communities by census tract that are disadvantaged according to <a href='https://screeningtool.geoplatform.gov/en/methodology' target='_blank'>Justice40 Initiative criteria</a>."
+							var infoTemplate = new InfoTemplate(
+								"Disadvanted Census Tracts:",
+								tableText
+							);
+							// symbol and renderer
+							var theSymbol= new SimpleFillSymbol();
+							theSymbol.color = new Color([0, 0, 255, 0.15]);
+							theSymbol.outline = new SimpleLineSymbol(
+								SimpleLineSymbol.STYLE_SOLID,
+								new Color([255, 255, 255]),
+								0.5
+							);
+							var theRenderer = new SimpleRenderer(theSymbol);
+							var projectsUrl = "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/Justice40_Tracts_May_2022/FeatureServer/0";
+							disadTractsLyr = new FeatureLayer(projectsUrl, {
+								id: "Disadvanted_Tracts",
+								visible: true,
+								outFields: ["*"],
+								infoTemplate: infoTemplate,
+							});
+							disadTractsLyr.setDefinitionExpression("SF='Texas' AND CC>0");
+							disadTractsLyr.setRenderer(theRenderer);
+							map.addLayer(disadTractsLyr);
+						}
+						activeOverlay = disadTractsLyr;
+						layerInfo.push({
+							layer: disadTractsLyr,
+							title: "Disadvanted Census Tracts",
+						});
+					}
+
 					if (activeOverlaysArray.indexOf("TxDOT_Facilities") > -1) {
 						var pos = activeOverlaysArray.indexOf("TxDOT_Facilities");
 						if (facLyr) {
@@ -7868,15 +7923,16 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li> Added custom printing and data download tools</li>
+			<li>Added new Disadvantaged Census Tracts layer</li>
+			<li>(v4.5.0) Added custom printing and data download tools</li>
 			<li>(v4.4.20) Updated Future Traffic popup notes</li>
 			<li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li>
 			<li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li>
 			<li>(v4.4.18) Added new Maintenance District Routes Layer</li>
 			<li>(v4.4.17) Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li>
-			<li>(v4.4.16) Updated text and link information</li>
+			<!-- <li>(v4.4.16) Updated text and link information</li> -->
 			<li>(v4.4.16) Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li>
-			<li>(v4.4.15) Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li>
+			<!-- <li>(v4.4.15) Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li> -->
 			<!-- <li>(v4.4.14) Added Alternative Fuel Layers</li>
 			<li>(v4.4.14) Increased Maximum Overlays to 5</li> -->
 			<!-- <li>(v4.4.13) Updated Non-Attainment (Air Quality) Layers</li>
@@ -7966,6 +8022,7 @@
 			<tr><td class="Overlay" id='Connectivitiy_Corridors'>Connectivity Corridors</td></tr>
 			<tr><td class="Overlay" id='Current_Congestion'>Congestion (Base Year)</td></tr>
 			<tr><td class="Overlay" id='Future_Congestion'>Congestion (Forecast Year)</td></tr>
+			<tr><td class="Overlay" id='Disadvanted_Tracts'>Disadvantaged Census Tracts</td></tr>
 			<tr><td class="Overlay" id='Energy_Sector'>Energy Sector Corridors</td></tr>
 			<tr><td class="Overlay" id='Natl_Freight_Network'>Freight Network (FHWA)</td></tr>
 			<tr><td class="Overlay" id='TX_Freight_Network'>Freight Network (TxDOT)</td></tr>
