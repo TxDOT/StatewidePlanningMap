@@ -565,7 +565,7 @@
 			google,
 			TxDOTVectorTileLayer,
 			txAccessToken,
-			appVersion = "4.5.1 Fahrenheit";
+			appVersion = "4.5.2 Uruapan";
 
 		//Route Event Variables
 		var dropbox,
@@ -591,6 +591,7 @@
 			NHSLyr,
 			maintOfficeLyr,
 			maintDistRoutesLyr,
+			maintSecBoundLyr,
 			maintSecRoutesLyr,
 			txTrunkLyr,
 			MarkerLyr,
@@ -3873,6 +3874,9 @@
 				if (maintDistRoutesLyr) {
 					maintDistRoutesLyr.hide();
 				}
+				if (maintSecBoundLyr) {
+					maintSecBoundLyr.hide();
+				}
 				if (maintSecRoutesLyr) {
 					maintSecRoutesLyr.hide();
 				}
@@ -4830,6 +4834,36 @@
 							title: "Maintenance Section Routes",
 						});
 						map.infoWindow.resize(325, 500);
+					}
+
+					if (activeOverlaysArray.indexOf("Maintenance_Section_Boundaries") > -1) {
+						var pos = activeOverlaysArray.indexOf("Maintenance_Section_Boundaries");
+						if (maintSecBoundLyr) {
+							maintSecBoundLyr.show();
+							map.reorderLayer(maintSecBoundLyr, pos);
+						} else {
+							var tableText = makeTableFromArrayNoHeader([
+								["District Name", "${DIST_NM}"],
+								["Maintenance Section Number", "${MAINT_SEC_NBR}"],
+								["Maintenance Section Name", "${MAINT_SEC_NM}"],
+
+							]);
+							var infoTemplate = new InfoTemplate(
+								"Maintenance Section Boundary:",
+								tableText
+							);
+							var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/TxDOT_Maintenance_Section_Boundaries/FeatureServer/0";
+
+							maintSecBoundLyr = new FeatureLayer(projectsUrl, {
+								id: "Maintenance_Section_Boundaries",
+								visible: true,
+								outFields: ["*"],
+								infoTemplate: infoTemplate,
+							});
+							map.addLayer(maintSecBoundLyr);
+						}
+						activeOverlay = maintSecBoundLyr;
+						layerInfo.push({ layer: maintSecBoundLyr, title: "Maintenance Section Boundaries" });
 					}
 
 					if (activeOverlaysArray.indexOf("Maintenance_District_Routes") > -1) {
@@ -7923,7 +7957,8 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Added new Disadvantaged Census Tracts layer</li>
+			<li>Added new Maintenance Section Boundaries layer</li>
+			<li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li>
 			<li>(v4.5.0) Added custom printing and data download tools</li>
 			<li>(v4.4.20) Updated Future Traffic popup notes</li>
 			<li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li>
@@ -7931,7 +7966,7 @@
 			<li>(v4.4.18) Added new Maintenance District Routes Layer</li>
 			<li>(v4.4.17) Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li>
 			<!-- <li>(v4.4.16) Updated text and link information</li> -->
-			<li>(v4.4.16) Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li>
+			<!-- <li>(v4.4.16) Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li> -->
 			<!-- <li>(v4.4.15) Added button to display LRS info in <a href="https://apps3.txdot.gov/srd/" target="_blank">Simplified Roadway Diagram</a></li> -->
 			<!-- <li>(v4.4.14) Added Alternative Fuel Layers</li>
 			<li>(v4.4.14) Increased Maximum Overlays to 5</li> -->
@@ -8032,6 +8067,7 @@
 			<tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr> 
 			<tr><td class="Overlay" id='INRIX_Traffic'>Live Traffic</td></tr>
 			<tr><td class="Overlay" id='Maintenance_District_Routes'>Maintenance District Routes</td></tr>
+			<tr><td class="Overlay" id='Maintenance_Section_Boundaries'>Maintenance Section Boundaries</td></tr>
 			<tr><td class="Overlay" id='Maintenance_Section_Routes'>Maintenance Section Routes</td></tr>
 			<tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
 			<tr><td class="Overlay" id='MPO'>Metropolitan Planning Organizations (MPO)</td></tr>
