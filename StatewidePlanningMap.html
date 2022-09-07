@@ -567,7 +567,7 @@
 			vectorURL = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basema/VectorTileServer",
 			serviceError = 0,
 			txAccessToken,
-			appVersion = "4.5.2 Uruapan";
+			appVersion = "4.5.3 Vector";
 
 		//Route Event Variables
 		var dropbox,
@@ -829,47 +829,18 @@
 			}
 			
 			function serviceCheck(){
-				// var url = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basema/VectorTileServer";
-                // let vectorURL;
 				let request = new XMLHttpRequest();
-				// request.responseType = "json"
                 request.open("GET", vectorURL, false);
                 request.onreadystatechange = function() {
-					// console.log(request.response.error.code)
-					console.log(JSON.parse(request.response))
-                    // This block catches general errors (i.e. AGO services down/unavailable)
-                    // Either send to another function for handling, or handle within
-					// if (request.readyState === XMLHttpRequest.DONE && !request.response.includes("error")) {
-					// 	// alert("Services Down");
-						
-					// 	// alert("Basemap service down, switching to backup");
-					// 	// TxDOTVectorTileLayer = new VectorTileLayer(
-					// 	vectorURL = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer"
-					// 	// ); 				// TxDOT Vector Tile Basemap Backup
-					// 	// map.addLayer(TxDOTVectorTileLayer);
-					// 	// setURL(vectorURL)
-					// }
-					if (request.readyState === XMLHttpRequest.DONE && request.response.includes("error"))
-					// else {
-						
-					// 	// TxDOTVectorTileLayer = new VectorTileLayer(
+					if (request.readyState === XMLHttpRequest.DONE && request.response.includes("error")) {
+						console.log(JSON.parse(request.response));
 						vectorURL =	"https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap_BACKUP/VectorTileServer";
 						serviceError = 1;
-					// 	// ); // TxDOT Vector Tile Basemap
-						// setURL("https://www.arcgis.com/sharing/rest/content/items/507a9905e7154ce484617c7327ee8bc4/resources/styles/root.json?f=pjson")
-					// }
-					// map.addLayer(TxDOTVectorTileLayer);
-					
+					}
                 }
                 request.send();
 			}
-			// Vector basemap service
-			// function setURL(vectorURL){
-			// 	TxDOTVectorTileLayer = new VectorTileLayer(vectorURL);
-			// 	console.log(vectorURL)
-			// 	map.addLayer(TxDOTVectorTileLayer);
-			// }
-			TxDOTVectorTileLayer = new VectorTileLayer(vectorURL); // TxDOT Vector Tile Basemap
+			TxDOTVectorTileLayer = new VectorTileLayer(vectorURL);
 			map.addLayer(TxDOTVectorTileLayer);
 			
 			// Google Imagery WMTS layer info
@@ -3388,8 +3359,9 @@
 					}
 					else {
 						alert("This basemap service is temporarily unavailable");
-						map.addLayer(layer0);
+						map.addLayer(TxDOTVectorTileLayer);
 						document.getElementById(newMap).style.color = "";
+						document.getElementById("TxDOT").style.color = "red";
 					}
 				}
 				if (newMap == "txdotDarkGray") {
@@ -3402,8 +3374,9 @@
 					}
 					else {
 						alert("This basemap service is temporarily unavailable");
-						map.addLayer(layer0);
+						map.addLayer(TxDOTVectorTileLayer);
 						document.getElementById(newMap).style.color = "";
+						document.getElementById("TxDOT").style.color = "red";
 					}
 				}
 				if (newMap == "esriStreets") {
@@ -8013,7 +7986,8 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Added new Maintenance Section Boundaries layer</li>
+			<li>Added TxDOT Basemap backup service</li>
+			<li>(v4.5.2) Added new Maintenance Section Boundaries layer</li>
 			<li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li>
 			<li>(v4.5.0) Added custom printing and data download tools</li>
 			<li>(v4.4.20) Updated Future Traffic popup notes</li>
