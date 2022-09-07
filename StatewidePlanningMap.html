@@ -825,10 +825,16 @@
 			}
 
 			// Vector basemap service
-			TxDOTVectorTileLayer = new VectorTileLayer(
-				"https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer"
-			); // TxDOT Vector Tile Basemap
-			map.addLayer(TxDOTVectorTileLayer);
+			// TxDOTVectorTileLayer = new VectorTileLayer(
+			// 	"https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer"
+			// ); // TxDOT Vector Tile Basemap
+			// map.addLayer(TxDOTVectorTileLayer);
+
+			esriStreets = new VectorTileLayer(
+				"https://www.arcgis.com/sharing/rest/content/items/a60a37a27cc140ddad15f919cd5a69f2/resources/styles/root.json?f=pjson"
+			);
+			map.addLayer(esriStreets);
+
 
 			// Google Imagery WMTS layer info
 			var GoogleLayerInfo = new WMTSLayerInfo({
@@ -8030,10 +8036,10 @@
 		<div id="mapTab">
 			<table id="tocMaps" class="tocTables">
 			<tr><th>Basemaps</th></tr>
-			<tr><td class="Basemaps" id='TxDOT' style="color:red; font-weight: bold;">TxDOT</td></tr>
+			<!-- <tr><td class="Basemaps" id='TxDOT' style="color:red; font-weight: bold;">TxDOT</td></tr> -->
 			<tr><td class="Basemaps" id='Google'>Texas Imagery Service</td></tr>
-			<tr><td class="Basemaps" id='txdotLightGray'>TxDOT Light Gray</td></tr>
-			<tr><td class="Basemaps" id='txdotDarkGray'>TxDOT Dark Gray</td></tr>
+			<!-- <tr><td class="Basemaps" id='txdotLightGray'>TxDOT Light Gray</td></tr> -->
+			<!-- <tr><td class="Basemaps" id='txdotDarkGray'>TxDOT Dark Gray</td></tr> -->
 			<tr><td class="Basemaps" id='esriStreets'>Esri Streets</td></tr>
 			<tr><td class="Basemaps" id='openStreetMap'>Open Street Map</td></tr>
 			</table>
