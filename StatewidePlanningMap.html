@@ -456,6 +456,11 @@
 			display: none;
 		}
 
+		/* prevent AGOL sign in dialog */
+		.dijitDialogUnderlayWrapper, .dijitDialog {
+			display: none !important;
+		}
+
 		.esriLegendLayerLabel td {
 			display: none;
 			font-weight: bold;
@@ -891,6 +896,7 @@
 				createToolbar();
 				getBasemapLayers();
 				loadRoadwaysLyr();
+				serviceAlert();
 			});
 
 			on(dom.byId("HomeButton"), "click", function () {
@@ -1913,6 +1919,12 @@
 				layer0 = map.getLayer(map.layerIds[0]); //This should be the SPM Basemap layer
 				layer1 = map.getLayer(map.layerIds[1]); //This will be INRIX if present
 				document.getElementById("credits").innerHTML = credits;
+			}
+
+			function serviceAlert(){
+				if (serviceError == 1){
+					document.getElementById("credits").style.color = "red";
+				}
 			}
 
 			//Function to force IE8 to work, eventually this will not be needed.
