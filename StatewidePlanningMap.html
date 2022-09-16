@@ -456,10 +456,10 @@
 			display: none;
 		}
 
-		/* prevent AGOL sign in dialog */
-		.dijitDialogUnderlayWrapper, .dijitDialog {
+		/* prevent AGOL sign-in dialog */
+		/* .dijitDialogUnderlayWrapper, .dijitDialog {
 			display: none !important;
-		}
+		} */
 
 		.esriLegendLayerLabel td {
 			display: none;
@@ -1648,7 +1648,8 @@
 			sources.push({
 				featureLayer: new FeatureLayer(
 					"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_City_Boundaries/FeatureServer/0"
-				),
+					// "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/CRI_EDITS/FeatureServer"
+					),
 				searchFields: ["CITY_NM"],
 				displayField: "CITY_NM",
 				exactMatch: false,
