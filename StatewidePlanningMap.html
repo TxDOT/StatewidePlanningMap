@@ -591,6 +591,7 @@
 			COGLyr,
 			disadTractsLyr,
 			FCLyr,
+			FCPropLyr,
 			fcLastEditDate,
 			UZAlyr,
 			NatlFreightLyr,
@@ -3904,6 +3905,9 @@
 				if (FCLyr) {
 					UZALyr.hide();
 				}
+				if (FCPropLyr) {
+					FCPropLyr.hide();
+				}
 				if (NatlFreightLyr) {
 					NatlFreightLyr.hide();
 				}
@@ -5120,6 +5124,40 @@
 						);
 					}
 
+					if (activeOverlaysArray.indexOf("Functional_Classification_Prop") > -1) {
+						var pos = activeOverlaysArray.indexOf("Functional_Classification_Prop");
+						if (FCPropLyr) {
+							FCPropLyr.show();
+							map.reorderLayer(FCPropLyr, pos);
+						} 
+						else {
+							var tableText = makeTableFromArrayNoHeader([
+								["Route Name", "${RTE_NM}"],
+								["FC Description", "${PRPS_FC_DESC}"],
+								["Approval Date", "${APRV_DT}"]
+							]);
+							var infoTemplate = new InfoTemplate(
+								"Functional Classification (Proposed):",
+								tableText
+							);
+							var projectsUrl =
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/TxDOT_Proposed_Functional_Classification/FeatureServer/0";
+
+								FCPropLyr = new FeatureLayer(projectsUrl, {
+								id: "Functional Classification (Proposed)",
+								visible: true,
+								outFields: ["*"],
+								infoTemplate: infoTemplate,
+							});
+							map.addLayer(FCPropLyr);
+						}
+						activeOverlay = FCPropLyr;
+						layerInfo.push({
+							layer: FCPropLyr,
+							title: "Functional Classification (Proposed)",
+						});
+						map.infoWindow.resize(350);
+					}
 					if (activeOverlaysArray.indexOf("Natl_Freight_Network") > -1) {
 						var pos = activeOverlaysArray.indexOf("Natl_Freight_Network");
 						if (NatlFreightLyr) {
@@ -5309,7 +5347,7 @@
 							labelLayerAADT.addFeatureLayer(
 								aadtLyr,
 								label_renderer,
-								"{AADT_2021}"
+								"{AADT_LABEL}"
 							);
 							map.addLayer(labelLayerAADT);
 						}
@@ -7998,6 +8036,7 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
+			<li>Added new Proposed Functional Classification layer</li>
 			<li>Added TxDOT Basemap backup service</li>
 			<li>(v4.5.2) Added new Maintenance Section Boundaries layer</li>
 			<li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li>
@@ -8005,7 +8044,7 @@
 			<li>(v4.4.20) Updated Future Traffic popup notes</li>
 			<li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li>
 			<li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li>
-			<li>(v4.4.18) Added new Maintenance District Routes Layer</li>
+			<!-- <li>(v4.4.18) Added new Maintenance District Routes Layer</li> -->
 			<!-- <li>(v4.4.17) Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li> -->
 			<!-- <li>(v4.4.16) Updated text and link information</li> -->
 			<!-- <li>(v4.4.16) Added new EV Stations Study Areas to Alt Fuels - Electric Overlay</li> -->
@@ -8104,6 +8143,7 @@
 			<tr><td class="Overlay" id='Natl_Freight_Network'>Freight Network (FHWA)</td></tr>
 			<tr><td class="Overlay" id='TX_Freight_Network'>Freight Network (TxDOT)</td></tr>
 			<tr><td class="Overlay" id='Functional_Classification'>Functional Classification & Urban Areas</td></tr>
+			<tr><td class="Overlay" id='Functional_Classification_Prop'>Functional Classification (Proposed)</td></tr>
 			<tr><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
 			<tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>
 			<tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr> 
