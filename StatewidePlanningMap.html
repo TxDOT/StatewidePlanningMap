@@ -572,7 +572,7 @@
 			vectorURL = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer",
 			serviceError = 0,
 			txAccessToken,
-			appVersion = "4.5.3 Vector";
+			appVersion = "4.5.4 Big-Block";
 
 		//Route Event Variables
 		var dropbox,
@@ -4100,15 +4100,15 @@
 							map.reorderLayer(minuteOrderLyr, pos);
 						} else {
 							var tableText = makeTableFromArrayNoHeader([
-								["Route Name", "${RTE_NM}"],
-								["Control Section", "${CTRL_SECT}"],
+								["Route Name", "${RTE_NM}".toLowerCase()],
+								["Control Section", "${CTRL_SECT}".toLowerCase()],
 								[
 									"Minute Order Number",
-									"<a href='https://publicdocs.txdot.gov/Pages/Minute-Order-Search-Results.aspx#k=${MO_NBR}' target='_blank'>${MO_NBR}</a>",
+									"<a href='https://publicdocs.txdot.gov/Pages/Minute-Order-Search-Results.aspx#k=${MO_NBR}' target='_blank'>${MO_NBR}</a>".toLowerCase(),
 								],
-								["Approval Date", "${APRV_DT}"],
-								["Description", "${DSPN_DSCR}"],
-								["AASHTO Application", "${AASHTO_APPLN}"],
+								["Approval Date", "${APRV_DT}".toLowerCase()],
+								["Description", "${DSPN_DSCR}".toLowerCase()],
+								["AASHTO Application", "${AASHTO_APPLN}".toLowerCase()],
 							]);
 							var infoTemplate = new InfoTemplate(
 								"Highway Designations:",
@@ -4120,14 +4120,7 @@
 							minuteOrderLyr = new FeatureLayer(projectsUrl, {
 								id: "Minute Orders",
 								visible: true,
-								outFields: [
-									"RTE_NM",
-									"CTRL_SECT",
-									"MO_NBR",
-									"APRV_DT",
-									"DSPN_DSCR",
-									"AASHTO_APPLN",
-								],
+								outFields: ["*"],	
 								infoTemplate: infoTemplate,
 							});
 							map.addLayer(minuteOrderLyr);
@@ -7069,7 +7062,6 @@
 							var infoTemplate = new InfoTemplate("Bridge:", tableText);
 							var projectsUrl =
 								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Bridges/FeatureServer/0";
-
 							bridgeLyr = new FeatureLayer(projectsUrl, {
 								id: "Bridges",
 								visible: true,
@@ -7304,7 +7296,6 @@
 				var infoTemplate = new InfoTemplate("Bridge:", tableText);
 				var projectsBridgeUrl =
 					"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Bridges/FeatureServer/0";
-
 				bridgeLyr = new FeatureLayer(projectsBridgeUrl, {
 					id: "Bridges",
 					visible: false,
@@ -7336,7 +7327,6 @@
 				if (document.getElementById("radBridge").checked) {
 					bridgeLyr.setDefinitionExpression(theQuery);
 					noResults("queryResults", "Running Query.....");
-
 					bridgeLyr.selectFeatures(
 						theQuery,
 						FeatureLayer.SELECTION_NEW,
@@ -8035,14 +8025,15 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Added new Proposed Functional Classification layer</li>
-			<li>Added TxDOT Basemap backup service</li>
+			<li>Updated Highway Designations layer popup</li>
+			<li>(v4.5.3) Added new Proposed Functional Classification layer</li>
+			<li>(v4.5.3) Added TxDOT Basemap backup service</li>
 			<li>(v4.5.2) Added new Maintenance Section Boundaries layer</li>
 			<li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li>
 			<li>(v4.5.0) Added custom printing and data download tools</li>
 			<li>(v4.4.20) Updated Future Traffic popup notes</li>
 			<li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li>
-			<li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li>
+			<!-- <li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li> -->
 			<!-- <li>(v4.4.18) Added new Maintenance District Routes Layer</li> -->
 			<!-- <li>(v4.4.17) Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li> -->
 			<!-- <li>(v4.4.16) Updated text and link information</li> -->
