@@ -572,7 +572,7 @@
 			vectorURL = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer",
 			serviceError = 0,
 			txAccessToken,
-			appVersion = "4.5.4 Big-Block";
+			appVersion = "4.5.5 Rancher";
 
 		//Route Event Variables
 		var dropbox,
@@ -3394,7 +3394,7 @@
 				}
 				if (newMap == "esriStreets") {
 					esriStreets = new VectorTileLayer(
-						"https://www.arcgis.com/sharing/rest/content/items/a60a37a27cc140ddad15f919cd5a69f2/resources/styles/root.json?f=pjson"
+						"https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer"
 					);
 					map.addLayer(esriStreets);
 					document.getElementById("credits").innerHTML = "Esri";
@@ -8025,14 +8025,15 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Updated Highway Designations layer popup</li>
+			<li> Updated Esri Streets basemap source</li>
+			<li>(v4.5.4) Updated Highway Designations layer popup</li>
 			<li>(v4.5.3) Added new Proposed Functional Classification layer</li>
 			<li>(v4.5.3) Added TxDOT Basemap backup service</li>
 			<li>(v4.5.2) Added new Maintenance Section Boundaries layer</li>
 			<li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li>
 			<li>(v4.5.0) Added custom printing and data download tools</li>
 			<li>(v4.4.20) Updated Future Traffic popup notes</li>
-			<li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li>
+			<!-- <li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li> -->
 			<!-- <li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li> -->
 			<!-- <li>(v4.4.18) Added new Maintenance District Routes Layer</li> -->
 			<!-- <li>(v4.4.17) Added new Planned Fast Charge Stations to Alt Fuels - Electric Overlay</li> -->
