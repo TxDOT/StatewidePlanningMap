@@ -457,9 +457,9 @@
 		}
 
 		/* prevent AGOL sign-in dialog */
-		/* .dijitDialogUnderlayWrapper, .dijitDialog {
+		.dijitDialogUnderlayWrapper, .dijitDialog {
 			display: none !important;
-		} */
+		}
 
 		.esriLegendLayerLabel td {
 			display: none;
@@ -572,7 +572,7 @@
 			vectorURL = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer",
 			serviceError = 0,
 			txAccessToken,
-			appVersion = "4.5.5 Rancher";
+			appVersion = "4.5.6 Ferrari";
 
 		//Route Event Variables
 		var dropbox,
@@ -8025,14 +8025,15 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li> Updated Esri Streets basemap source</li>
+			<li>Updated links in LRS and Query tabs; error handling for Esri popup</li>
+			<li>(v4.5.5) Updated Esri Streets basemap source</li>
 			<li>(v4.5.4) Updated Highway Designations layer popup</li>
 			<li>(v4.5.3) Added new Proposed Functional Classification layer</li>
 			<li>(v4.5.3) Added TxDOT Basemap backup service</li>
 			<li>(v4.5.2) Added new Maintenance Section Boundaries layer</li>
 			<li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li>
-			<li>(v4.5.0) Added custom printing and data download tools</li>
-			<li>(v4.4.20) Updated Future Traffic popup notes</li>
+			<!-- <li>(v4.5.0) Added custom printing and data download tools</li>
+			<li>(v4.4.20) Updated Future Traffic popup notes</li> -->
 			<!-- <li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li> -->
 			<!-- <li>(v4.4.19) Optimized TxDOT Roadways layer (unsegmented geometry)</li> -->
 			<!-- <li>(v4.4.18) Added new Maintenance District Routes Layer</li> -->
@@ -8196,7 +8197,7 @@
 				<br>
 		<a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/296c473f466e44dba31ad3edf2700af6/data' target='_blank' id="refBridge" style="display:none;">Bridge Coding Guide</a>
 		<a href='https://txdot.maps.arcgis.com/sharing/rest/content/items/e9d8d0e3a9794be19be6ecaf5a24c176/data' target='_blank' id="refBridgeDD" style="display:none;">Bridge Data Dictionary</a>
-		<a href="https://gis-txdot.opendata.arcgis.com/datasets/txdot-roadway-inventory-specifications-2020" target="_blank" id="refRoadway">Roadway Data Dictionary</a>
+		<a href="https://gis-txdot.opendata.arcgis.com/datasets/txdot-roadway-inventory-specifications-2021" target="_blank" id="refRoadway">Roadway Data Dictionary</a>
 		<br>
 		<br>
 				<input type="radio" id="radBridge" name="dataType" value="bridge" title="Select Bridge Data">
@@ -8321,13 +8322,13 @@
 			Click on a route in the map to populate the table and calculate the following:
 			<br>
 			<br>
-			<a href="https://www.arcgis.com/home/item.html?id=8d65f4b0455a4be0b4d1de759678209c" target="_blank">Control Section Milepoint</a>
+			<a href="https://www.arcgis.com/home/item.html?id=21cdcfaf95d644ec83d5878696937713" target="_blank">Control Section Milepoint</a>
 			<br>
 			<br>
 			<a href="https://www.arcgis.com/home/item.html?id=fe58a88d6196446981017fe161f4b1fd" target="_blank">Reference Marker Offset</a>
 			<br>
 			<br>
-			<a href="https://www.arcgis.com/home/item.html?id=d4f7206d27af4358acb70cb1cc819d10" target="_blank">Distance from Origin</a>
+			<a href="https://www.arcgis.com/home/item.html?id=008906d83772435bb757cb76c9644e5d" target="_blank">Distance from Origin</a>
 			<br>
 			<br>Latitude/Longitude
 			<br>
