@@ -589,6 +589,7 @@
 			labelLayerAADT,
 			areaOfficeLyr,
 			COGLyr,
+			contourLyr,
 			disadTractsLyr,
 			FCLyr,
 			FCPropLyr,
@@ -3960,6 +3961,9 @@
 				if (speedLimitLyr) {
 					speedLimitLyr.hide();
 				}
+				if (contourLyr) {
+					contourLyr.hide();
+				}
 				if (StateSenateLyr) {
 					StateSenateLyr.hide();
 				}
@@ -4167,6 +4171,28 @@
 						activeOverlay = speedLimitLyr;
 						layerInfo.push({ layer: speedLimitLyr, title: "Speed Limits" });
 					}
+
+					if (activeOverlaysArray.indexOf("Contours") > -1) {
+						var pos = activeOverlaysArray.indexOf("Contours");
+						// if (contourLyr) {
+						// 	contourLyr.show();
+							// map.reorderLayer(contourLyr, pos);
+						// 	console.log(pos)
+						// 	console.log(activeOverlaysArray)
+						// } 
+						// else {
+							
+							var projectsUrl =
+								"https://basemaps.arcgis.com/arcgis/rest/services/World_Contours_v2/VectorTileServer";
+
+							contourLyr = new VectorTileLayer(projectsUrl)
+							map.addLayer(contourLyr);
+							console.log(pos)
+						}
+						activeOverlay = contourLyr;
+						console.log(activeOverlaysArray)
+						layerInfo.push({ layer: contourLyr, title: "Contours" });
+					// }
 
 					if (activeOverlaysArray.indexOf("Construction_Scheduled") > -1) {
 						var pos = activeOverlaysArray.indexOf("Construction_Scheduled");
@@ -8125,6 +8151,7 @@
 			<tr><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 			<tr><td class="Overlay" id='Bridges'>Bridges</td></tr>
 			<tr><td class="Overlay" id='Cemetery'>Cemeteries</td></tr>
+			<tr><td class="Overlay" id='Contours'>Contours</td></tr>
 			<tr><td class="Overlay" id='Control_Section'>Control Sections</td></tr>
 			<tr><td class="Overlay" id='COG'>Councils of Governments (COG)</td></tr>
 			<tr><td class="Overlay" id='Connectivitiy_Corridors'>Connectivity Corridors</td></tr>
