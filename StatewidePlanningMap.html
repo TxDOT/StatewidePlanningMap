@@ -572,7 +572,7 @@
 			vectorURL = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer",
 			serviceError = 0,
 			txAccessToken,
-			appVersion = "4.5.6 Ferrari";
+			appVersion = "4.5.7 General Purpose";
 
 		//Route Event Variables
 		var dropbox,
@@ -651,6 +651,7 @@
 			curCongLyr,
 			futCongLyr,
 			facLyr,
+			futIHLyr,
 			bridgeLyr,
 			connCorrLyr,
 			MAP21Lyr,
@@ -2118,19 +2119,33 @@
 							para.appendChild(text);
 							document.getElementById("legendNotesDiv").style.display =
 								"block";
-						} else if (name == "Bicycle_Trails") {
+						}  else if (name == "TxDOT_Future_Interstates") {
+							
 							var text = document.createTextNode(
-								"From January 2017 to July 2018, TxDOT's Bicycle Tourism Trails Study examined the potential for a statewide network of long-distance bicycle routes to accommodate tourism and local needs. This feature class shows the Example Network segments, which may indicate future demand for long distance and local bicycling. Example Network routes represent an application of the qualitative and quantitative criteria established as part of the study. A more thorough analysis of local conditions and extensive stakeholder engagement is needed to advance development of any route."
+								`There are three congressionally designated high priority corridors as future interstates in Texas. They include:`
 							);
+							var bullet1 = document.createElement("p");
+							bullet1.innerText = `69 (I-69) System is part of ISTEA (Intermodal Surface Transportation Efficiency Act) of 1991.`
+
+							var bullet2 = document.createElement("p");
+							bullet2.innerText=  `14 (I-14) System from Texas to Georgia designated with the signing of the Infrastructure Investment and Jobs Act (IIJA) in November 2021.`
+							
+							var bullet3= document.createElement("p");
+							bullet3.innerText =  `Ports to Plains (P2P) System from the Texas/Mexico border to New Mexico, designated in the March Fiscal Year 2022 Omnibus.`
+
 							para.appendChild(text);
+							para.appendChild(bullet1);
+							para.appendChild(bullet2);
+							para.appendChild(bullet3);
 							var linkText = document.createTextNode(
-								"For more information, please consult TxDOT's Bicycle Tourism Trails Study Final Report"
+								"More Information"
 							);
 							link.appendChild(linkText);
 							link.href =
-								"https://www.txdot.gov/inside-txdot/modes-of-travel/bicycle/plan-design/tourism-study.html";
+								"https://txdot.maps.arcgis.com/home/item.html?id=0c8a79f7488545f281e532b63b83ef20";
 							document.getElementById("legendNotesDiv").style.display =
 								"block";
+								
 						} else if (name == "INRIX_Traffic") {
 							// Create legend using html5 canvas
 							var text = document.createTextNode(
@@ -4035,6 +4050,9 @@
 				}
 				if (facLyr) {
 					facLyr.hide();
+				}
+				if (futIHLyr) {
+					futIHLyr.hide();
 				}
 				if (bridgeLyr) {
 					bridgeLyr.hide();
@@ -7015,6 +7033,42 @@
 						layerInfo.push({ layer: facLyr, title: "TxDOT Facilities" });
 					}
 
+					if (activeOverlaysArray.indexOf("TxDOT_Future_Interstates") > -1) {
+						var pos = activeOverlaysArray.indexOf("TxDOT_Future_Interstates");
+						if (futIHLyr) {
+							futIHLyr.show();
+							map.reorderLayer(futIHLyr, pos);
+						} else {
+							var tableText = makeTableFromArrayNoHeader([
+								["Route Name", "${ROUTE_NM}"],
+								["Status", "${STAT}"],
+								["System", "${SYS}"],
+								["Description", "${DESC_}"],
+								["Legislation", "${LEGIS}"],
+								["Link", "<a href=${LINK} target=_blank>Link</a>"],
+								//<a href='https://publicdocs.txdot.gov/Pages/Minute-Order-Search-Results.aspx#k=${MO_NBR}' target='_blank'>${MO_NBR}</a>"
+							]);
+							var infoTemplate = new InfoTemplate(
+								"TxDOT Future Interstates:",
+								tableText
+							);
+							var projectsUrl =
+								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Future_Interstates/FeatureServer/18";
+
+							futIHLyr = new FeatureLayer(projectsUrl, {
+								id: "TxDOT_Future_Interstates",
+								visible: true,
+								outFields: ["*"],
+								infoTemplate: infoTemplate,
+							});
+							map.addLayer(futIHLyr);
+							console.log(futIHLyr)
+							// map.infoWindow.resize(300, 460);
+						}
+						activeOverlay = futIHLyr;
+						layerInfo.push({ layer: futIHLyr, title: "TxDOT Future Interstates" });
+					}
+
 					if (activeOverlaysArray.indexOf("Bridges") > -1) {
 						var pos = activeOverlaysArray.indexOf("Bridges");
 						if (bridgeLyr) {
@@ -8025,7 +8079,8 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Updated links in LRS and Query tabs; error handling for Esri popup</li>
+			<li>Added new TxDOT Future Interstates layer</li>
+			<li>(v4.5.6) Updated links in LRS and Query tabs; error handling for Esri popup</li>
 			<li>(v4.5.5) Updated Esri Streets basemap source</li>
 			<li>(v4.5.4) Updated Highway Designations layer popup</li>
 			<li>(v4.5.3) Added new Proposed Functional Classification layer</li>
@@ -8168,6 +8223,7 @@
 			<tr><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
 			<tr><td class="Overlay" id='Bicycle_Trails'>TxDOT Bicycle Tourism Example Network</td></tr>
 			<tr><td class="Overlay" id='TxDOT_Facilities'>TxDOT Facilities</td></tr>
+			<tr><td class="Overlay" id='TxDOT_Future_Interstates'>TxDOT Future Interstates</td></tr>
 			<tr><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>
 			<tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>
 			</table>			
