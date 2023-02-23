@@ -2119,7 +2119,7 @@
 							para.appendChild(text);
 							document.getElementById("legendNotesDiv").style.display =
 								"block";
-						}  else if (name == "TxDOT_Future_Interstates") {
+						}  else if (name == "Future_Interstates") {
 							
 							var text = document.createTextNode(
 								`There are three congressionally designated high priority corridors as future interstates in Texas. They include:`
@@ -7033,8 +7033,8 @@
 						layerInfo.push({ layer: facLyr, title: "TxDOT Facilities" });
 					}
 
-					if (activeOverlaysArray.indexOf("TxDOT_Future_Interstates") > -1) {
-						var pos = activeOverlaysArray.indexOf("TxDOT_Future_Interstates");
+					if (activeOverlaysArray.indexOf("Future_Interstates") > -1) {
+						var pos = activeOverlaysArray.indexOf("Future_Interstates");
 						if (futIHLyr) {
 							futIHLyr.show();
 							map.reorderLayer(futIHLyr, pos);
@@ -7048,14 +7048,14 @@
 								["Link", "<a href=${LINK} target=_blank>Link</a>"],
 							]);
 							var infoTemplate = new InfoTemplate(
-								"TxDOT Future Interstates:",
+								"Future Interstates:",
 								tableText
 							);
 							var projectsUrl =
 								"https://services.arcgis.com/KTcxiTD9dsQw4r7Z/arcgis/rest/services/Future_Interstates/FeatureServer/0";
 
 							futIHLyr = new FeatureLayer(projectsUrl, {
-								id: "TxDOT_Future_Interstates",
+								id: "Future_Interstates",
 								visible: true,
 								outFields: ["*"],
 								infoTemplate: infoTemplate,
@@ -7064,7 +7064,7 @@
 							// map.infoWindow.resize(300, 460);
 						}
 						activeOverlay = futIHLyr;
-						layerInfo.push({ layer: futIHLyr, title: "TxDOT Future Interstates" });
+						layerInfo.push({ layer: futIHLyr, title: "Future Interstates" });
 					}
 
 					if (activeOverlaysArray.indexOf("Bridges") > -1) {
@@ -8189,6 +8189,7 @@
 			<tr><td class="Overlay" id='TX_Freight_Network'>Freight Network (TxDOT)</td></tr>
 			<tr><td class="Overlay" id='Functional_Classification'>Functional Classification & Urban Areas</td></tr>
 			<tr><td class="Overlay" id='Functional_Classification_Prop'>Functional Classification (Proposed)</td></tr>
+			<tr><td class="Overlay" id='Future_Interstates'>TxDOT Future Interstates</td></tr>
 			<tr><td class="Overlay" id='Future_Traffic'>Future Traffic & Percent Truck</td></tr>
 			<tr><td class="Overlay" id='Minute_Orders'>Highway Designations</td></tr>
 			<tr><td class="Overlay" id='Hurricane_Evac'>Hurricane Evacuation Routes</td></tr> 
@@ -8221,7 +8222,6 @@
 			<tr><td class="Overlay" id='Top_100'>Top 100 Congested Roadways</td></tr>
 			<tr><td class="Overlay" id='Bicycle_Trails'>TxDOT Bicycle Tourism Example Network</td></tr>
 			<tr><td class="Overlay" id='TxDOT_Facilities'>TxDOT Facilities</td></tr>
-			<tr><td class="Overlay" id='TxDOT_Future_Interstates'>TxDOT Future Interstates</td></tr>
 			<tr><td class="Overlay" id='US_House_Districts'>US House Districts</td></tr>
 			<tr><td class="Overlay" id='Vertical_Clearance'>Vertical Clearance</td></tr>
 			</table>			
