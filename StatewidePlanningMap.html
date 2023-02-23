@@ -7046,7 +7046,6 @@
 								["Description", "${DESC_}"],
 								["Legislation", "${LEGIS}"],
 								["Link", "<a href=${LINK} target=_blank>Link</a>"],
-								//<a href='https://publicdocs.txdot.gov/Pages/Minute-Order-Search-Results.aspx#k=${MO_NBR}' target='_blank'>${MO_NBR}</a>"
 							]);
 							var infoTemplate = new InfoTemplate(
 								"TxDOT Future Interstates:",
@@ -7062,7 +7061,6 @@
 								infoTemplate: infoTemplate,
 							});
 							map.addLayer(futIHLyr);
-							console.log(futIHLyr)
 							// map.infoWindow.resize(300, 460);
 						}
 						activeOverlay = futIHLyr;
