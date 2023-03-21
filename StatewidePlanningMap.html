@@ -572,7 +572,7 @@
 			vectorURL = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer",
 			serviceError = 0,
 			txAccessToken,
-			appVersion = "4.5.7 General Purpose";
+			appVersion = "4.5.8 Oregon Trail";
 
 		//Route Event Variables
 		var dropbox,
@@ -1981,7 +1981,7 @@
 							);
 							link.appendChild(linkText);
 							link.href =
-								"https://www.dot.state.tx.us/move-texas-freight/";
+								"https://www.txdot.gov/projects/planning/freight-planning.html";
 							document.getElementById("legendNotesDiv").style.display =
 								"block";
 						} else if (name == "Functional_Classification") {
@@ -5175,7 +5175,7 @@
 							map.reorderLayer(NatlFreightLyr, pos);
 						} else {
 							var tableText = makeTableFromArrayNoHeader([
-								["Route Name", "${RTE_RB_NM}"],
+								["Route Name", "${RTE_NM}"],
 							]);
 							var infoTemplate = new InfoTemplate(
 								"National Highway Freight Network:",
@@ -5187,7 +5187,7 @@
 							NatlFreightLyr = new FeatureLayer(projectsUrl, {
 								id: "National Highway Freight Network",
 								visible: true,
-								outFields: ["RTE_RB_NM", "NATL_FRT"],
+								outFields: ["*"],
 								infoTemplate: infoTemplate,
 							});
 							map.addLayer(NatlFreightLyr);
@@ -5210,7 +5210,7 @@
 								["Route Name", "${RTE_NM}"],
 							]);
 							var infoTemplate = new InfoTemplate(
-								"Freight Network:",
+								"Texas Freight Network:",
 								tableText
 							);
 							var projectsUrl =
@@ -8077,14 +8077,15 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Added new Future Interstates layer</li>
+			<li>Updated FHWA and TxDOT Freight Network layer names and popup</li>
+			<li>(v4.5.7) Added new Future Interstates layer</li>
 			<li>(v4.5.6) Updated links in LRS and Query tabs; error handling for Esri popup</li>
 			<li>(v4.5.5) Updated Esri Streets basemap source</li>
 			<li>(v4.5.4) Updated Highway Designations layer popup</li>
 			<li>(v4.5.3) Added new Proposed Functional Classification layer</li>
 			<li>(v4.5.3) Added TxDOT Basemap backup service</li>
 			<li>(v4.5.2) Added new Maintenance Section Boundaries layer</li>
-			<li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li>
+			<!-- <li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li> -->
 			<!-- <li>(v4.5.0) Added custom printing and data download tools</li>
 			<li>(v4.4.20) Updated Future Traffic popup notes</li> -->
 			<!-- <li>(v4.4.20) Updated AADT labels to reflect 2021 counts</li> -->
@@ -8185,8 +8186,6 @@
 			<tr><td class="Overlay" id='Future_Congestion'>Congestion (Forecast Year)</td></tr>
 			<tr><td class="Overlay" id='Disadvanted_Tracts'>Disadvantaged Census Tracts</td></tr>
 			<tr><td class="Overlay" id='Energy_Sector'>Energy Sector Corridors</td></tr>
-			<tr><td class="Overlay" id='Natl_Freight_Network'>Freight Network (FHWA)</td></tr>
-			<tr><td class="Overlay" id='TX_Freight_Network'>Freight Network (TxDOT)</td></tr>
 			<tr><td class="Overlay" id='Functional_Classification'>Functional Classification & Urban Areas</td></tr>
 			<tr><td class="Overlay" id='Functional_Classification_Prop'>Functional Classification (Proposed)</td></tr>
 			<tr><td class="Overlay" id='Future_Interstates'>Future Interstates</td></tr>
@@ -8199,6 +8198,7 @@
 			<tr><td class="Overlay" id='Maintenance_Section_Routes'>Maintenance Section Routes</td></tr>
 			<tr><td class="Overlay" id='Memorial_Highway'>Memorial Highways</td></tr>
 			<tr><td class="Overlay" id='MPO'>Metropolitan Planning Organizations (MPO)</td></tr>
+			<tr><td class="Overlay" id='Natl_Freight_Network'>National Highway Freight Network (FHWA)</td></tr>
 			<tr><td class="Overlay" id='NHS'>National Highway System</td></tr>
 			<!-- <tr><td class="Overlay" id='Pavement_Conditions'>Pavement Conditions</td></tr> -->
 			<tr><td class="Overlay" id='Permanent_Stations'>Permanent Count Stations</td></tr>
@@ -8216,6 +8216,7 @@
 			<tr><td class="Overlay" id='State_House_Districts'>State House Districts</td></tr>
 			<tr><td class="Overlay" id='State_Senate_Districts'>State Senate Districts</td></tr>
 			<tr><td class="Overlay" id='STRAHNET'>Strategic Highway Network (STRAHNET)</td></tr>
+			<tr><td class="Overlay" id='TX_Freight_Network'>Texas Highway Freight Network (TxDOT)</td></tr>
 			<tr><td class="Overlay" id='Texas_Trunk'>Texas Trunk System & Urban Areas</td></tr>
 			<tr><td class="Overlay" id='Tolls'>Tolls</td></tr>
 			<tr><td class="Overlay" id='Future_Tolls'>Tolls (Future & Proposed)</td></tr>
