@@ -634,6 +634,7 @@
 			tollLyr,
 			futTollLyr,
 			hurrEvacLyr,
+			borderCrossLyr,
 			altFuelCorrEvLyr,
 			altFuelCorrStationEvLyr,
 			altFuelCorrStudyEvLyr,
@@ -4036,6 +4037,9 @@
 				if (hurrEvacLyr) {
 					hurrEvacLyr.hide();
 				}
+				if(borderCrossLyr){
+					borderCrossLyr.hide()
+				}
 				if (inrixTrafficLyr) {
 					inrixTrafficLyr.hide();
 				}
@@ -6293,7 +6297,57 @@
 						activeOverlay = memorialHighwayLyr;
 					}
 
-					if (activeOverlaysArray.indexOf("Hurricane_Evac") > -1) {
+					if(activeOverlaysArray.indexOf("Border_Cross") > -1){//DJP MEOW
+						
+						var pos = activeOverlaysArray.indexOf("Border_Cross");
+						if(borderCrossLyr){
+							borderCrossLyr.show()
+							map.reorderLayer(borderCrossLyr, pos)
+						}
+						else{
+							var tableText = makeTableFromArrayNoHeader([
+								["Crossing Name", "${XING_NM}"],
+								["Owner", "${OWNER}"],
+								["Operator", "${OPRTR}"],
+								["Jurisdiction", "${JURIS_TYPE}"],
+								["Pedestrian", "${PED}"],
+								["Commercial", "${VEH_COML}"],
+								["Car", "${VEH_CAR}"],
+								["Rail Bridge", "${RR_BRDGE}"],
+								["Toll", "${TOLL_BRDGE}"],
+								["Street Address", "${ST_ADDR}"],
+								["Texas House District", "${TX_STATE_HOUSE}"],
+								["Texas Senate District", "${TX_STATE_SEN}"],
+								["Congressional District", "${CONGL_DIST}"],
+								["Hours of Operation", "${OPR_HRS}"],
+								["Toll Fee", "${TOLL_FEE}"],
+								["Website", "${URL}"]
+							])
+							
+							var infoTemplate = new InfoTemplate(
+								"Border Crossings:",
+								tableText
+							)
+							var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/TxDOT_Border_Crossings/FeatureServer/0"
+							
+							borderCrossLyr = new FeatureLayer(projectsUrl, {
+								id: "Border_Cross",
+								visible: true,
+								outFields: ["*"],
+								infoTemplate: infoTemplate
+							})
+							console.log(borderCrossLyr)
+							map.addLayer(borderCrossLyr)
+						}
+						activeOverlay = borderCrossLyr;
+						layerInfo.push({
+							layer: borderCrossLyr,
+							title: "Border Crossing",
+						});
+
+					}
+
+					if (activeOverlaysArray.indexOf("Hurricane_Evac") > -1) { 
 						var pos = activeOverlaysArray.indexOf("Hurricane_Evac");
 						if (hurrEvacLyr) {
 							hurrEvacLyr.show();
@@ -8179,6 +8233,7 @@
 			<tr><td class="Overlay" id='Alt_Fuel_Corridor_LPG'>Alt Fuels - Propane</td></tr>
 			<tr><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 			<tr><td class="Overlay" id='Bridges'>Bridges</td></tr>
+			<tr><td class="Overlay" id='Border_Cross'>Border Crossing</td></tr>
 			<tr><td class="Overlay" id='Cemetery'>Cemeteries</td></tr>
 			<tr><td class="Overlay" id='Control_Section'>Control Sections</td></tr>
 			<tr><td class="Overlay" id='COG'>Councils of Governments (COG)</td></tr>
