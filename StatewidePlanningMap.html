@@ -572,7 +572,7 @@
 			vectorURL = "https://tiles.arcgis.com/tiles/KTcxiTD9dsQw4r7Z/arcgis/rest/services/TxDOT_Vector_Tile_Basemap/VectorTileServer",
 			serviceError = 0,
 			txAccessToken,
-			appVersion = "4.5.8 Oregon Trail";
+			appVersion = "4.5.9 Mustang Island";
 
 		//Route Event Variables
 		var dropbox,
@@ -6338,6 +6338,7 @@
 							})
 							console.log(borderCrossLyr)
 							map.addLayer(borderCrossLyr)
+							map.infoWindow.resize(350, 350);
 						}
 						activeOverlay = borderCrossLyr;
 						layerInfo.push({
@@ -8132,14 +8133,15 @@
 		<h1><strong>RELEASE NOTES</strong></h1>
 		<p3 id="version"></p3>
 		<ul>
-			<li>Updated FHWA and TxDOT Freight Network layer names and popup</li>
+			<li>Added new Border Crossings Layer</li>
+			<li>(v4.5.8) Updated FHWA and TxDOT Freight Network layer names and popup</li>
 			<li>(v4.5.7) Added new Future Interstates layer</li>
 			<li>(v4.5.6) Updated links in LRS and Query tabs; error handling for Esri popup</li>
 			<li>(v4.5.5) Updated Esri Streets basemap source</li>
 			<li>(v4.5.4) Updated Highway Designations layer popup</li>
 			<li>(v4.5.3) Added new Proposed Functional Classification layer</li>
 			<li>(v4.5.3) Added TxDOT Basemap backup service</li>
-			<li>(v4.5.2) Added new Maintenance Section Boundaries layer</li>
+			<!-- <li>(v4.5.2) Added new Maintenance Section Boundaries layer</li> -->
 			<!-- <li>(v4.5.1) Added new Disadvantaged Census Tracts layer</li> -->
 			<!-- <li>(v4.5.0) Added custom printing and data download tools</li>
 			<li>(v4.4.20) Updated Future Traffic popup notes</li> -->
@@ -8233,7 +8235,7 @@
 			<tr><td class="Overlay" id='Alt_Fuel_Corridor_LPG'>Alt Fuels - Propane</td></tr>
 			<tr><td class="Overlay" id='Area_Offices'>Area Offices</td></tr>
 			<tr><td class="Overlay" id='Bridges'>Bridges</td></tr>
-			<tr><td class="Overlay" id='Border_Cross'>Border Crossing</td></tr>
+			<tr><td class="Overlay" id='Border_Cross'>Border Crossings</td></tr>
 			<tr><td class="Overlay" id='Cemetery'>Cemeteries</td></tr>
 			<tr><td class="Overlay" id='Control_Section'>Control Sections</td></tr>
 			<tr><td class="Overlay" id='COG'>Councils of Governments (COG)</td></tr>
