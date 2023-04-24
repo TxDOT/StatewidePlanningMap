@@ -6334,10 +6334,11 @@
 								getTextContent
 							)
 							let borderSymbol = new SimpleMarkerSymbol()
-							borderSymbol.color = new Color([34,139,34,.5])
+							borderSymbol.color = new Color([34,139,34])
 							borderSymbol.style = SimpleMarkerSymbol.STYLE_TRIANGLE
+							borderSymbol.size = 12;
+							borderSymbol.outline = new SimpleLineSymbol().setWidth(0)
 							let borderRender =  new SimpleRenderer(borderSymbol)
-							console.log(borderSymbol)
 							
 							var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/TxDOT_Border_Crossings/FeatureServer/0"
 							
