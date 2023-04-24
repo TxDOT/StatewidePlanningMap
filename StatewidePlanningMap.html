@@ -6305,29 +6305,40 @@
 							map.reorderLayer(borderCrossLyr, pos)
 						}
 						else{
-							var tableText = makeTableFromArrayNoHeader([
-								["Crossing Name", "${XING_NM}"],
-								["Owner", "${OWNER}"],
-								["Operator", "${OPRTR}"],
-								["Jurisdiction", "${JURIS_TYPE}"],
-								["Pedestrian", "${PED}"],
-								["Commercial", "${VEH_COML}"],
-								["Car", "${VEH_CAR}"],
-								["Rail Bridge", "${RR_BRDGE}"],
-								["Toll", "${TOLL_BRDGE}"],
-								["Street Address", "${ST_ADDR}"],
-								["Texas House District", "${TX_STATE_HOUSE}"],
-								["Texas Senate District", "${TX_STATE_SEN}"],
-								["Congressional District", "${CONGL_DIST}"],
-								["Hours of Operation", "${OPR_HRS}"],
-								["Toll Fee", "${TOLL_FEE}"],
-								["Website", "${URL}"]
-							])
+							function getTextContent(graphic){
+								console.log(graphic)
+								var tableText = makeTableFromArrayNoHeader([
+									["Crossing Name", graphic.attributes.XING_NM],
+									["Owner", graphic.attributes.OWNER],
+									["Operator", graphic.attributes.OPRTR],
+									["Jurisdiction", graphic.attributes.JURIS_TYPE],
+									["Pedestrian", graphic.attributes.PED === 1 ? "Yes" : "No"],
+									["Commercial", graphic.attributes.VEH_COML === 1 ? "Yes" : "No"],
+									["Car", graphic.attributes.VEH_CAR === 1 ? "Yes" : "No"],
+									["Rail Bridge", graphic.attributes.RR_BRDGE === 1 ? "Yes" : "No"],
+									["Toll", graphic.attributes.TOLL_BRDGE === 1 ? "Yes" : "No"],
+									["Street Address", graphic.attributes.ST_ADDR],
+									["Texas House District", graphic.attributes.TX_STATE_HOUSE],
+									["Texas Senate District", graphic.attributes.TX_STATE_SEN],
+									["Congressional District", graphic.attributes.CONGL_DIST],
+									["Hours of Operation", graphic.attributes.OPR_HRS],
+									["Toll Fee", graphic.attributes.TOLL_FEE],
+									["Website", graphic.attributes.URL]
+								])
+								return tableText
+							}
+
 							
 							var infoTemplate = new InfoTemplate(
 								"Border Crossings:",
-								tableText
+								getTextContent
 							)
+							let borderSymbol = new SimpleMarkerSymbol()
+							borderSymbol.color = new Color([34,139,34,.5])
+							borderSymbol.style = SimpleMarkerSymbol.STYLE_TRIANGLE
+							let borderRender =  new SimpleRenderer(borderSymbol)
+							console.log(borderSymbol)
+							
 							var projectsUrl = "https://services.arcgis.com/KTcxiTD9dsQw4r7Z/ArcGIS/rest/services/TxDOT_Border_Crossings/FeatureServer/0"
 							
 							borderCrossLyr = new FeatureLayer(projectsUrl, {
@@ -6336,16 +6347,21 @@
 								outFields: ["*"],
 								infoTemplate: infoTemplate
 							})
-							console.log(borderCrossLyr)
+
+							borderCrossLyr.setRenderer(borderRender)
+
+		
 							map.addLayer(borderCrossLyr)
 							map.infoWindow.resize(350, 350);
+							
 						}
 						activeOverlay = borderCrossLyr;
+						
 						layerInfo.push({
 							layer: borderCrossLyr,
 							title: "Border Crossing",
 						});
-
+						
 					}
 
 					if (activeOverlaysArray.indexOf("Hurricane_Evac") > -1) { 
@@ -7971,9 +7987,12 @@
 					"<table border=1 cellspacing=0 cellpadding=3 style='font-size:small'>";
 				for (var i = 0; i < dataArray.length; i++) {
 					result += "<tr>";
-					for (var j = 0; j < dataArray[i].length; j++) {
-						result += "<td>" + dataArray[i][j] + "</td>";
-					}
+					result += `<td>${dataArray[i][0]}</td>`
+					result += dataArray[i][0] === 'Website' ?`<td><a href="${dataArray[i][1]}" target="_blank">${dataArray[i][1]}</a></td>` : `<td>${dataArray[i][1]}</td>`
+					// for (var j = 0; j < dataArray[i].length; j++) {
+						
+					// 	result += "<td>" + dataArray[i][j] + "</td>";
+					// }
 					result += "</tr>";
 				}
 				result += "</table>";
