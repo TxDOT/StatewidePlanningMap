@@ -540,6 +540,7 @@
 	<script>
 		//Map and measure variables
 		var map,
+			newMap,
 			osmLayer,
 			projectsRI,
 			esri,
@@ -824,18 +825,49 @@
 			
 
 			//IF THERE ARE URL PARAMS, CENTER AND ZOOM
-			var urlObject = esri.urlToObject(document.location.href);
-			if (urlObject.query && urlObject.query.coords && urlObject.query.z) {
-				var coords = urlObject.query.coords.split(",");
+			
+			
+			// if (urlObject.query && urlObject.query.coords && urlObject.query.z) {
+			// 	var coords = urlObject.query.coords.split(",");
+			// 	var lat = parseFloat(coords[0]);
+			// 	var long = parseFloat(coords[1]);
+			// 	var z = parseInt(urlObject.query.z);
+			// 	var point = esri.geometry.geographicToWebMercator(
+			// 		new esri.geometry.Point(long, lat)
+			// 	);
+			// 	map.centerAndZoom(point, z);
+			// }
+			function urlQuery(){
+				var urlObject = esri.urlToObject(document.location.href);
+				if(!urlObject.query) return;
+				if(urlObject.query.activelayers){
+					let activeLayers = urlObject.query.activelayers.split(",") ? urlObject.query.activelayers.split(",") : urlObject.query.activelayers
+					let getTr = document.querySelectorAll("tr")
+					let copyTr = [...getTr]
+					activeLayers.forEach((x) => {
+						let idArr = copyTr.find((z) => z.textContent === x).lastElementChild.attributes.id.nodeValue
+						//loadRoadwaysLyr()
+						changeOverlay({target: {id: idArr}})
+					})
+				}
+
+				let basemapQuery = urlObject.query.basemap
+				basemapQuery === 'TxDOT' ? document.getElementById(`${basemapQuery}`).style.color = "black" : null
+				changeBaseMap(({target: {id: basemapQuery}}))
+				
+				document.getElementById(`${basemapQuery}`).style.color = "red"
+				var coords = urlObject.query.coords.split(",")
 				var lat = parseFloat(coords[0]);
 				var long = parseFloat(coords[1]);
 				var z = parseInt(urlObject.query.z);
 				var point = esri.geometry.geographicToWebMercator(
-					new esri.geometry.Point(long, lat)
+						new esri.geometry.Point(long, lat)
 				);
-				map.centerAndZoom(point, z);
+
+				map.centerAndZoom(point, z)
+				return;
 			}
-			
+
 			function serviceCheck(){
 				let request = new XMLHttpRequest();
                 request.open("GET", vectorURL, false);
@@ -1602,14 +1634,14 @@
 				attachTo: "bottom-left",
 			});
 
-			map.on("layer-add-result", function (evt) {
-				// var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
-				// return {layer:layer.layer, title:layer.layer.name};
-				// });
-			});
+			// map.on("layer-add-result", function (evt) {
+			// 	// var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
+			// 	// return {layer:layer.layer, title:layer.layer.name};
+			// 	// });
+			// });
 
 			//Set up the legend and create an array of the layers that will show in the legend
-			var layerInfo = [];
+			//var layerInfo = [];
 			theLegend = new Legend({ map: map }, "legendDiv");
 			theLegend.layerInfos = layerInfo;
 
@@ -1915,6 +1947,7 @@
 					roadwaysLyr.setVisibility(false); //toggling the visibility prevents console errors related to trying to perform the query while the layer is redrawing (or because there are too many features to draw)
 				});
 
+				urlQuery()
 				//zoom-end definition queries for roadways moved to scaleDependentQueries()
 			}
 
@@ -3365,7 +3398,7 @@
 			function changeBaseMap(event) {
 				getBasemapLayers();
 				clearStyle("tocMaps");
-				var newMap = event.target.id;
+				newMap = event.target.id;
 				document.getElementById(newMap).style.color = "red";
 				map.removeLayer(layer0);
 				if (newMap == "TxDOT") {
@@ -3859,6 +3892,7 @@
 			}
 
 			function hideAllOverlays() {
+				console.log(borderCrossLyr)
 				activeOverlay = "";
 				if (aadtLyr) {
 					aadtLyr.hide();
@@ -4075,7 +4109,7 @@
 				}
 				clearLegendCanvas()
 				clearStyle("tocData");
-				map.graphics.clear();
+				!map.graphics ? null : map.graphics.clear();
 			}
 
 			dojo.query(".Overlay").forEach(function (result) {
@@ -4083,13 +4117,15 @@
 			});
 
 			function changeOverlay(event) {
+				console.log('hey')
+				console.log(event)
 				var tableText = "";
 				clearStyle("tocData");
 				hideAllOverlays();
 				map.infoWindow.hide();
 				map.infoWindow.resize(300, 270);
 				var theLayer = event.target.id;
-				layerInfo.length = 0;
+				//layerInfo.length = 0;
 
 				if (theLayer == "CLEAR") {
 					activeOverlay = "";
@@ -6353,6 +6389,7 @@
 
 		
 							map.addLayer(borderCrossLyr)
+							console.log('run')
 							map.infoWindow.resize(350, 350);
 							
 						}
@@ -8048,18 +8085,25 @@
 			document.getElementById("getCoordsDiv").style.width = "280px";
 			document.getElementById("getCoordsDiv").style.height = "240px";
 
+			let baseMapLayer = !newMap ? 'TxDOT' : newMap
+			let overlayNames = activeOverlaysArray.map((x) => document.getElementById(x).textContent)
 			var long = globalY;
 			var lat = globalX;
 			var zoom = map.getZoom();
+
+			let activeLayers = overlayNames.length > 0 ? overlayNames.join() : null
+			
+			url = overlayNames.length > 0 ? `${window.location.href}?coords=${long},${lat}&z=${zoom}&basemap=${baseMapLayer}&activelayers=${overlayNames.join()}` : `${window.location.href}?coords=${long},${lat}&z=${zoom}&basemap=${baseMapLayer}`
+			console.log(url)
 			//check if URL already has parameters and reset
-			if (window.location.href.indexOf("?") > -1) {
-				var index = window.location.href.indexOf("?");
-				var baseURL = window.location.href.slice(0, index);
-				url = baseURL + "?coords=" + long + "," + lat + "&z=" + zoom;
-			} else {
-				url =
-					window.location.href + "?coords=" + long + "," + lat + "&z=" + zoom;
-			}
+			// if (window.location.href.indexOf("?") > -1) {
+			// 	var index = window.location.href.indexOf("?");
+			// 	var baseURL = window.location.href.slice(0, index);
+			// 	url = baseURL + "?coords=" + long + "," + lat + "&z=" + zoom;
+			// } else {
+			// 	url =
+			// 		window.location.href + "?coords=" + long + "," + lat + "&z=" + zoom;
+			// }
 			document.getElementById("linkDisp").innerText = url;
 		}
 		function closegetCoordsDiv() {
